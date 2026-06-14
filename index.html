@@ -119,6 +119,28 @@
   .banner-card.b-muzan{background:linear-gradient(135deg,#050005,#1a001a,#4a0033,#8b0000,#050005); border:2px solid #cc0033; box-shadow:0 0 28px rgba(180,0,50,0.9); animation:muzan-glow 2s ease-in-out infinite alternate;}
   @keyframes muzan-glow{from{box-shadow:0 0 20px rgba(180,0,50,0.7);}to{box-shadow:0 0 55px rgba(220,0,60,1), 0 0 85px rgba(100,0,30,0.6), 0 0 110px rgba(255,50,100,0.2);}}
 
+  /* OVERLORD / AINZ STYLES */
+  .banner-card.b-overlord{
+    background:linear-gradient(135deg,#020008,#0a0020,#1a0040,#2a0060,#000010);
+    border:2px solid #8800ff; box-shadow:0 0 28px rgba(136,0,255,0.9);
+    animation:ainz-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes ainz-glow{
+    from{box-shadow:0 0 20px rgba(100,0,200,0.7), 0 0 30px rgba(0,0,50,0.5);}
+    to{box-shadow:0 0 60px rgba(136,0,255,1), 0 0 90px rgba(80,0,180,0.6), 0 0 120px rgba(50,0,100,0.3);}
+  }
+  .bar-shield{background:linear-gradient(90deg,#aa66ff,#6600cc);}
+  .ainz-goat-card{
+    background:linear-gradient(135deg,#0a0020,#1a0040); border-radius:10px;
+    border:2px solid #aa66ff; padding:6px; text-align:center;
+    box-shadow:0 0 10px rgba(136,0,255,0.5); margin:3px;
+  }
+  .ainz-raid-badge{
+    font-size:9px; font-weight:800; padding:2px 6px; border-radius:6px;
+    background:linear-gradient(90deg,#6600cc,#000033); color:#aa66ff;
+    border:1px solid #6600cc; display:inline-block;
+  }
+
 
   /* FUSION SYSTEM */
   .fusion-panel{
@@ -846,6 +868,35 @@ const HERO_DB = [
     base:{hp:200, atk:42, def:24, spd:14},
     skill:{name:"Earthen Slam — กำปั้นหินมรณะ", desc:"โจมตีเดี่ยว 210% ATK เจาะเกราะ 25% และเพิ่ม DEF ตัวเอง 20% 2 เทิร์น", power:2.1, type:"single_buff", cost:40},
     forms:[{name:"ไฮโระ ล่างที่สาม", emoji:"🪨💢"},{name:"ไฮโระ กำแพงหิน", emoji:"🪨💢🛡️"},{name:"ไฮโระ อสูรดินสมบูรณ์", emoji:"🪨💢🛡️⚡"}]},
+
+  // =============================================
+  // OVERLORD — อาณาจักรนาซาริック
+  // =============================================
+  // ---- Overlord Heroes (ผู้พิทักษ์แห่งนาซาริค) ----
+  {id:"ol_albedo", name:"อัลเบโด้ — หัวหน้าผู้พิทักษ์แห่งนาซาริค", emoji:"👼🖤", rarity:"legendary", element:"dark",
+    base:{hp:520, atk:72, def:65, spd:16},
+    skill:{name:"Heretic Destroyer ทำลายล้างผู้นอกรีต", desc:"โจมตีเดี่ยว 340% ATK เจาะเกราะ 40% + เพิ่ม DEF ทีมทั้งหมด 30% เป็น 2 เทิร์น", power:3.4, type:"single_def_buff_team", cost:62},
+    forms:[{name:"อัลเบโด้ ผู้พิทักษ์", emoji:"👼🖤"},{name:"อัลเบโด้ Black Valkyrie", emoji:"👼🖤⚔️"},{name:"อัลเบโด้ Overseer of all", emoji:"👼🖤⚔️👑"}]},
+  {id:"ol_shalltear", name:"ชาลเทียร์ บลัดฟอลเลน — แวมไพร์ผู้พิทักษ์แท้จริง", emoji:"🧛‍♀️🩸", rarity:"legendary", element:"dark",
+    base:{hp:460, atk:95, def:40, spd:22},
+    skill:{name:"Purifying Lance ทวนชำระล้างวิญญาณ", desc:"โจมตีเดี่ยว 450% ATK ดูดซับ HP 35% จากดาเมจ + เพิ่ม ATK ตัวเอง 40% เป็น 2 เทิร์น", power:4.5, type:"single_lifesteal", cost:70},
+    forms:[{name:"ชาลเทียร์ แวมไพร์", emoji:"🧛‍♀️🩸"},{name:"ชาลเทียร์ Blood Fury", emoji:"🧛‍♀️🩸⚡"},{name:"ชาลเทียร์ True Ancestor", emoji:"🧛‍♀️🩸⚡💀"}]},
+  {id:"ol_cocytus", name:"โคไซทัส — ผู้พิทักษ์ชั้น 5 นักรบน้ำแข็ง", emoji:"🦋❄️⚔️", rarity:"epic", element:"ice",
+    base:{hp:490, atk:85, def:50, spd:15},
+    skill:{name:"Frost Aura ออร่าน้ำแข็งมรณะ", desc:"โจมตีหมู่ 300% ATK + แช่แข็งศัตรูทั้งหมด 1 เทิร์น เพิ่ม DEF ตัวเอง 20%", power:3.0, type:"aoe_freeze", cost:58},
+    forms:[{name:"โคไซทัส ผู้พิทักษ์", emoji:"🦋❄️⚔️"},{name:"โคไซทัส Glacial Warrior", emoji:"🦋❄️⚔️🌀"},{name:"โคไซทัส Absolute Zero", emoji:"🦋❄️⚔️🌀💎"}]},
+  {id:"ol_demiurge", name:"เดมิเอิร์จ — ผู้พิทักษ์ชั้น 7 นักวางแผน", emoji:"😈🧠", rarity:"epic", element:"fire",
+    base:{hp:380, atk:78, def:38, spd:20},
+    skill:{name:"Hellfire Inferno ไฟนรกจากเดมิเอิร์จ", desc:"โจมตีหมู่ 280% ATK ติดไหม้ 3 เทิร์น ลด ATK ศัตรู 25%", power:2.8, type:"aoe_burn", cost:55},
+    forms:[{name:"เดมิเอิร์จ ผู้พิทักษ์", emoji:"😈🧠"},{name:"เดมิเอิร์จ Hellfire Demon", emoji:"😈🧠🔥"},{name:"เดมิเอิร์จ Mastermind", emoji:"😈🧠🔥👑"}]},
+  // ---- Ainz Ooal Gown — MYTHIC FUSION (ต้องการทุกตัวใน Overlord) ----
+  {id:"ol_ainz", name:"เอนซ์ โออัล กาวน์ — ราชาแห่งความตาย Overlord ★★★★★★", emoji:"💀👑🌑", rarity:"mythic", element:"dark",
+    base:{hp:1200, atk:220, def:90, spd:18},
+    skill:{name:"𝕾𝖚𝖒𝖒𝖔𝖓: Nazarick Goat Lords เรียกลูกแพะแห่งนาซาริค", desc:"เรียกลูกแพะ 3 ตัว ลูกแพะแต่ละตัวมี HP=120,000 ATK=22,000 โจมตีศัตรูทั้งหมดพร้อมกัน 10000% ATK! (Ainz ATK ×100)", power:100.0, type:"ainz_summon_goats", cost:90},
+    skill2:{name:"𝕾𝖚𝖒𝖒𝖔𝖓: Despair Aura V เกราะแห่งความสิ้นหวัง", desc:"[Passive + Active] สร้าง Shield ให้ทีมทั้งหมด = 100% Max HP ของ Ainz เป็นเกราะพิเศษ (หลอดเลือดชั้นที่ 2) ล้างทุกสถานะแย่ในทีม!", power:1.0, type:"ainz_team_shield", cost:80},
+    forms:[{name:"เอนซ์ นักผจญภัย", emoji:"💀👑🌑"},{name:"เอนซ์ Sorcerer King", emoji:"💀👑🌑⚡"},{name:"เอนซ์ TRUE OVERLORD", emoji:"💀👑🌑⚡🌌"}],
+    isFusion:true, fusionRequires:["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"], fusionType:"ainz",
+    isAinz:true},
 ];
 
 // ตัวละครจากโคลแลบ (นารูโตะ + มาดาระ) — ออกเฉพาะตู้ของตัวเอง
@@ -860,7 +911,9 @@ const DRAGONBALL_IDS = ["db_goku","db_vegeta","db_vegito","db_gogeta","db_piccol
 const DEMONSLAYER_IDS = ["ds_tanjiro","ds_giyu","ds_shinobu","ds_rengoku","ds_tengen","ds_mitsuri","ds_obanai","ds_himejima","ds_muichiro","ds_sanemi","ds_yoriichi"];
 // ตัวละคร Demon Slayer (ฝั่งอสูร) — ออกเฉพาะตู้อสูร
 const DEMON_IDS = ["dm_muzan","dm_kokushibo","dm_doma","dm_akaza","dm_hantengu","dm_gyutaro","dm_daki","dm_gyokko","dm_enmu","dm_rui","dm_kamanue","dm_mukago","dm_hairo"];
-const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id)).map(h => h.id);
+// ตัวละคร Overlord — ออกเฉพาะตู้ของตัวเอง (Ainz ได้จาก Fusion เท่านั้น)
+const OVERLORD_IDS = ["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"];
+const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id) && !OVERLORD_IDS.includes(h.id) && h.id !== 'ol_ainz').map(h => h.id);
 
 // Gacha banners
 const BANNERS = [
@@ -911,6 +964,11 @@ const BANNERS = [
    feature:"dm_muzan", cost:220, costType:"gem",
    pool: ["dm_muzan","dm_kokushibo","dm_doma","dm_akaza","dm_hantengu","dm_gyutaro","dm_daki","dm_gyokko","dm_enmu","dm_rui","dm_kamanue","dm_mukago","dm_hairo"],
    rateUp:"dm_muzan", mythicBanner:true, demonslayerBanner:true},
+  // ===== OVERLORD BANNER =====
+  {id:"overlord", name:"💀 ตู้ Overlord — ผู้พิทักษ์แห่งนาซาริค", cls:"b-overlord", desc:"สุ่มตัวละคร Overlord 4 ตัว! Rate Up: อัลเบโด้ ★★★★ + ชาลเทียร์ ★★★★ ⚠️ เอนซ์ โออัล กาวน์ ★★★★★★ ได้เฉพาะจาก Fusion เท่านั้น!",
+   feature:"ol_albedo", cost:200, costType:"gem",
+   pool: ["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"],
+   rateUp:"ol_albedo", mythicBanner:false, overlordBanner:true},
 ];
 
 // Stages: chapters with story / farm / boss
@@ -1085,6 +1143,11 @@ const STAGES = [
     {id:"raid-muzan-1", name:"🌑🩸 มุซัง — เลือดอสูรแรก", type:"raid", enemyLv:500, reward:{gold:40000, exp:18000, gem:3000}, enemies:["dm_muzan"], bossRate:0.05, story:"มุซังในร่างมนุษย์ปกติปรากฏตัว! ทุกการโจมตีของเขาฝังเลือดอสูรสร้างสถานะพิษถาวร! ต้องการทีม Legendary ขึ้นไปเท่านั้น! โอกาสดรอป 5%"},
     {id:"raid-muzan-2", name:"🌑💀👑 มุซัง ร่างสมบูรณ์แบบ — อสูรนิรันดร์", type:"raid", enemyLv:580, reward:{gold:65000, exp:28000, gem:4500}, enemies:["dm_muzan","dm_kokushibo"], bossRate:0.05, story:"มุซังปลดปล่อยร่างสมบูรณ์แบบ! พลังแห่งเลือดอสูรของเขาทำให้ฟื้นฟูตัวเองได้ไม่จำกัด! แสงอาทิตย์เท่านั้นที่หยุดเขาได้ — ต้องการทีม Mythic! โอกาสดรอป 5%"},
   ]},
+  // ===== OVERLORD RAID =====
+  {ch:"💀👑 โหมดพิเศษ OVERLORD: เอนซ์ โออัล กาวน์ — ราชาผู้ยิ่งใหญ่แห่งนาซาริค", stages:[
+    {id:"raid-ainz-1", name:"💀🏰 นาซาริค ชั้น 10 — ปราสาทแห่งความตาย", type:"raid", enemyLv:600, reward:{gold:50000, exp:22000, gem:3500}, enemies:["ol_albedo","ol_shalltear"], bossRate:0.08, story:"ผู้พิทักษ์สูงสุดแห่งนาซาริคปกป้องราชาของพวกเขา! อัลเบโด้และชาลเทียร์ยืนขวางทาง! โอกาสดรอปผู้พิทักษ์ 8% — ต้องการทีม Mythic!"},
+    {id:"raid-ainz-2", name:"💀👑🌑 เอนซ์ โออัล กาวน์ — ราชาแห่งความตาย TRUE OVERLORD", type:"raid", enemyLv:700, reward:{gold:80000, exp:35000, gem:5500}, enemies:["ol_ainz","ol_albedo"], bossRate:0.04, isAinzRaid:true, story:"เอนซ์ โออัล กาวน์ Sorcerer King of Ainz Ooal Gown ปรากฏตัวในร่างสมบูรณ์แบบ! มนตรา [The Goal of All Life is Death] ทำให้ทุกการโจมตีมีโอกาส Instant Kill! ลูกแพะแห่งนาซาริคล้อมรอบเขา! ต้องการทีม Fusion เท่านั้น! โอกาสดรอป: 🎲 ฆาตกร ✕ 4%"},
+  ]},
 ];
 
 // Special repeatable farming stages (always unlocked, for resource grinding)
@@ -1102,6 +1165,8 @@ const EQUIP_DB = [
   {id:"armor1", name:"เกราะหนัง", emoji:"🥋", slot:"armor", bonus:{def:6,hp:20}, rarity:"common"},
   {id:"armor2", name:"เกราะมังกร", emoji:"🛡️", slot:"armor", bonus:{def:15,hp:60}, rarity:"epic"},
   {id:"ring1", name:"แหวนแห่งความเร็ว", emoji:"💍", slot:"ring", bonus:{spd:5}, rarity:"rare"},
+  // Ainz Boss Drop — ของสะสมพิเศษเพื่อปลดล็อค Ainz Fusion
+  {id:"ainz_killer_shard", name:"ฆาตกร — ผลึกแห่งความตายจากเอนซ์", emoji:"💀🔮", slot:"weapon", bonus:{atk:999, def:500, hp:5000}, rarity:"mythic", isAinzDrop:true},
 ];
 
 /* ---------- GAME STATE (in-memory, resets on reload) ---------- */
@@ -1678,6 +1743,7 @@ function makeEnemy(heroId, lv){
     isAizen: heroId==='bl_aizen', // ไอเซ็นหลอกสายตาทีมศัตรู
     isIchigoBankai: heroId==='bl_ichigo_bankai', // อิจิโกะแบงไคโจมตีรวดเร็ว
     isFusion: heroId==='db_vegito'||heroId==='db_gogeta', // Fusion heroes
+    isAinz: heroId==='ol_ainz', // Ainz ใช้ Goats + Shield
   };
 }
 
@@ -1688,8 +1754,12 @@ function startBattle(stage, staminaCost){
     const stats = computeStats(u);
     const def = heroDef(u.heroId);
     return {
-      uid:u.uid, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji, rarity:def.rarity,
-      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, isEnemy:false, alive:true, level:u.level,
+      uid:u.uid, heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji, rarity:def.rarity,
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, skill2: def.skill2||null,
+      isEnemy:false, alive:true, level:u.level,
+      isAinz: !!def.isAinz,
+      isFusion: !!def.isFusion,
+      shield:0, maxshield:0,
     };
   });
   const enemyUnits = stage.enemies.map(eid=>makeEnemy(eid, stage.enemyLv));
@@ -1731,7 +1801,8 @@ function drawUnits(containerId, units){
     <div class="unit ${u.alive?'':'dead'}" id="${containerId}_${u.uid||u.name+units.indexOf(u)}_${units.indexOf(u)}">
       <div class="hero-emoji">${u.emoji}</div>
       <div class="bar-bg"><div class="bar-fill bar-hp" style="width:${Math.max(0,u.hp/u.maxhp*100)}%"></div></div>
-      <div style="font-size:9px;">${u.name}</div>
+      ${(u.shield && u.shield>0 && u.maxshield>0) ? `<div class="bar-bg" style="height:6px; margin-top:1px;"><div class="bar-fill bar-shield" style="width:${Math.max(0,Math.min(100,u.shield/u.maxshield*100))}%;"></div></div>` : ''}
+      <div style="font-size:9px;">${u.name}${(u.shield&&u.shield>0)?'🛡️':''}</div>
     </div>
   `).join('');
 }
@@ -1774,15 +1845,51 @@ function doAction(actor, allies, enemies, addLog){
   const skill = actor.skill;
   let dmgMul = useSkill ? skill.power : 1.0;
   let type = useSkill ? skill.type : (actor.isMadara ? 'madara_normal_aoe' : 'single');
-  if(useSkill){ actor.mp -= skill.cost; addLog(`✨ ${actor.name} ใช้สกิล [${skill.name}]!`); }
-  else if(actor.isMadara){ addLog(`🌑 มาดาระ ตีหมู่ด้วยพลังชาคระ!`); }
+  // Ainz: สลับสกิล 1 / สกิล 2 ทุกครั้งที่ MP เต็ม
+  const ainzHeroDef = actor.heroId ? heroDef(actor.heroId) : null;
+  const hasSkill2 = ainzHeroDef && ainzHeroDef.skill2 && actor.skill2;
+  if(useSkill && hasSkill2){
+    // สลับ toggle: odd = skill1, even = skill2
+    if(actor._ainzSkillToggle){
+      // ใช้สกิล 2
+      const sk2 = actor.skill2;
+      type = sk2.type;
+      dmgMul = sk2.power;
+      actor.mp -= skill.cost; // MP หักแล้วจาก skill.cost ก่อนหน้า แต่ต้องแก้ cost ให้ถูก
+      // Refund skill1 cost and apply skill2 cost
+      actor.mp += skill.cost;
+      actor.mp -= (sk2.cost||80);
+      addLog(`💜 ${actor.name} ใช้สกิล 2 [${sk2.name}]!`);
+    } else {
+      actor.mp -= skill.cost;
+      addLog(`✨ ${actor.name} ใช้สกิล [${skill.name}]!`);
+    }
+    actor._ainzSkillToggle = !actor._ainzSkillToggle;
+  } else if(useSkill){
+    actor.mp -= skill.cost;
+    addLog(`✨ ${actor.name} ใช้สกิล [${skill.name}]!`);
+  } else if(actor.isMadara){ addLog(`🌑 มาดาระ ตีหมู่ด้วยพลังชาคระ!`); }
   else if(actor.isFusion){ addLog(`💥 ${actor.name} โจมตีด้วยพลัง Fusion!`); }
 
   function dealDamage(target, mul, pen=0){
     const rawAtk = actor.atk * mul;
     const eff = Math.max(1, rawAtk - target.def*(1-pen));
     const dmg = Math.round(eff * (0.9+Math.random()*0.2));
-    target.hp = Math.max(0, target.hp - dmg);
+    // Shield absorbs damage first (Ainz Despair Aura)
+    if(target.shield && target.shield > 0){
+      if(dmg <= target.shield){
+        target.shield -= dmg;
+        addLog(`🛡️ เกราะแห่งความสิ้นหวังดูดซับ ${dmg} ดาเมจ! (Shield เหลือ ${Math.round(target.shield)})`);
+        return dmg;
+      } else {
+        const remain = dmg - target.shield;
+        addLog(`🛡️ เกราะแตก! ดาเมจส่วนเกิน ${Math.round(remain)} ลด HP!`);
+        target.shield = 0; target.maxshield = 0;
+        target.hp = Math.max(0, target.hp - remain);
+      }
+    } else {
+      target.hp = Math.max(0, target.hp - dmg);
+    }
     addLog(`${actor.emoji} ${actor.name} โจมตี ${target.emoji} ${target.name} ดาเมจ ${dmg}`);
     if(target.hp<=0 && target.alive){ target.alive=false; addLog(`💀 ${target.name} ถูกกำจัด!`); }
     return dmg;
@@ -1830,6 +1937,34 @@ function doAction(actor, allies, enemies, addLog){
       dealDamage(t, dmgMul);
       break;
     }
+    // ===== AINZ SPECIAL SKILLS =====
+    case 'ainz_summon_goats':{
+      // เรียกลูกแพะ 3 ตัว — แต่ละตัว HP/ATK = Ainz ×100
+      const ainzAtk = actor.atk || 220;
+      const ainzHp  = actor.maxhp || 1200;
+      const goatAtk = ainzAtk * 100;  // 10000%
+      const goatHp  = ainzHp  * 100;
+      addLog(`💀 ${actor.name} เรียกลูกแพะแห่งนาซาริค 3 ตัว! (ATK ${goatAtk.toLocaleString()}, HP ${goatHp.toLocaleString()})`);
+      for(let g=1;g<=3;g++){
+        const goatDmg = Math.max(1, goatAtk - (aliveEnemies[0]?.def||0)*0.5);
+        aliveEnemies.forEach(t=>{
+          t.hp -= goatDmg;
+          if(t.hp <= 0){ t.hp=0; t.alive=false; }
+        });
+        addLog(`🐐 ลูกแพะ #${g} โจมตีทุกศัตรู! ดาเมจ ${Math.round(goatDmg).toLocaleString()} ×${aliveEnemies.length} ศัตรู!`);
+      }
+      break;
+    }
+    case 'ainz_team_shield':{
+      // สร้างเกราะพิเศษให้ทีมทั้งหมด = 100% Ainz MaxHP
+      const shieldVal = actor.maxhp || 1200;
+      allyTeam.filter(u=>u.alive).forEach(u=>{
+        u.shield = (u.shield||0) + shieldVal;
+        u.maxshield = (u.maxshield||0) + shieldVal;
+      });
+      addLog(`🛡️ ${actor.name} สร้างเกราะ [Despair Aura V] ให้ทีมทั้งหมด! Shield +${shieldVal.toLocaleString()} HP ต่อคน!`);
+      break;
+    }
     case 'heal_single':{
       const aliveAllies = allyTeam.filter(u=>u.alive);
       const t = aliveAllies.reduce((a,b)=> a.hp/a.maxhp < b.hp/b.maxhp ? a:b);
@@ -1857,8 +1992,12 @@ function simulateBattleFast(stage, staminaCost){
     const u = getUnit(uid);
     const stats = computeStats(u);
     const def = heroDef(u.heroId);
-    return { name: def.forms[u.form].name, emoji: def.forms[u.form].emoji,
-      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, isEnemy:false, alive:true };
+    return {
+      heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji,
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, skill2: def.skill2||null,
+      isEnemy:false, alive:true, isAinz:!!def.isAinz, isFusion:!!def.isFusion,
+      shield:0, maxshield:0,
+    };
   });
   const enemies = stage.enemies.map(eid=>makeEnemy(eid, stage.enemyLv));
 
@@ -1924,14 +2063,20 @@ function showBattleResult(win, stage, allies){
     // boss stages have a chance to drop a bonus hero shard/unit
     let bossHero = null;
     if((stage.type==='boss'||stage.type==='raid') && stage.bossRate && Math.random()<stage.bossRate){
-      const bossDef = heroDef(stage.enemies[0]);
-      bossHero = bossDef;
-      let existing = state.roster.find(r=>r.heroId===bossDef.id);
-      if(existing){
-        existing.dupes++;
-        if(existing.dupes % 3 === 0 && existing.form < bossDef.forms.length-1) existing.form++;
+      // Ainz Raid drops "ฆาตกร" item instead of hero
+      if(stage.isAinzRaid){
+        state.inventory['ainz_killer_shard'] = (state.inventory['ainz_killer_shard']||0)+1;
+        bossHero = {name:"ฆาตกร", emoji:"💀🔮", rarity:"mythic", isAinzItem:true};
       } else {
-        addStarterHero(bossDef.id, 0);
+        const bossDef = heroDef(stage.enemies[0]);
+        bossHero = bossDef;
+        let existing = state.roster.find(r=>r.heroId===bossDef.id);
+        if(existing){
+          existing.dupes++;
+          if(existing.dupes % 3 === 0 && existing.form < bossDef.forms.length-1) existing.form++;
+        } else {
+          addStarterHero(bossDef.id, 0);
+        }
       }
     }
 
@@ -1950,7 +2095,7 @@ function showBattleResult(win, stage, allies){
         <div style="font-size:48px;">🏆</div>
         <p>ได้รับ: 🪙 ${goldGain} ${gemGain?('• 💎 '+gemGain):''} • EXP ${expGain} (ทุกคนในทีม)</p>
         ${dropEquip?`<p>🎁 ดรอปไอเทม: ${dropEquip.emoji} ${dropEquip.name} <span style="color:#9dff9d;">(เข้าคลังแล้ว ✓)</span></p>`:''}
-        ${bossHero?`<p style="color:${bossHero.rarity==='mythic'?'#ff2a6d':'var(--legend)'}; font-weight:${bossHero.rarity==='mythic'?'800':'400'};">${bossHero.rarity==='mythic'?'🌑☄️ ดรอปตำนาน!! ':'🌟 บอสดรอปฮีโร่: '}${bossHero.emoji} ${bossHero.name}${bossHero.rarity==='mythic'?' ★★★★★ เข้าคลังแล้ว!':'!'}</p>`:''}
+        ${bossHero?`<p style="color:${bossHero.rarity==='mythic'?'#bb88ff':'var(--legend)'}; font-weight:${bossHero.rarity==='mythic'?'800':'400'};">${bossHero.isAinzItem?'💀🔮 ดรอปพิเศษ!! ':bossHero.rarity==='mythic'?'🌑☄️ ดรอปตำนาน!! ':'🌟 บอสดรอปฮีโร่: '}${bossHero.emoji} ${bossHero.name}${bossHero.isAinzItem?' เข้าคลังแล้ว! (ใช้ Fusion เอนซ์ได้เลย 🔮)':bossHero.rarity==='mythic'?' ★★★★★ เข้าคลังแล้ว!':'!'}</p>`:''}
         ${stage.type==='raid' && !bossHero?`<p class="small-muted" style="color:#888;">💨 บอสหลบหนีไป... (โอกาส ${Math.round((stage.bossRate||0)*100)}%) ลองใหม่อีกครั้ง!</p>`:''}
 
         <!-- AUTO-REPLAY SECTION -->
@@ -2570,6 +2715,9 @@ function renderFusionPanel(){
   const fusionTarget = document.getElementById('fusionTabBody') || content;
   fusionTarget.appendChild(panel);
 
+  // Ainz Fusion panel
+  renderAinzFusionPanel(fusionTarget);
+
   // Fusion buttons
   const vBtn = panel.querySelector('#fusionVegitoBtn');
   const gBtn = panel.querySelector('#fusionGogetaBtn');
@@ -2636,6 +2784,148 @@ function doYoriichiFusion(){
   });
 }
 
+/* ============================================================
+   AINZ FUSION SYSTEM — Overlord
+   ============================================================ */
+function hasAinzIngredients(){
+  const ainzDef = heroDef('ol_ainz');
+  return ainzDef.fusionRequires.every(id => !!state.roster.find(r=>r.heroId===id));
+}
+function hasAinzItem(){
+  return (state.inventory['ainz_killer_shard']||0) > 0;
+}
+function hasAinz(){
+  return !!state.roster.find(r=>r.heroId==='ol_ainz');
+}
+
+function renderAinzFusionPanel(container){
+  const oldPanel = document.getElementById('ainzFusionPanel');
+  if(oldPanel) oldPanel.remove();
+
+  const ainzDef = heroDef('ol_ainz');
+  const ingredientDefs = ainzDef.fusionRequires.map(id=>heroDef(id));
+  const hasIngredients = hasAinzIngredients();
+  const hasItem = hasAinzItem();
+  const canFuse = hasIngredients && hasItem;
+  const alreadyHas = hasAinz();
+  const itemCount = state.inventory['ainz_killer_shard']||0;
+
+  const panel = document.createElement('div');
+  panel.id = 'ainzFusionPanel';
+  panel.style.cssText = `
+    background:linear-gradient(135deg,#020008,#0a001a,#1a0035,#000010);
+    border-radius:14px; padding:14px; border:2px solid #8800ff;
+    box-shadow:0 0 30px rgba(136,0,255,0.7); margin:16px 0;
+    animation:ainz-glow 2s ease-in-out infinite alternate;
+  `;
+  panel.innerHTML = `
+    <h3 style="color:#bb88ff; font-size:15px; margin-bottom:4px; text-shadow:0 0 10px rgba(136,0,255,0.8);">
+      💀👑 ระบบ Fusion — เอนซ์ โออัล กาวน์ TRUE OVERLORD
+    </h3>
+    <p class="small-muted" style="margin-bottom:10px; font-size:11px; color:#9966cc;">
+      ต้องการผู้พิทักษ์แห่งนาซาริคทั้ง 4 ตัว + <b style="color:#bb88ff;">💀🔮 ฆาตกร (ดรอปจาก Raid เอนซ์)</b> 1 ชิ้น!
+    </p>
+
+    <!-- ส่วนแสดงผลวัตถุดิบ -->
+    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; margin:10px 0;">
+      ${ingredientDefs.map(d=>{
+        const owned = !!state.roster.find(r=>r.heroId===d.id);
+        return `
+          <div style="text-align:center; background:rgba(0,0,0,0.4); border-radius:10px; padding:6px 8px;
+            border:2px solid ${owned?'#8800ff':'#333'}; min-width:58px;">
+            <div style="font-size:26px;">${d.emoji}</div>
+            <div style="font-size:9px; color:${owned?'#bb88ff':'#888'};">${owned?'✓ มี':'ต้องการ'}</div>
+            <div style="font-size:8px; color:#aaa;">${d.name.split(' ')[0].replace('—','')}</div>
+          </div>
+        `;
+      }).join('')}
+      <div style="font-size:22px; color:#8800ff; font-weight:800;">+</div>
+      <div style="text-align:center; background:rgba(0,0,0,0.4); border-radius:10px; padding:6px 8px;
+        border:2px solid ${hasItem?'#bb88ff':'#333'}; min-width:58px;">
+        <div style="font-size:26px;">💀🔮</div>
+        <div style="font-size:9px; color:${hasItem?'#bb88ff':'#888'};">${hasItem?('มี ×'+itemCount):'ยังไม่มี'}</div>
+        <div style="font-size:8px; color:#aaa;">ฆาตกร</div>
+      </div>
+      <div style="font-size:22px; color:#8800ff;">→</div>
+      <div style="text-align:center; background:linear-gradient(135deg,rgba(136,0,255,0.25),rgba(0,0,30,0.8));
+        border-radius:10px; padding:8px; border:2px solid #8800ff; min-width:70px;
+        box-shadow:0 0 16px rgba(136,0,255,0.5); ${alreadyHas?'':'filter:brightness(0.4)'}">
+        <div style="font-size:32px;">${ainzDef.emoji}</div>
+        <div style="font-size:9px; font-weight:800; padding:1px 5px; border-radius:5px; background:linear-gradient(90deg,#6600cc,#440088); color:#bb88ff; margin-top:3px;">★★★★★★</div>
+        <div style="font-size:9px; margin-top:2px; color:#bb88ff;">เอนซ์</div>
+      </div>
+    </div>
+
+    <!-- Skill Preview -->
+    <div style="background:rgba(0,0,0,0.4); border-radius:8px; padding:8px; margin:8px 0; border-left:3px solid #8800ff;">
+      <div style="font-size:11px; font-weight:700; color:#bb88ff; margin-bottom:4px;">📖 สกิลพิเศษของเอนซ์</div>
+      <div style="font-size:10px; color:#9966cc; margin-bottom:3px;">
+        <b>🐐 สกิล 1 — Summon: Goat Lords</b><br>
+        เรียกลูกแพะ 3 ตัว มี HP และ ATK มากกว่าเอนซ์ 10,000%! (100×) โจมตีศัตรูทั้งหมดพร้อมกัน
+      </div>
+      <div style="font-size:10px; color:#9966cc;">
+        <b>🛡️ สกิล 2 — Despair Aura V</b><br>
+        สร้างเกราะพิเศษ (Shield Bar) ให้ทีมทั้งหมด = 100% Max HP ของเอนซ์ เหมือนมีหลอดเลือดเพิ่มอีกหนึ่งหลอด!
+      </div>
+    </div>
+
+    ${alreadyHas
+      ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-bottom:6px;">✅ เอนซ์ โออัล กาวน์ ปลดล็อกแล้ว! Fusion ซ้ำเพื่อเพิ่ม Dupe!</div>
+         <button class="btn" id="ainzFusionBtn" style="width:100%; background:linear-gradient(180deg,#aa66ff,#6600cc); color:#fff; box-shadow:0 3px 0 #330066;"
+           ${!canFuse?'disabled':''}>
+           💀 OVERLORD Fusion! ${!canFuse?`(${!hasIngredients?'ผู้พิทักษ์ไม่ครบ ':''}${!hasItem?'ขาด 💀🔮 ฆาตกร':''})`:'(Dupe เพิ่ม)'}
+         </button>`
+      : `<button class="btn" id="ainzFusionBtn" style="width:100%; background:linear-gradient(180deg,#aa66ff,#6600cc); color:#fff; box-shadow:0 3px 0 #330066;"
+           ${!canFuse?'disabled':''}>
+           💀 OVERLORD Fusion! ${!canFuse?`(${!hasIngredients?'ผู้พิทักษ์ไม่ครบ':''} ${!hasItem?'• ขาด 💀🔮 ฆาตกร':''})`:'สร้างเอนซ์ ★★★★★★!'}
+         </button>`
+    }
+    <p class="small-muted" style="margin-top:6px; font-size:10px; text-align:center; color:#6644aa;">
+      ⚠️ ผู้พิทักษ์ทั้ง 4 และ ฆาตกร 1 ชิ้นจะถูกใช้ไปในการ Fusion (หายจากคลัง)
+      <br>รับ 💀🔮 ฆาตกร จากเรด: เอนซ์ โออัล กาวน์ — ราชาแห่งความตาย
+    </p>
+  `;
+  container.appendChild(panel);
+
+  const ainzBtn = panel.querySelector('#ainzFusionBtn');
+  if(ainzBtn) ainzBtn.onclick = ()=> doAinzFusion();
+}
+
+function doAinzFusion(){
+  const id = 'ol_ainz';
+  const def = heroDef(id);
+  if(!hasAinzIngredients()){ showToast("ต้องการผู้พิทักษ์แห่งนาซาริคทั้ง 4 ตัวก่อน!"); return; }
+  if(!hasAinzItem()){ showToast("ต้องการ 💀🔮 ฆาตกร 1 ชิ้น! (ดรอปจากเรด Ainz)"); return; }
+
+  showConfirm(
+    `ใช้ Fusion สร้าง "${def.emoji} ${def.name}"?\n<b style="color:#ff8888;">อัลเบโด้ + ชาลเทียร์ + โคไซทัส + เดมิเอิร์จ + 💀🔮 ฆาตกร จะหายไป</b>\nเอนซ์จะถูกเพิ่มในคลัง ★★★★★★!`,
+    ()=>{
+      // remove all 4 guardian heroes
+      def.fusionRequires.forEach(heroId=>{
+        const idx = state.roster.findIndex(r=>r.heroId===heroId);
+        if(idx !== -1){
+          const uid = state.roster[idx].uid;
+          for(let i=0;i<state.team.length;i++){ if(state.team[i]===uid) state.team[i]=null; }
+          state.roster.splice(idx,1);
+        }
+      });
+      // consume ainz item
+      state.inventory['ainz_killer_shard']--;
+
+      const existing = state.roster.find(r=>r.heroId===id);
+      if(existing){
+        existing.dupes++;
+        if(existing.dupes % 3 === 0 && existing.form < def.forms.length-1) existing.form++;
+        showToast(`💀 เอนซ์ ได้รับ Dupe! (${existing.dupes} dupes) — ลูกแพะแข็งแกร่งขึ้น!`);
+      } else {
+        addStarterHero(id, 0);
+        showToast(`💀👑🌌 เอนซ์ โออัล กาวน์ ★★★★★★ TRUE OVERLORD ปลดล็อกสำเร็จ!! เพิ่มในทีมทันที!`);
+      }
+      if(activeTab==='fusion') renderFusionTab(); else renderTeam();
+    }
+  );
+}
+
 /* ---------- PLAYER PROFILES (Local) ---------- */
 const PROFILES_KEY = "hero_collector_profiles_v1";
 let currentProfile = null;
@@ -2686,6 +2976,9 @@ function loadGame(){
     if(!state.team) state.team = [null,null,null,null,null,null];
     if(!state.pity) state.pity = {};
     BANNERS.forEach(b=>{ if(state.pity[b.id]==null) state.pity[b.id]=0; });
+    // อัปเดตคลัง Ainz item field
+    if(!state.inventory) state.inventory = {};
+    if(state.inventory['ainz_killer_shard'] == null) state.inventory['ainz_killer_shard'] = 0;
     // ===================================================
     return true;
   }catch(e){ return false; }
