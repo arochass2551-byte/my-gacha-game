@@ -1,0 +1,2775 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hero Collector - Gacha RPG</title>
+<style>
+  :root{
+    --bg1:#0f0c29; --bg2:#302b63; --bg3:#24243e;
+    --gold:#ffd86b; --epic:#b15bff; --rare:#5bb8ff; --common:#9fb3c8; --legend:#ff9d3a;
+    --hp:#ff5d6c; --mp:#5dc8ff;
+    --mythic:#ff2a6d;
+    --panel:rgba(20,18,40,0.85);
+    --panel2:rgba(40,35,75,0.9);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Segoe UI', 'Trebuchet MS', sans-serif;
+    background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%,var(--bg3));
+    color:#fff; min-height:100vh; overflow-x:hidden;
+  }
+  #app{max-width:480px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; position:relative;}
+
+  /* TOP BAR */
+  #topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 12px; background:var(--panel); backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(255,255,255,0.08); position:sticky; top:0; z-index:50;
+  }
+  .currency{display:flex; gap:10px; font-size:13px; font-weight:600;}
+  .currency span{display:flex; align-items:center; gap:4px; background:rgba(0,0,0,0.25); padding:3px 8px; border-radius:12px;}
+  .gem{color:#7be3ff;} .gold{color:var(--gold);} .stamina{color:#9dff9d;}
+  #title{font-weight:800; font-size:15px; letter-spacing:1px; background:linear-gradient(90deg,var(--gold),#ff8de0); -webkit-background-clip:text; background-clip:text; color:transparent;}
+
+  /* MAIN CONTENT */
+  #content{flex:1; padding:12px 12px 90px 12px; animation:fadein 0.25s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+  /* BOTTOM NAV */
+  #navbar{
+    position:fixed; bottom:0; left:0; right:0; max-width:480px; margin:0 auto;
+    display:flex; background:var(--panel); border-top:1px solid rgba(255,255,255,0.1);
+    backdrop-filter:blur(8px); z-index:50;
+  }
+  .navbtn{flex:1; text-align:center; padding:10px 2px 8px; cursor:pointer; font-size:11px; color:#cfcfe8; transition:0.2s; user-select:none;}
+  .navbtn .ic{font-size:20px; display:block;}
+  .navbtn.active{color:var(--gold); background:rgba(255,255,255,0.06);}
+
+  h2.section-title{font-size:16px; margin-bottom:10px; color:var(--gold); border-left:4px solid var(--gold); padding-left:8px;}
+
+  /* CARDS GENERAL */
+  .card{background:var(--panel2); border-radius:12px; padding:10px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.06);}
+
+  /* RARITY COLORS / FRAMES */
+  .rarity-common{ --rc: var(--common); }
+  .rarity-rare{ --rc: var(--rare); }
+  .rarity-epic{ --rc: var(--epic); }
+  .rarity-legendary{ --rc: var(--legend); }
+  .rarity-mythic{ --rc: var(--mythic); }
+
+  .hero-tile{
+    position:relative; border-radius:10px; overflow:hidden; aspect-ratio:1/1.15;
+    border:2px solid var(--rc, #888); background:linear-gradient(160deg,#1c1c34,#34304f);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    cursor:pointer; transition:transform 0.15s;
+  }
+  .hero-tile:active{transform:scale(0.95);}
+  .hero-tile.locked{filter:grayscale(0.8) brightness(0.5); cursor:default;}
+  .hero-emoji{font-size:46px; margin-top:8px;}
+  .hero-name{font-size:11px; font-weight:700; text-align:center; padding:2px 4px; width:100%; background:rgba(0,0,0,0.45);}
+  .hero-lvl{position:absolute; top:3px; left:3px; background:rgba(0,0,0,0.6); font-size:10px; padding:1px 5px; border-radius:8px;}
+  .hero-stars{position:absolute; top:3px; right:3px; font-size:10px; color:var(--rc); font-weight:800; text-shadow:0 0 4px #000;}
+  .rarity-badge{
+    font-size:9px; font-weight:800; padding:1px 6px; border-radius:6px; color:#1a1a2e; text-transform:uppercase;
+    background:var(--rc); display:inline-block;
+  }
+
+  /* GRID */
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  .grid4{display:grid; grid-template-columns:repeat(4,1fr); gap:6px;}
+
+  /* BUTTONS */
+  .btn{
+    border:none; border-radius:10px; padding:10px 16px; font-weight:700; font-size:13px;
+    cursor:pointer; transition:0.15s; color:#1a1a2e;
+    background:linear-gradient(180deg,#ffe9a8,var(--gold));
+    box-shadow:0 3px 0 #b3852f;
+  }
+  .btn:active{transform:translateY(2px); box-shadow:0 1px 0 #b3852f;}
+  .btn.secondary{background:linear-gradient(180deg,#9adfff,var(--rare)); box-shadow:0 3px 0 #2b6fa3; color:#0a1a2e;}
+  .btn.danger{background:linear-gradient(180deg,#ff9d9d,#ff5d6c); box-shadow:0 3px 0 #a32b2b;}
+  .btn:disabled{opacity:0.4; cursor:not-allowed; box-shadow:none;}
+  .btn-row{display:flex; gap:8px; flex-wrap:wrap;}
+
+  /* BANNER SELECTION */
+  .banner-card{
+    border-radius:14px; padding:14px; margin-bottom:12px; position:relative; overflow:hidden;
+    border:2px solid rgba(255,255,255,0.15); background-size:cover; background-position:center;
+  }
+  .banner-card.b-fire{background:linear-gradient(135deg,#ff5e62,#ff9966);}
+  .banner-card.b-ice{background:linear-gradient(135deg,#4e54c8,#8f94fb);}
+  .banner-card.b-nature{background:linear-gradient(135deg,#11998e,#38ef7d);}
+  .banner-card.b-dark{background:linear-gradient(135deg,#3a1c71,#d76d77);}
+  .banner-card.b-naruto{background:linear-gradient(135deg,#ff6b00,#ff9d3a,#ffd86b); border:2px solid #ff6b00; box-shadow:0 0 18px rgba(255,107,0,0.5);}
+  .banner-card.b-madara{background:linear-gradient(135deg,#1a0010,#6b0028,#ff2a6d,#1a0010); border:2px solid #ff2a6d; box-shadow:0 0 24px rgba(255,42,109,0.7); animation:madara-glow 2s ease-in-out infinite alternate;}
+  @keyframes madara-glow{from{box-shadow:0 0 18px rgba(255,42,109,0.6);}to{box-shadow:0 0 40px rgba(255,42,109,1), 0 0 60px rgba(255,42,109,0.4);}}
+  .banner-card.b-onepiece{background:linear-gradient(135deg,#003b8e,#0077cc,#ffd700,#ff4500); border:2px solid #ffd700; box-shadow:0 0 22px rgba(255,215,0,0.6); animation:onepiece-glow 2s ease-in-out infinite alternate;}
+  @keyframes onepiece-glow{from{box-shadow:0 0 16px rgba(255,215,0,0.5);}to{box-shadow:0 0 38px rgba(255,215,0,1), 0 0 55px rgba(255,69,0,0.4);}}
+  .banner-card.b-bleach{background:linear-gradient(135deg,#0a0a1a,#1a1a3e,#4a0080,#8b00ff,#ffffff22); border:2px solid #8b00ff; box-shadow:0 0 22px rgba(139,0,255,0.7); animation:bleach-glow 2s ease-in-out infinite alternate;}
+  @keyframes bleach-glow{from{box-shadow:0 0 16px rgba(139,0,255,0.5);}to{box-shadow:0 0 38px rgba(139,0,255,1), 0 0 60px rgba(255,255,255,0.2);}}
+  .banner-card.b-bleach-aizen{background:linear-gradient(135deg,#0a0005,#3a0050,#7700cc,#ff00ff44,#0a0005); border:2px solid #cc00ff; box-shadow:0 0 26px rgba(204,0,255,0.8); animation:aizen-glow 2s ease-in-out infinite alternate;}
+  @keyframes aizen-glow{from{box-shadow:0 0 20px rgba(204,0,255,0.6);}to{box-shadow:0 0 50px rgba(204,0,255,1), 0 0 80px rgba(139,0,255,0.5), 0 0 100px rgba(255,0,200,0.2);}}
+  .banner-card.b-dragonball{background:linear-gradient(135deg,#1a0a00,#ff6600,#ffa500,#ffe066,#ffffff22); border:2px solid #ff8c00; box-shadow:0 0 22px rgba(255,140,0,0.8); animation:db-glow 2s ease-in-out infinite alternate;}
+  @keyframes db-glow{from{box-shadow:0 0 16px rgba(255,140,0,0.6);}to{box-shadow:0 0 42px rgba(255,200,0,1), 0 0 65px rgba(255,100,0,0.5);}}
+  .banner-card.b-demonslayer{background:linear-gradient(135deg,#0a0a14,#1a2a3a,#2d6e5c,#88e0c0,#0a0a14); border:2px solid #5fe0c0; box-shadow:0 0 22px rgba(95,224,192,0.7); animation:ds-glow 2s ease-in-out infinite alternate;}
+  @keyframes ds-glow{from{box-shadow:0 0 16px rgba(95,224,192,0.5);}to{box-shadow:0 0 40px rgba(95,224,192,1), 0 0 60px rgba(255,255,255,0.3);}}
+  .banner-card.b-yoriichi{background:linear-gradient(135deg,#1a0a00,#3a1a00,#ff4400,#ffee00,#ffffff); border:2px solid #ffcc00; box-shadow:0 0 28px rgba(255,180,0,0.9); animation:yoriichi-glow 2s ease-in-out infinite alternate;}
+  @keyframes yoriichi-glow{from{box-shadow:0 0 20px rgba(255,180,0,0.7);}to{box-shadow:0 0 55px rgba(255,220,0,1), 0 0 85px rgba(255,80,0,0.5), 0 0 110px rgba(255,255,255,0.2);}}
+  .banner-card.b-muzan{background:linear-gradient(135deg,#050005,#1a001a,#4a0033,#8b0000,#050005); border:2px solid #cc0033; box-shadow:0 0 28px rgba(180,0,50,0.9); animation:muzan-glow 2s ease-in-out infinite alternate;}
+  @keyframes muzan-glow{from{box-shadow:0 0 20px rgba(180,0,50,0.7);}to{box-shadow:0 0 55px rgba(220,0,60,1), 0 0 85px rgba(100,0,30,0.6), 0 0 110px rgba(255,50,100,0.2);}}
+
+
+  /* FUSION SYSTEM */
+  .fusion-panel{
+    background:linear-gradient(135deg,#1a0a00,#3a1500,#5a2800); border-radius:14px; padding:14px;
+    border:2px solid #ff8c00; box-shadow:0 0 20px rgba(255,140,0,0.5); margin:12px 0;
+    animation:db-glow 2s ease-in-out infinite alternate;
+  }
+  .fusion-panel h3{color:#ffcc00; font-size:15px; margin-bottom:8px; text-shadow:0 0 8px rgba(255,200,0,0.6);}
+  .fusion-slot-row{display:flex; align-items:center; justify-content:center; gap:10px; margin:10px 0;}
+  .fusion-hero-box{
+    width:68px; text-align:center; background:rgba(0,0,0,0.4); border-radius:10px; padding:8px 4px;
+    border:2px solid rgba(255,140,0,0.4);
+  }
+  .fusion-hero-box.has{border-color:#ffcc00;}
+  .fusion-plus{font-size:24px; color:#ffcc00; font-weight:800; text-shadow:0 0 8px #ff8c00;}
+  .fusion-arrow{font-size:22px; color:#ffcc00;}
+  .fusion-result-box{
+    width:80px; text-align:center; background:linear-gradient(135deg,rgba(255,150,0,0.25),rgba(100,0,255,0.15));
+    border-radius:10px; padding:8px 4px; border:2px solid #ffcc00;
+    box-shadow:0 0 12px rgba(255,200,0,0.4);
+  }
+  .fusion-locked{filter:grayscale(1) brightness(0.4);}
+  .mythic-plus-badge{
+    font-size:9px; font-weight:800; padding:2px 6px; border-radius:6px; color:#1a1a2e; text-transform:uppercase;
+    background:linear-gradient(90deg,#ffcc00,#ff8c00); display:inline-block; margin-top:2px;
+  }
+
+  /* RAID BOSS */
+  .stage-item.raid{border-color:#ff2a6d; box-shadow:0 0 16px rgba(255,42,109,0.5); animation:raid-pulse 2s ease-in-out infinite alternate;}
+  @keyframes raid-pulse{from{box-shadow:0 0 10px rgba(255,42,109,0.4);}to{box-shadow:0 0 25px rgba(255,42,109,0.9);}}
+  .banner-card h3{font-size:16px; text-shadow:0 1px 4px #000;}
+  .banner-card p{font-size:11px; opacity:0.9; margin:4px 0 10px; text-shadow:0 1px 3px #000;}
+  .banner-feature{display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;}
+  .feat-emoji{font-size:28px; background:rgba(0,0,0,0.35); border-radius:50%; width:46px; height:46px; display:flex; align-items:center; justify-content:center; border:2px solid var(--legend);}
+
+  /* STAGE LIST */
+  .stage-item{
+    display:flex; align-items:center; justify-content:space-between; padding:10px 12px;
+    border-radius:10px; margin-bottom:8px; background:var(--panel2); border:1px solid rgba(255,255,255,0.06);
+  }
+  .stage-item.locked{opacity:0.45;}
+  .stage-item.boss{border-color:var(--legend); box-shadow:0 0 10px rgba(255,157,58,0.3);}
+  .stage-item.goldfarm{border-color:var(--gold); box-shadow:0 0 8px rgba(255,216,107,0.2);}
+  .stage-item.gemfarm{border-color:#7be3ff; box-shadow:0 0 8px rgba(123,227,255,0.25);}
+  .stage-stars{font-size:11px; color:var(--gold);}
+  .chapter-title{font-size:13px; color:#c9c9ff; margin:14px 0 6px; opacity:0.8; text-transform:uppercase; letter-spacing:1px;}
+
+  /* TEAM SLOTS */
+  .team-slots{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;}
+  .team-slot{
+    aspect-ratio:1/1.15; border-radius:10px; border:2px dashed rgba(255,255,255,0.25);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:28px; color:rgba(255,255,255,0.3);
+    background:rgba(0,0,0,0.2);
+  }
+  .team-slot.filled{border-style:solid;}
+
+  /* MODAL */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center;
+    z-index:600; padding:16px; animation:fadein 0.2s;
+  }
+  .modal{
+    background:linear-gradient(160deg,#23213d,#34304f); border-radius:16px; padding:16px; max-width:420px; width:100%;
+    max-height:85vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.1);
+  }
+  .modal h3{margin-bottom:8px; color:var(--gold);}
+  .modal-close{float:right; cursor:pointer; font-size:20px; color:#aaa;}
+
+  /* GACHA RESULT */
+  #gachaResults{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:12px 0;}
+  .pull-card{
+    aspect-ratio:1/1.2; border-radius:10px; border:2px solid var(--rc,#888);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#1c1c34,#34304f); animation:popin 0.4s ease;
+    position:relative;
+  }
+  .pull-card.new::after{content:"NEW"; position:absolute; top:2px; right:2px; background:#ff5d6c; font-size:8px; padding:1px 4px; border-radius:4px; font-weight:800;}
+  @keyframes popin{from{transform:scale(0.4) rotate(-10deg); opacity:0;} to{transform:scale(1) rotate(0); opacity:1;}}
+  .pull-card .hero-emoji{font-size:38px;}
+
+  /* PROGRESS BARS */
+  .bar-bg{width:100%; height:8px; background:rgba(0,0,0,0.4); border-radius:6px; overflow:hidden; margin:3px 0;}
+  .bar-fill{height:100%; border-radius:6px; transition:width 0.4s;}
+  .bar-hp{background:linear-gradient(90deg,#ff8a8a,var(--hp));}
+  .bar-mp{background:linear-gradient(90deg,#9adfff,var(--mp));}
+  .bar-xp{background:linear-gradient(90deg,#ffe9a8,var(--gold));}
+
+  /* BATTLE SCREEN */
+  .battle-row{display:flex; gap:6px; margin-bottom:10px; justify-content:center;}
+  .unit{
+    width:62px; text-align:center; font-size:10px; position:relative; transition:0.2s;
+  }
+  .unit .hero-emoji{font-size:32px; display:block; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.5));}
+  .unit.dead{opacity:0.25; filter:grayscale(1);}
+  .unit.acting{transform:scale(1.25); z-index:5;}
+  .unit.hit{animation:shake 0.3s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-4px);}75%{transform:translateX(4px);}}
+  .dmg-float{
+    position:absolute; top:-10px; left:50%; transform:translateX(-50%); font-weight:800; font-size:12px;
+    color:#ff5d6c; animation:floatup 0.8s ease forwards; pointer-events:none;
+  }
+  .dmg-float.heal{color:#9dff9d;}
+  @keyframes floatup{from{opacity:1; top:0;} to{opacity:0; top:-30px;}}
+  #battleLog{
+    background:rgba(0,0,0,0.35); border-radius:8px; padding:8px; font-size:11px; height:90px; overflow-y:auto;
+    margin-top:8px; line-height:1.5;
+  }
+  #battleLog div{opacity:0.85;}
+
+  /* TOAST */
+  #toast{
+    position:fixed; bottom:78px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85);
+    padding:8px 16px; border-radius:20px; font-size:12px; z-index:300; opacity:0; transition:0.3s; pointer-events:none;
+    border:1px solid var(--gold);
+  }
+  #toast.show{opacity:1;}
+
+  .small-muted{font-size:11px; color:#aaa;}
+  .row-between{display:flex; justify-content:space-between; align-items:center;}
+  .skill-card{background:rgba(0,0,0,0.3); border-radius:8px; padding:8px; margin-bottom:6px; border-left:3px solid var(--rare);}
+  .equip-slot{
+    width:48px; height:48px; border-radius:8px; border:2px dashed rgba(255,255,255,0.25);
+    display:flex; align-items:center; justify-content:center; font-size:22px; cursor:pointer; background:rgba(0,0,0,0.25);
+  }
+  .equip-slot.filled{border-style:solid; border-color:var(--rare);}
+  ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:#555; border-radius:4px;}
+
+  /* AUTO-REPLAY STYLES */
+  .auto-replay-box{
+    background:rgba(0,0,0,0.35); border-radius:12px; padding:10px 12px; margin:10px 0;
+    border:1px solid rgba(123,227,255,0.3);
+  }
+  .auto-replay-box h4{font-size:13px; color:#7be3ff; margin-bottom:8px; display:flex; align-items:center; gap:6px;}
+  .repeat-selector{display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:8px;}
+  .repeat-selector button{
+    background:rgba(255,255,255,0.12); border:none; border-radius:8px; color:#fff;
+    width:32px; height:32px; font-size:18px; cursor:pointer; font-weight:700; transition:0.15s;
+  }
+  .repeat-selector button:hover{background:rgba(255,255,255,0.22);}
+  .repeat-selector span{font-size:20px; font-weight:800; color:#ffd86b; min-width:40px; text-align:center;}
+  .auto-replay-progress{
+    background:rgba(0,0,0,0.4); border-radius:8px; padding:8px; margin:8px 0; font-size:12px;
+    border:1px solid rgba(123,227,255,0.2); display:none;
+  }
+  .auto-replay-progress.show{display:block;}
+  .auto-replay-bar-bg{width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:4px; margin:6px 0;}
+  .auto-replay-bar-fill{height:100%; border-radius:4px; background:linear-gradient(90deg,#5bb8ff,#7be3ff); transition:width 0.3s;}
+  .auto-replay-stat{display:flex; justify-content:space-between; font-size:11px; color:#aaa; margin-top:4px;}
+  #autoReplayBtn.running{background:linear-gradient(180deg,#ff9d9d,#ff5d6c); box-shadow:0 3px 0 #a32b2b; color:#1a1a2e;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="startScreen" style="position:fixed; inset:0; z-index:500; display:flex; flex-direction:column; align-items:center; justify-content:center; background:linear-gradient(160deg,var(--bg1),var(--bg2) 60%,var(--bg3)); text-align:center; padding:20px;">
+    <div style="font-size:60px; margin-bottom:6px;">⚔️✨</div>
+    <h1 id="startTitle" style="font-size:26px; background:linear-gradient(90deg,var(--gold),#ff8de0); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:4px;">HERO COLLECTOR</h1>
+    <div id="startSub" class="small-muted" style="margin-bottom:24px;">Gacha RPG Adventure</div>
+    <div id="startBtns" style="display:flex; flex-direction:column; gap:10px; width:220px;"></div>
+    <div id="startMsg" class="small-muted" style="margin-top:12px; min-height:16px;"></div>
+  </div>
+  <div id="topbar">
+    <div id="title">⚔️ HERO COLLECTOR<div id="playerTag" style="font-size:9px; font-weight:600; color:#9dff9d; letter-spacing:0; -webkit-text-fill-color:#9dff9d;"></div></div>
+    <div class="currency">
+      <span class="gem">💎 <span id="gemCount">0</span></span>
+      <span class="gold">🪙 <span id="goldCount">0</span></span>
+      <span class="stamina">⚡ <span id="staminaCount">0</span>/<span id="staminaMax">0</span></span>
+    </div>
+  </div>
+  <div id="content"></div>
+  <div id="navbar">
+    <div class="navbtn" data-tab="home"><span class="ic">🏰</span>หน้าหลัก</div>
+    <div class="navbtn" data-tab="gacha"><span class="ic">🎰</span>กาชา</div>
+    <div class="navbtn" data-tab="stages"><span class="ic">🗺️</span>ด่าน</div>
+    <div class="navbtn" data-tab="roster"><span class="ic">📖</span>คลังฮีโร่</div>
+    <div class="navbtn" data-tab="team"><span class="ic">🛡️</span>จัดทีม</div>
+    <div class="navbtn" id="saveBtn"><span class="ic">💾</span>เซฟ</div>
+    <div class="navbtn" id="logoutBtn"><span class="ic">🚪</span>ออก</div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   HERO COLLECTOR - GACHA RPG (single-file demo)
+   ============================================================ */
+
+/* ---------- DATA DEFINITIONS ---------- */
+const RARITY = {
+  common:    {label:"Common",    color:"common",    weight:54.5, stars:1},
+  rare:      {label:"Rare",      color:"rare",       weight:30, stars:2},
+  epic:      {label:"Epic",      color:"epic",       weight:12, stars:3},
+  legendary: {label:"Legendary", color:"legendary",  weight:3,  stars:4},
+  mythic:    {label:"Mythic ★★★★★", color:"mythic", weight:0.5, stars:5},
+};
+
+// Each hero has: base stats, skill, evolution forms (alt forms unlocked via duplicates/level)
+const HERO_DB = [
+  // ---- Common ----
+  {id:"h_swordling", name:"ดาบน้อยกล้า", emoji:"🗡️", rarity:"common", element:"neutral",
+    base:{hp:120, atk:18, def:10, spd:9},
+    skill:{name:"ฟันตรง", desc:"โจมตีเดี่ยวสร้างดาเมจ 130% ATK", power:1.3, type:"single", cost:20},
+    forms:[{name:"ดาบน้อยกล้า", emoji:"🗡️"},{name:"นักดาบฝึกหัด", emoji:"⚔️"},{name:"นักดาบมาสเตอร์", emoji:"⚔️🔥"}]},
+  {id:"h_archerling", name:"นักธนูสายลม", emoji:"🏹", rarity:"common", element:"wind",
+    base:{hp:100, atk:20, def:8, spd:12},
+    skill:{name:"ยิงธนูคู่", desc:"โจมตี 2 ครั้ง 70% ATK ต่อครั้ง", power:0.7, type:"double", cost:25},
+    forms:[{name:"นักธนูสายลม", emoji:"🏹"},{name:"นายพรานเหยี่ยว", emoji:"🦅"},{name:"นักธนูราชัน", emoji:"🏹👑"}]},
+  {id:"h_shieldling", name:"ผู้พิทักษ์โล่หิน", emoji:"🛡️", rarity:"common", element:"earth",
+    base:{hp:160, atk:12, def:18, spd:7},
+    skill:{name:"ปะทะโล่", desc:"โจมตีเดี่ยว 100% ATK และเพิ่ม DEF ตัวเอง 10%", power:1.0, type:"single_buff", cost:30},
+    forms:[{name:"ผู้พิทักษ์โล่หิน", emoji:"🛡️"},{name:"การ์เดียนแห่งกำแพง", emoji:"🏯"},{name:"การ์เดียนอมตะ", emoji:"🏯⚡"}]},
+  {id:"h_healthling", name:"แม่มดสมุนไพร", emoji:"🌿", rarity:"common", element:"nature",
+    base:{hp:110, atk:14, def:9, spd:10},
+    skill:{name:"กลิ่นสมุนไพร", desc:"ฮีลพันธมิตร 1 ตัว 25% ของ HP สูงสุด", power:0.25, type:"heal_single", cost:25},
+    forms:[{name:"แม่มดสมุนไพร", emoji:"🌿"},{name:"นักบวชแห่งป่า", emoji:"🍃"},{name:"เทพแห่งการรักษา", emoji:"🍃✨"}]},
+
+  // ---- Rare ----
+  {id:"h_flameknight", name:"อัศวินเปลวเพลิง", emoji:"🔥", rarity:"rare", element:"fire",
+    base:{hp:180, atk:28, def:16, spd:10},
+    skill:{name:"ดาบเพลิง", desc:"โจมตีเดี่ยว 160% ATK และมีโอกาสเผา 20%", power:1.6, type:"single_burn", cost:35},
+    forms:[{name:"อัศวินเปลวเพลิง", emoji:"🔥"},{name:"จอมพลเพลิงนรก", emoji:"👹"},{name:"จักรพรรดิเพลิงนรก", emoji:"🔥👑"}]},
+  {id:"h_frostmage", name:"จอมเวทน้ำแข็ง", emoji:"❄️", rarity:"rare", element:"ice",
+    base:{hp:130, atk:32, def:11, spd:11},
+    skill:{name:"พายุน้ำแข็ง", desc:"โจมตีศัตรูทั้งหมด 80% ATK", power:0.8, type:"aoe", cost:40},
+    forms:[{name:"จอมเวทน้ำแข็ง", emoji:"❄️"},{name:"ราชินีน้ำแข็งนิรันดร์", emoji:"🧊"},{name:"เทพหิมะนิรันดร์", emoji:"❄️🌌"}]},
+  {id:"h_thunderfox", name:"จิ้งจอกสายฟ้า", emoji:"⚡", rarity:"rare", element:"thunder",
+    base:{hp:140, atk:30, def:12, spd:16},
+    skill:{name:"ฟาดสายฟ้า", desc:"โจมตีเดี่ยว 180% ATK เร็วที่สุด", power:1.8, type:"single", cost:30},
+    forms:[{name:"จิ้งจอกสายฟ้า", emoji:"⚡"},{name:"เทพจิ้งจอกเก้าหาง", emoji:"🦊"},{name:"เทพสายฟ้าเก้าหาง", emoji:"⚡🦊💫"}]},
+  {id:"h_lightcleric", name:"นักบวชแสงสว่าง", emoji:"✨", rarity:"rare", element:"light",
+    base:{hp:150, atk:22, def:14, spd:9},
+    skill:{name:"แสงบำบัด", desc:"ฮีลทุกพันธมิตร 18% ของ HP สูงสุด", power:0.18, type:"heal_all", cost:45},
+    forms:[{name:"นักบวชแสงสว่าง", emoji:"✨"},{name:"เทพธิดาแห่งรุ่งอรุณ", emoji:"😇"},{name:"เทพองค์แห่งแสง", emoji:"😇🌟"}]},
+
+  // ---- Epic ----
+  {id:"h_dragonblade", name:"จอมดาบมังกร", emoji:"🐉", rarity:"epic", element:"fire",
+    base:{hp:220, atk:42, def:20, spd:13},
+    skill:{name:"เขี้ยวมังกรเพลิง", desc:"โจมตีเดี่ยว 220% ATK เจาะเกราะ 30%", power:2.2, type:"single_pen", cost:45},
+    forms:[{name:"จอมดาบมังกร", emoji:"🐉"},{name:"อวตารมังกรเพลิง", emoji:"🔥🐉"},{name:"เทพมังกรแห่งจักรวาล", emoji:"🐉👑🔥"}]},
+  {id:"h_voidassassin", name:"นินจาเงามืด", emoji:"🥷", rarity:"epic", element:"dark",
+    base:{hp:170, atk:48, def:14, spd:20},
+    skill:{name:"ลอบสังหารเงา", desc:"โจมตีเดี่ยวศัตรู HP น้อยสุด 250% ATK", power:2.5, type:"execute", cost:40},
+    forms:[{name:"นินจาเงามืด", emoji:"🥷"},{name:"จอมโจรราตรีนิรันดร์", emoji:"🌑"},{name:"จอมเงาแห่งนิรันดร์", emoji:"🌑💀"}]},
+  {id:"h_stormcaller", name:"ผู้เรียกพายุ", emoji:"🌩️", rarity:"epic", element:"thunder",
+    base:{hp:200, atk:40, def:18, spd:14},
+    skill:{name:"พิโรธสายฟ้าฟาด", desc:"โจมตีศัตรูทั้งหมด 120% ATK", power:1.2, type:"aoe", cost:55},
+    forms:[{name:"ผู้เรียกพายุ", emoji:"🌩️"},{name:"เทพแห่งพายุฟ้าคำรณ", emoji:"⚡👑"},{name:"เทพพายุสายฟ้าสมบูรณ์", emoji:"⚡🌪️👑"}]},
+
+  // ---- Legendary ----
+  {id:"h_celestialqueen", name:"ราชินีสวรรค์", emoji:"👑", rarity:"legendary", element:"light",
+    base:{hp:280, atk:50, def:24, spd:15},
+    skill:{name:"พรแห่งสวรรค์", desc:"ฮีลทุกพันธมิตร 30% และเพิ่ม ATK 15% ใน 2 เทิร์น", power:0.3, type:"heal_all_buff", cost:60},
+    forms:[{name:"ราชินีสวรรค์", emoji:"👑"},{name:"เทพีแห่งจักรวาล", emoji:"🌌👑"},{name:"เทพีสวรรค์นิรันดร์", emoji:"🌌👑✨"}]},
+  {id:"h_voidleviathan", name:"ราชาเลวีอาธานมืด", emoji:"🐋", rarity:"legendary", element:"dark",
+    base:{hp:320, atk:55, def:22, spd:11},
+    skill:{name:"คลื่นมรณะ", desc:"โจมตีศัตรูทั้งหมด 150% ATK และดูดเลือด 10%", power:1.5, type:"aoe_drain", cost:65},
+    forms:[{name:"ราชาเลวีอาธานมืด", emoji:"🐋"},{name:"เทพอสูรใต้สมุทรลึก", emoji:"🌊👹"},{name:"จักรพรรดิอสูรใต้สมุทร", emoji:"🌊👹💀"}]},
+  {id:"h_phoenixlord", name:"จอมเทพหงส์ไฟ", emoji:"🦅🔥", rarity:"legendary", element:"fire",
+    base:{hp:260, atk:58, def:20, spd:17},
+    skill:{name:"ปีกอัคคีนิรันดร์", desc:"โจมตีเดี่ยว 280% ATK และฟื้นฟู HP ตัวเอง 15%", power:2.8, type:"single_lifesteal", cost:55},
+    forms:[{name:"จอมเทพหงส์ไฟ", emoji:"🦅🔥"},{name:"อวตารนกฟีนิกซ์อมตะ", emoji:"🔥🦅✨"},{name:"อวตารนกฟีนิกซ์จักรวาล", emoji:"🔥🦅🌟"}]},
+
+  // ---- New Heroes ----
+  {id:"h_pixiebloom", name:"นางฟ้าดอกไม้", emoji:"🧚", rarity:"common", element:"nature",
+    base:{hp:115, atk:16, def:9, spd:13},
+    skill:{name:"ผงเกสรคุ้มครอง", desc:"เพิ่ม DEF พันธมิตร 1 ตัว 15% และฮีล 10%", power:0.1, type:"heal_single", cost:25},
+    forms:[{name:"นางฟ้าดอกไม้", emoji:"🧚"},{name:"เทพธิดาแห่งสายลม", emoji:"🧚‍♀️🌸"},{name:"เทพีดอกไม้นิรันดร์", emoji:"🌸🧚✨"}]},
+  {id:"h_rockgolem", name:"โกเลมหิน", emoji:"🪨", rarity:"common", element:"earth",
+    base:{hp:175, atk:14, def:20, spd:6},
+    skill:{name:"กำปั้นศิลา", desc:"โจมตีเดี่ยว 110% ATK และมีโอกาสทำให้ศัตรูมึนงง", power:1.1, type:"single", cost:25},
+    forms:[{name:"โกเลมหิน", emoji:"🪨"},{name:"ไททันหินบรรพกาล", emoji:"⛰️"},{name:"จักรพรรดิหินบรรพกาล", emoji:"⛰️👑"}]},
+  {id:"h_moonarcher", name:"นักธนูจันทรา", emoji:"🌙", rarity:"rare", element:"light",
+    base:{hp:135, atk:34, def:12, spd:15},
+    skill:{name:"ลูกธนูจันทร์เสี้ยว", desc:"โจมตีเดี่ยว 190% ATK เจาะเกราะ 15%", power:1.9, type:"single_pen", cost:35},
+    forms:[{name:"นักธนูจันทรา", emoji:"🌙"},{name:"เทพีแห่งราตรีกาฬ", emoji:"🌕🏹"},{name:"เทพีจันทร์เต็มดวง", emoji:"🌕🏹✨"}]},
+  {id:"h_blazerider", name:"นักรบม้าเพลิง", emoji:"🐎", rarity:"rare", element:"fire",
+    base:{hp:165, atk:30, def:15, spd:17},
+    skill:{name:"พุ่งทะยานเพลิง", desc:"โจมตีเดี่ยว 170% ATK และมีโอกาสเผา 25%", power:1.7, type:"single_burn", cost:35},
+    forms:[{name:"นักรบม้าเพลิง", emoji:"🐎"},{name:"จอมทัพอัศวินอัคนี", emoji:"🔥🐎"},{name:"จักรพรรดิอัศวินอัคนี", emoji:"🔥🐎👑"}]},
+  {id:"h_runeknight", name:"อัศวินอักษรเวท", emoji:"📘", rarity:"epic", element:"light",
+    base:{hp:210, atk:38, def:22, spd:12},
+    skill:{name:"กำแพงเวทมนตร์", desc:"เพิ่ม DEF ทีมทั้งหมด 12% และโจมตี 130% ATK", power:1.3, type:"single_buff", cost:45},
+    forms:[{name:"อัศวินอักษรเวท", emoji:"📘"},{name:"จอมเวทผู้พิทักษ์อนันต์", emoji:"📘✨"},{name:"จอมเวทผู้พิทักษ์นิรันดร์", emoji:"📘✨👑"}]},
+  {id:"h_abysswitch", name:"แม่มดห้วงเหว", emoji:"🔮", rarity:"epic", element:"dark",
+    base:{hp:185, atk:46, def:16, spd:14},
+    skill:{name:"คำสาปแห่งห้วงเหว", desc:"โจมตีศัตรูทั้งหมด 110% ATK และดูดเลือด 8%", power:1.1, type:"aoe_drain", cost:50},
+    forms:[{name:"แม่มดห้วงเหว", emoji:"🔮"},{name:"จอมราชินีปีศาจมืด", emoji:"🔮👹"},{name:"จักรพรรดินีปีศาจมืด", emoji:"🔮👹💀"}]},
+  {id:"h_starforger", name:"ผู้สร้างดวงดาว", emoji:"🌟", rarity:"legendary", element:"light",
+    base:{hp:270, atk:54, def:23, spd:14},
+    skill:{name:"กำเนิดดวงดาว", desc:"โจมตีศัตรูทั้งหมด 160% ATK และฮีลทีม 10%", power:1.6, type:"aoe", cost:60},
+    forms:[{name:"ผู้สร้างดวงดาว", emoji:"🌟"},{name:"เทพแห่งจักรวาลนิรันดร์", emoji:"🌌🌟"},{name:"เทพแห่งจักรวาลสมบูรณ์", emoji:"🌌🌟💫"}]},
+  {id:"h_chaosdragon", name:"มังกรอลวน", emoji:"🐲", rarity:"legendary", element:"dark",
+    base:{hp:310, atk:60, def:25, spd:13},
+    skill:{name:"ลมหายใจอลวน", desc:"โจมตีเดี่ยว 300% ATK เจาะเกราะ 25%", power:3.0, type:"single_pen", cost:60},
+    forms:[{name:"มังกรอลวน", emoji:"🐲"},{name:"เทพอสูรมังกรแห่งจุดจบ", emoji:"🐲🔥💀"},{name:"เทพมังกรแห่งการทำลายล้าง", emoji:"🐲💀🌌"}]},
+
+  // ---- Wave 3 Heroes ----
+  {id:"h_sandnomad", name:"นักเดินทรายพเนจร", emoji:"🏜️", rarity:"common", element:"earth",
+    base:{hp:125, atk:19, def:11, spd:11},
+    skill:{name:"พายุทราย", desc:"โจมตีเดี่ยว 140% ATK และลด SPD ศัตรู 10%", power:1.4, type:"single", cost:25},
+    forms:[{name:"นักเดินทรายพเนจร", emoji:"🏜️"},{name:"จอมเวทแห่งทะเลทราย", emoji:"🐫"},{name:"จอมทะเลทรายไม่มีที่สิ้นสุด", emoji:"🏜️🌪️"}]},
+  {id:"h_coralguard", name:"ผู้พิทักษ์ปะการัง", emoji:"🐚", rarity:"common", element:"water",
+    base:{hp:135, atk:15, def:14, spd:9},
+    skill:{name:"คลื่นกระแทก", desc:"โจมตีเดี่ยว 120% ATK และฮีลตัวเอง 8%", power:1.2, type:"single_lifesteal", cost:25},
+    forms:[{name:"ผู้พิทักษ์ปะการัง", emoji:"🐚"},{name:"เทพแห่งแนวปะการังลึก", emoji:"🐢"},{name:"ราชาแห่งมหาสมุทร", emoji:"🐢🌊👑"}]},
+  {id:"h_windsylph", name:"ภูตสายลมจิ๋ว", emoji:"🍃", rarity:"rare", element:"wind",
+    base:{hp:120, atk:33, def:10, spd:19},
+    skill:{name:"ใบมีดลมกรด", desc:"โจมตี 2 ครั้ง 75% ATK และเพิ่ม SPD ทีม 8%", power:0.75, type:"double", cost:35},
+    forms:[{name:"ภูตสายลมจิ๋ว", emoji:"🍃"},{name:"เทพอสูรพายุหมุน", emoji:"🌪️"},{name:"เทพอสูรพายุเต็มรูปแบบ", emoji:"🌪️⚡👑"}]},
+  {id:"h_emberpriest", name:"นักบวชอัคคี", emoji:"🕯️", rarity:"rare", element:"fire",
+    base:{hp:155, atk:26, def:14, spd:12},
+    skill:{name:"เปลวพิทักษ์", desc:"ฮีลทุกพันธมิตร 15% และโจมตี 90% ATK", power:0.9, type:"heal_all_buff", cost:45},
+    forms:[{name:"นักบวชอัคคี", emoji:"🕯️"},{name:"เทพไฟผู้เผาผลาญ", emoji:"🔥🕯️"},{name:"เทพไฟผู้พิทักษ์นิรันดร์", emoji:"🔥🕯️✨"}]},
+  {id:"h_ironvalkyrie", name:"วาลคิรีเกราะเหล็ก", emoji:"🦾", rarity:"epic", element:"thunder",
+    base:{hp:230, atk:44, def:24, spd:15},
+    skill:{name:"หอกสายฟ้าทะลวง", desc:"โจมตีเดี่ยว 230% ATK เจาะเกราะ 20%", power:2.3, type:"single_pen", cost:45},
+    forms:[{name:"วาลคิรีเกราะเหล็ก", emoji:"🦾"},{name:"เทพีวาลคิรีสายฟ้า", emoji:"🦾⚡"},{name:"เทพีวาลคิรีสายฟ้าสมบูรณ์", emoji:"🦾⚡👑"}]},
+  {id:"h_spiritowl", name:"นกฮูกวิญญาณ", emoji:"🦉", rarity:"epic", element:"light",
+    base:{hp:195, atk:36, def:17, spd:18},
+    skill:{name:"แสงแห่งปัญญา", desc:"ฮีลพันธมิตร HP น้อยสุด 35% และเพิ่ม ATK 10%", power:0.35, type:"heal_single", cost:50},
+    forms:[{name:"นกฮูกวิญญาณ", emoji:"🦉"},{name:"เทพแห่งราตรีและปัญญา", emoji:"🦉✨"},{name:"เทพแห่งปัญญาจักรวาล", emoji:"🦉✨🌌"}]},
+  {id:"h_abyssking", name:"ราชาห้วงนรกขุมลึก", emoji:"👑👹", rarity:"legendary", element:"dark",
+    base:{hp:300, atk:56, def:26, spd:12},
+    skill:{name:"บัลลังก์อสูรราชัน", desc:"โจมตีศัตรูทั้งหมด 140% ATK และดูดเลือด 15%", power:1.4, type:"aoe_drain", cost:60},
+    forms:[{name:"ราชาห้วงนรกขุมลึก", emoji:"👑👹"},{name:"จอมจักรพรรดิแห่งนรกอนันต์", emoji:"👑🔥👹"},{name:"จักรพรรดิแห่งนรกสมบูรณ์", emoji:"👑🔥💀🌑"}]},
+  {id:"h_auroratitan", name:"ไททันแสงเหนือ", emoji:"🌈", rarity:"legendary", element:"light",
+    base:{hp:290, atk:52, def:28, spd:14},
+    skill:{name:"แสงเหนือนิรันดร์", desc:"ฮีลทีม 25% และโจมตีศัตรูทั้งหมด 130% ATK", power:1.3, type:"aoe", cost:60},
+    forms:[{name:"ไททันแสงเหนือ", emoji:"🌈"},{name:"เทพไททันแห่งขอบจักรวาล", emoji:"🌈👑"},{name:"เทพไททันแห่งจักรวาล", emoji:"🌈👑🌌"}]},
+
+  // ---- Naruto Banner Heroes (12 ตัว) ----
+  {id:"n_naruto", name:"นารูโตะ อุซุมากิ", emoji:"🍥", rarity:"legendary", element:"wind",
+    base:{hp:300, atk:58, def:22, spd:18},
+    skill:{name:"ราเซ็งกัน มหาอลวน", desc:"โจมตีเดี่ยว 300% ATK + สร้างโคลนช่วยฮีลทีม 10%", power:3.0, type:"single_lifesteal", cost:60},
+    forms:[{name:"นารูโตะ เจนิน", emoji:"🍥"},{name:"นารูโตะ โหมด 9 หาง", emoji:"🦊🔥"},{name:"นารูโตะ โหมด Baryon", emoji:"🦊🔥⭐"}]},
+
+  {id:"n_sasuke", name:"ซาสุเกะ อุชิฮะ", emoji:"⚡", rarity:"legendary", element:"thunder",
+    base:{hp:260, atk:65, def:20, spd:20},
+    skill:{name:"ชิเดน - สายฟ้าสังหาร", desc:"โจมตีเดี่ยว 320% ATK เจาะเกราะ 40%", power:3.2, type:"single_pen", cost:55},
+    forms:[{name:"ซาสุเกะ เจนิน", emoji:"⚡"},{name:"ซาสุเกะ ตาชาริงกัน", emoji:"🌀⚡"},{name:"ซาสุเกะ รินเนกัน", emoji:"🌀⚡👁️"}]},
+
+  {id:"n_kakashi", name:"คาคาชิ ฮาตาเกะ", emoji:"📖", rarity:"epic", element:"thunder",
+    base:{hp:240, atk:50, def:26, spd:17},
+    skill:{name:"ราคิริ - สายฟ้าฉับพลัน", desc:"โจมตีเดี่ยว 250% ATK และมึนงง 1 เทิร์น", power:2.5, type:"single_pen", cost:50},
+    forms:[{name:"คาคาชิ โจนิน", emoji:"📖"},{name:"คาคาชิ ตาชาริงกัน", emoji:"📖⚡"},{name:"คาคาชิ ผู้คัดลอก 6 เส้นทาง", emoji:"📖⚡👁️"}]},
+
+  {id:"n_sakura", name:"ซากุระ ฮารุโนะ", emoji:"🌸", rarity:"epic", element:"nature",
+    base:{hp:220, atk:42, def:30, spd:14},
+    skill:{name:"หมัดพลัง ชาเนนัน", desc:"ฮีลทีมทั้งหมด 30% และโจมตีเดี่ยว 180% ATK", power:1.8, type:"heal_all_buff", cost:55},
+    forms:[{name:"ซากุระ เจนิน", emoji:"🌸"},{name:"ซากุระ จูนิน แพทย์เอก", emoji:"🌸💊"},{name:"ซากุระ โหมดสมบูรณ์แบบ", emoji:"🌸💊👑"}]},
+
+  {id:"n_gaara", name:"กาอาระ แห่งทราย", emoji:"🏜️", rarity:"epic", element:"earth",
+    base:{hp:280, atk:44, def:38, spd:12},
+    skill:{name:"เกราะทรายสังหาร", desc:"โจมตีศัตรูทั้งหมด 140% ATK และเพิ่ม DEF ทีม 20%", power:1.4, type:"single_buff", cost:50},
+    forms:[{name:"กาอาระ เจนิน", emoji:"🏜️"},{name:"กาอาระ คาเกะ แห่งซุนะ", emoji:"🏜️👑"},{name:"กาอาระ ราชาทรายแห่งจักรวาล", emoji:"🏜️👑🌪️"}]},
+
+  {id:"n_itachi", name:"อิทาจิ อุชิฮะ", emoji:"🦅", rarity:"legendary", element:"dark",
+    base:{hp:250, atk:60, def:24, spd:19},
+    skill:{name:"อามาเทอราสึ - เปลวไฟนิรันดร์", desc:"โจมตีศัตรูทั้งหมด 160% ATK + เผาไม่ดับ 15%", power:1.6, type:"aoe_drain", cost:65},
+    forms:[{name:"อิทาจิ อนุบุ", emoji:"🦅"},{name:"อิทาจิ อาคาสึกิ", emoji:"🔴🦅"},{name:"อิทาจิ ซุซาโนะโอะเต็มรูปแบบ", emoji:"🔴🦅⚡"}]},
+
+  {id:"n_rock_lee", name:"ร็อค ลี", emoji:"🥋", rarity:"rare", element:"neutral",
+    base:{hp:200, atk:40, def:20, spd:25},
+    skill:{name:"เปิดประตูชี่ มณีรัตน์", desc:"โจมตีเดี่ยว 200% ATK และโจมตีซ้ำ 2 ครั้ง 100% ATK", power:2.0, type:"double", cost:45},
+    forms:[{name:"ร็อค ลี เจนิน", emoji:"🥋"},{name:"ร็อค ลี เปิดประตู 8 ชั้น", emoji:"🥋🔥"},{name:"ร็อค ลี เปิดประตูชั้น 8 เต็ม", emoji:"🥋🔥💀"}]},
+
+  {id:"n_neji", name:"เนจิ ฮิวงะ", emoji:"👁️", rarity:"rare", element:"light",
+    base:{hp:185, atk:38, def:22, spd:16},
+    skill:{name:"จวบ 64 จุด ฮาคเคะ", desc:"โจมตี 8 ครั้ง 40% ATK และลด DEF ศัตรู 20%", power:0.4, type:"double", cost:40},
+    forms:[{name:"เนจิ เจนิน", emoji:"👁️"},{name:"เนจิ โจนิน ไบกุกัง", emoji:"👁️✨"},{name:"เนจิ ไบกุกัง สมบูรณ์แบบ", emoji:"👁️✨💫"}]},
+
+  {id:"n_tsunade", name:"สึนาเดะ โฮกาเงะ", emoji:"💎", rarity:"epic", element:"nature",
+    base:{hp:310, atk:46, def:32, spd:13},
+    skill:{name:"ผนึกสร้าง 100 ครั้ง", desc:"ฮีลทุกพันธมิตร 40% HP และโจมตีเดี่ยว 200% ATK", power:2.0, type:"heal_all_buff", cost:60},
+    forms:[{name:"สึนาเดะ โฮกาเงะ 5", emoji:"💎"},{name:"สึนาเดะ โหมดพลังร้อย", emoji:"💎🌸"},{name:"สึนาเดะ โหมดพลังร้อยสมบูรณ์", emoji:"💎🌸💀"}]},
+
+  {id:"n_orochimaru", name:"โอโรจิมารุ", emoji:"🐍", rarity:"rare", element:"dark",
+    base:{hp:195, atk:36, def:18, spd:15},
+    skill:{name:"งูผีพิษมรณะ", desc:"โจมตีเดี่ยว 170% ATK + วางพิษ 20%", power:1.7, type:"single_burn", cost:35},
+    forms:[{name:"โอโรจิมารุ", emoji:"🐍"},{name:"โอโรจิมารุ ร่างสมบูรณ์", emoji:"🐍💀"},{name:"โอโรจิมารุ ร่างอสูรงู", emoji:"🐍💀🌑"}]},
+
+  {id:"n_minato", name:"มินาโตะ นามิกาเซ", emoji:"⚡🌀", rarity:"legendary", element:"wind",
+    base:{hp:270, atk:62, def:20, spd:24},
+    skill:{name:"ราเซ็งกัน สายฟ้า - สี่บน", desc:"โจมตีเดี่ยว 340% ATK เจาะเกราะ 30% เร็วที่สุด", power:3.4, type:"single_pen", cost:60},
+    forms:[{name:"มินาโตะ โจนิน", emoji:"⚡🌀"},{name:"มินาโตะ โฮกาเงะ 4", emoji:"⚡👑"},{name:"มินาโตะ โหมดหกเส้นทาง", emoji:"⚡🌀👑"}]},
+
+  {id:"n_hinata", name:"ฮินาตะ ฮิวงะ", emoji:"💜", rarity:"common", element:"light",
+    base:{hp:130, atk:22, def:14, spd:13},
+    skill:{name:"จวบ 8 จุด ไบกุกัง", desc:"โจมตี 2 ครั้ง 80% ATK และฮีลตัวเอง 10%", power:0.8, type:"double", cost:30},
+    forms:[{name:"ฮินาตะ เจนิน", emoji:"💜"},{name:"ฮินาตะ ไบกุกัง สมบูรณ์", emoji:"💜👁️"},{name:"ฮินาตะ ไบกุกัง เต็มรูปแบบ", emoji:"💜👁️✨"}]},
+
+  // ---- One Piece Banner Heroes (12 ตัว) ----
+  // ★★★★★ Mythic
+  {id:"op_luffy_g5", name:"ลูฟี่ เกียร์ 5 นิกกะ", emoji:"☀️🦄", rarity:"mythic", element:"wind",
+    base:{hp:550, atk:100, def:42, spd:22},
+    skill:{name:"ท้าวแห่งดวงอาทิตย์ นิกกะ", desc:"แปลงร่างเป็นพระเจ้าแห่งดวงอาทิตย์ โจมตีศัตรูทั้งหมด 420% ATK เจาะเกราะ 45% ฮีลทีม 20%!", power:4.2, type:"meteor_aoe", cost:75},
+    forms:[{name:"ลูฟี่ เกียร์ 5", emoji:"☀️🦄"},{name:"ลูฟี่ นิกกะ อาวุธยักษ์", emoji:"☀️🦄🌀"},{name:"ลูฟี่ นิกกะ โหมดจักรวาล", emoji:"☀️🦄🌌👑"}]},
+  {id:"op_kaido_100b", name:"ไคโด ร้อยอสูร", emoji:"🐲🔥", rarity:"mythic", element:"fire",
+    base:{hp:600, atk:98, def:50, spd:14},
+    skill:{name:"กระแสไฟฟ้ามรณะ ร้อยอสูร", desc:"ไคโดแปลงร่างมังกรโจมตีศัตรูทั้งหมด 400% ATK ทำให้ทีมศัตรูมึนงงทั้งหมด 1 เทิร์น เจาะเกราะ 50%!", power:4.0, type:"meteor_aoe", cost:75},
+    forms:[{name:"ไคโด ร้อยอสูร", emoji:"🐲🔥"},{name:"ไคโด มังกรสายฟ้า", emoji:"🐲⚡💀"},{name:"ไคโด จอมทรราชนิรันดร์", emoji:"🐲💀🌑👑"}]},
+  // Legendary
+  {id:"op_zoro", name:"โซโร สามดาบ มูซู", emoji:"⚔️⚔️⚔️", rarity:"legendary", element:"dark",
+    base:{hp:290, atk:68, def:26, spd:16},
+    skill:{name:"ซันโตริวเซน สามพันโลก", desc:"โจมตีเดี่ยว 350% ATK เจาะเกราะ 40% มีโอกาสติดสถานะเลือดออก 30%", power:3.5, type:"single_pen", cost:65},
+    forms:[{name:"โซโร โจรสลัด", emoji:"⚔️⚔️⚔️"},{name:"โซโร รองกัปตัน", emoji:"⚔️⚔️⚔️🌊"},{name:"โซโร เอน็มะ สามพันโลก", emoji:"⚔️🌀💀"}]},
+  {id:"op_shanks", name:"แชงค์ผมแดง จักรพรรดิ", emoji:"🦁⚓", rarity:"legendary", element:"thunder",
+    base:{hp:310, atk:72, def:24, spd:20},
+    skill:{name:"ฮากิสังหาร ราชาแห่งทะเล", desc:"โจมตีเดี่ยว 340% ATK เจาะเกราะ 35% และทำให้ศัตรูทั้งหมดลด ATK 20%", power:3.4, type:"single_pen", cost:65},
+    forms:[{name:"แชงค์ จักรพรรดิ", emoji:"🦁⚓"},{name:"แชงค์ ดาบฮากิ", emoji:"🦁⚓⚡"},{name:"แชงค์ ราชาแห่งท้องทะเล", emoji:"🦁⚓👑🌊"}]},
+  // Epic
+  {id:"op_nami", name:"นามิ นักเดินเรือ", emoji:"🌪️💰", rarity:"epic", element:"thunder",
+    base:{hp:195, atk:46, def:18, spd:19},
+    skill:{name:"สายฟ้าซิเลน เทมเปสต์", desc:"โจมตีศัตรูทั้งหมด 130% ATK และทำให้มึนงง 20% 1 เทิร์น", power:1.3, type:"aoe", cost:50},
+    forms:[{name:"นามิ นักเดินเรือ", emoji:"🌪️💰"},{name:"นามิ ฤดูกาลโชกุน", emoji:"🌪️💰⚡"},{name:"นามิ มหาพายุสมบูรณ์", emoji:"🌪️💰⚡👑"}]},
+  {id:"op_robin", name:"โรบิน นักโบราณคดี", emoji:"🌸🔱", rarity:"epic", element:"dark",
+    base:{hp:210, atk:44, def:22, spd:15},
+    skill:{name:"มิล ฟลัวร์ หนังสือแห่งโลก", desc:"โจมตีศัตรูทั้งหมด 120% ATK และลด DEF ทุกศัตรู 15%", power:1.2, type:"aoe", cost:50},
+    forms:[{name:"โรบิน นักโบราณคดี", emoji:"🌸🔱"},{name:"โรบิน ออลบลูม", emoji:"🌸🔱💀"},{name:"โรบิน จอมพลาญทรราช", emoji:"🌸🔱👑🌑"}]},
+  {id:"op_sanji", name:"ซันจิ ไดโบลแบล็ก", emoji:"🔥🦵", rarity:"epic", element:"fire",
+    base:{hp:230, atk:50, def:20, spd:20},
+    skill:{name:"ไดโบลแจมบ์ นรกเพลิง", desc:"โจมตีเดี่ยว 240% ATK เผา 30% และโจมตีซ้ำ 1 ครั้ง 120% ATK", power:2.4, type:"single_burn", cost:50},
+    forms:[{name:"ซันจิ แบล็คเล็ก", emoji:"🔥🦵"},{name:"ซันจิ เจอร์มา เลขา66", emoji:"🔥🦵⚡"},{name:"ซันจิ ไดโบลสมบูรณ์", emoji:"🔥🦵💀🌑"}]},
+  {id:"op_jinbe", name:"จินเบ ขุนพลปลา", emoji:"🐟🌊", rarity:"epic", element:"water",
+    base:{hp:280, atk:42, def:36, spd:13},
+    skill:{name:"คาราเตะน้ำ เซ็นชากุ", desc:"โจมตีเดี่ยว 200% ATK เจาะเกราะ 15% และฮีลทีม 18%", power:2.0, type:"single_lifesteal", cost:55},
+    forms:[{name:"จินเบ ขุนพล", emoji:"🐟🌊"},{name:"จินเบ นักบิน", emoji:"🐟🌊⭐"},{name:"จินเบ จอมทะเลสมบูรณ์", emoji:"🐟🌊👑✨"}]},
+  // Rare
+  {id:"op_usopp", name:"อุซอป นักแม่นปืน", emoji:"🎯🌿", rarity:"rare", element:"wind",
+    base:{hp:165, atk:36, def:14, spd:17},
+    skill:{name:"ปืนใหญ่ป็อปกรีน", desc:"โจมตีเดี่ยว 200% ATK และลด SPD ศัตรู 20%", power:2.0, type:"single", cost:40},
+    forms:[{name:"อุซอป นักยิง", emoji:"🎯🌿"},{name:"อุซอป โซเกคิง", emoji:"🎯🌿👑"},{name:"อุซอป นักแม่นพระเจ้า", emoji:"🎯🌿👑🔥"}]},
+  {id:"op_chopper", name:"ช็อปเปอร์ หมอกวาง", emoji:"🦌🍬", rarity:"rare", element:"nature",
+    base:{hp:170, atk:30, def:16, spd:16},
+    skill:{name:"โมนสเตอร์พอยท์ ฮีลเลอร์", desc:"ฮีลทีมทั้งหมด 22% HP และโจมตีเดี่ยว 150% ATK", power:1.5, type:"heal_all_buff", cost:40},
+    forms:[{name:"ช็อปเปอร์ หมอ", emoji:"🦌🍬"},{name:"ช็อปเปอร์ โมนสเตอร์พอยท์", emoji:"🦌🍬💪"},{name:"ช็อปเปอร์ โหมดหมอเต็มรูปแบบ", emoji:"🦌🍬💪🌸"}]},
+  // Common
+  {id:"op_brook", name:"บรู๊ค โครงกระดูกนักดนตรี", emoji:"💀🎸", rarity:"common", element:"dark",
+    base:{hp:115, atk:22, def:11, spd:21},
+    skill:{name:"เพลงวิญญาณเยือกเย็น", desc:"โจมตีเดี่ยว 130% ATK และลด SPD ศัตรู 15%", power:1.3, type:"single", cost:25},
+    forms:[{name:"บรู๊ค นักดนตรี", emoji:"💀🎸"},{name:"บรู๊ค โซลคิง", emoji:"💀🎸🎤"},{name:"บรู๊ค ราชาวิญญาณ", emoji:"💀🎸👑🌑"}]},
+  {id:"op_franky", name:"แฟรงกี้ ไซบอร์ก", emoji:"🤖⚓", rarity:"common", element:"thunder",
+    base:{hp:145, atk:18, def:18, spd:10},
+    skill:{name:"เฟรชไฟร์ ปืนใหญ่ไซบอร์ก", desc:"โจมตีเดี่ยว 140% ATK และเพิ่ม DEF ตัวเอง 12%", power:1.4, type:"single_buff", cost:25},
+    forms:[{name:"แฟรงกี้ ไซบอร์ก", emoji:"🤖⚓"},{name:"แฟรงกี้ เจเนเนอรัล", emoji:"🤖⚓🔥"},{name:"แฟรงกี้ ซุปเปอร์สมบูรณ์", emoji:"🤖⚓🔥👑"}]},
+
+  // ---- Bleach Banner Heroes (20 ตัว) ----
+  // ★★★★★ Mythic
+  {id:"bl_ichigo_bankai", name:"อิจิโกะ คุโรซากิ แบงไค", emoji:"⬛🌙", rarity:"mythic", element:"dark",
+    base:{hp:580, atk:105, def:44, spd:21},
+    skill:{name:"เก็ตสึกะ เท็นไช โคโร — ดาบจันทร์มฤตยู", desc:"ปลดปล่อยแบงไคพลังเต็ม โจมตีศัตรูทั้งหมด 430% ATK เจาะเกราะ 50% ฮีลทีม 15% สั่นสะเทือนเวทีทั้งหมด!", power:4.3, type:"meteor_aoe", cost:75},
+    forms:[{name:"อิจิโกะ แบงไค เก็ตสึกะ", emoji:"⬛🌙"},{name:"อิจิโกะ โหมดโฮโลว์ แบงไค", emoji:"⬛🌙💀"},{name:"อิจิโกะ True Bankai สมบูรณ์", emoji:"⬛🌙💀👑"}]},
+  {id:"bl_aizen", name:"โซสุเกะ ไอเซ็น", emoji:"🦋👁️", rarity:"mythic", element:"light",
+    base:{hp:560, atk:110, def:48, spd:18},
+    skill:{name:"โคเตสึ โซโตสึ — ภาพมายาสมบูรณ์", desc:"ไอเซ็นใช้คิวเกียวกุ กาเต็น เบ่งพลังเต็มรูปแบบ โจมตีศัตรูทั้งหมด 450% ATK เจาะเกราะ 60% ทำให้มึนงงทั้งสนาม!", power:4.5, type:"meteor_aoe", cost:80},
+    forms:[{name:"ไอเซ็น กัปตัน", emoji:"🦋👁️"},{name:"ไอเซ็น Hougyoku ร่างที่ 1", emoji:"🦋👁️🌀"},{name:"ไอเซ็น Hougyoku ร่างสมบูรณ์", emoji:"🦋👁️🌀💜"}]},
+  // Legendary
+  {id:"bl_byakuya", name:"เบียคุยะ คุจิกิ — ดอกซากุระมรณะ", emoji:"🌸⚔️", rarity:"legendary", element:"light",
+    base:{hp:285, atk:70, def:28, spd:18},
+    skill:{name:"เซนบอนซากุระ คาเกโยชิ — พันดอกซากุระ", desc:"โจมตีศัตรูทั้งหมด 360% ATK เจาะเกราะ 40% มีโอกาสเลือดออก 35%", power:3.6, type:"aoe_drain", cost:65},
+    forms:[{name:"เบียคุยะ กัปตัน", emoji:"🌸⚔️"},{name:"เบียคุยะ แบงไค เซนบอนซากุระ", emoji:"🌸⚔️🌀"},{name:"เบียคุยะ เบงโก สมบูรณ์", emoji:"🌸⚔️🌀👑"}]},
+  {id:"bl_kenpachi", name:"เค็นปาจิ ซาราคิ — ราชาสงคราม", emoji:"⚔️💢", rarity:"legendary", element:"neutral",
+    base:{hp:400, atk:78, def:22, spd:15},
+    skill:{name:"โนซาราชิ — ดาบทำลายล้างทุกสิ่ง", desc:"โจมตีเดี่ยวศัตรู HP สูงสุด 400% ATK เจาะเกราะ 50% และโจมตีซ้ำ 1 ครั้ง", power:4.0, type:"single_pen", cost:70},
+    forms:[{name:"เค็นปาจิ กัปตัน", emoji:"⚔️💢"},{name:"เค็นปาจิ โหมด Eyepatch ปลด", emoji:"⚔️💢🔥"},{name:"เค็นปาจิ แบงไค โนซาราชิ", emoji:"⚔️💢🔥👑"}]},
+  {id:"bl_rukia", name:"รูเกีย คุจิกิ — น้ำแข็งมรณา", emoji:"❄️⚪", rarity:"legendary", element:"ice",
+    base:{hp:265, atk:60, def:26, spd:20},
+    skill:{name:"ฮาคุโระ มะอิ โยโกชิบุกิ — พายุหิมะสังหาร", desc:"โจมตีศัตรูทั้งหมด 300% ATK แช่แข็งศัตรูทุกตัว 1 เทิร์น เจาะเกราะ 30%", power:3.0, type:"aoe", cost:65},
+    forms:[{name:"รูเกีย ชินิกามิ", emoji:"❄️⚪"},{name:"รูเกีย แบงไค ซอมะ โนะ ซาดามิ", emoji:"❄️⚪🌌"},{name:"รูเกีย แบงไค เต็มรูปแบบ", emoji:"❄️⚪🌌👑"}]},
+  {id:"bl_urahara", name:"คิสุเกะ อุระฮาระ — อัจฉริยะซ่อนเร้น", emoji:"🎩🌸", rarity:"legendary", element:"wind",
+    base:{hp:275, atk:65, def:30, spd:22},
+    skill:{name:"เบนิฮิเมะ เจ — เปลวหมัดเจาะทะลุ", desc:"โจมตีเดี่ยว 350% ATK เจาะเกราะ 45% และเพิ่ม ATK ทีมทั้งหมด 15% 2 เทิร์น", power:3.5, type:"single_pen", cost:65},
+    forms:[{name:"อุระฮาระ ลับ", emoji:"🎩🌸"},{name:"อุระฮาระ ซันไน โนะ คาจิ", emoji:"🎩🌸⚡"},{name:"อุระฮาระ แบงไค เบนิฮิเมะ โอ", emoji:"🎩🌸⚡👑"}]},
+  // Epic
+  {id:"bl_renji", name:"เร็นจิ อาบาไร — ราชานักรบ", emoji:"🐍⚔️", rarity:"epic", element:"fire",
+    base:{hp:235, atk:52, def:22, spd:16},
+    skill:{name:"ฮิฮิโอ ซาบิมารุ — งูเพลิงโจมตี", desc:"โจมตีเดี่ยว 250% ATK + เผา 30% โจมตีซ้ำ 1 ครั้ง 120% ATK", power:2.5, type:"single_burn", cost:50},
+    forms:[{name:"เร็นจิ ฟุคุไทโจ", emoji:"🐍⚔️"},{name:"เร็นจิ แบงไค ซาบิมารุ", emoji:"🐍⚔️🔥"},{name:"เร็นจิ แบงไค ซาบิมารุ สมบูรณ์", emoji:"🐍⚔️🔥👑"}]},
+  {id:"bl_toshiro", name:"โทชิโระ ฮิทสึกายะ — มังกรน้ำแข็ง", emoji:"🐉❄️", rarity:"epic", element:"ice",
+    base:{hp:210, atk:54, def:24, spd:21},
+    skill:{name:"ไดกุ ไฮเฮียว โซเก็น — มังกรน้ำแข็งยักษ์", desc:"โจมตีเดี่ยว 260% ATK แช่แข็งศัตรู 1 เทิร์น เจาะเกราะ 20%", power:2.6, type:"single_pen", cost:50},
+    forms:[{name:"ฮิทสึกายะ กัปตัน", emoji:"🐉❄️"},{name:"ฮิทสึกายะ แบงไค ดายกุ", emoji:"🐉❄️🌌"},{name:"ฮิทสึกายะ แบงไค เต็มรูปแบบ", emoji:"🐉❄️🌌👑"}]},
+  {id:"bl_orihime", name:"โอริฮิเมะ อิโนะอุเอะ — ดอกไม้แห่งการรักษา", emoji:"🌺🛡️", rarity:"epic", element:"light",
+    base:{hp:245, atk:38, def:34, spd:17},
+    skill:{name:"โซเทน คิชชุน — ดอกไม้รักษาทุกบาดแผล", desc:"ฮีลทีมทั้งหมด 45% HP และโล่ป้องกัน DEF +15% 2 เทิร์น", power:0.45, type:"heal_all_buff", cost:55},
+    forms:[{name:"โอริฮิเมะ นักรบ", emoji:"🌺🛡️"},{name:"โอริฮิเมะ ด้วยพลัง 6 เทพ", emoji:"🌺🛡️✨"},{name:"โอริฮิเมะ เต็มพลังสมบูรณ์", emoji:"🌺🛡️✨👑"}]},
+  {id:"bl_chad", name:"ยาสุโทระ ซาโด — หมัดเหล็ก", emoji:"💪🛡️", rarity:"epic", element:"earth",
+    base:{hp:290, atk:48, def:38, spd:13},
+    skill:{name:"โบรากาน หมัดมหาพลัง", desc:"โจมตีเดี่ยว 230% ATK เจาะเกราะ 25% และเพิ่ม DEF ทีม 15%", power:2.3, type:"single_buff", cost:50},
+    forms:[{name:"ชาด นักรบ", emoji:"💪🛡️"},{name:"ชาด แขนขวา เอล ดิเรกโต", emoji:"💪🛡️🔥"},{name:"ชาด แขนซ้ายขวา ยานกี้สมบูรณ์", emoji:"💪🛡️🔥👑"}]},
+  {id:"bl_yoruichi", name:"โยรุอิจิ ชิโฮอิน — สายฟ้าสีม่วง", emoji:"⚡🐱", rarity:"epic", element:"thunder",
+    base:{hp:215, atk:56, def:20, spd:26},
+    skill:{name:"ชุนโค — สายฟ้าห่อหุ้มร่าง", desc:"โจมตีเดี่ยว 280% ATK เจาะเกราะ 30% มึนงง 25% 1 เทิร์น", power:2.8, type:"single_pen", cost:50},
+    forms:[{name:"โยรุอิจิ ชินิกามิ", emoji:"⚡🐱"},{name:"โยรุอิจิ โหมดเร็วสมบูรณ์", emoji:"⚡🐱👑"},{name:"โยรุอิจิ ชุนโค สมบูรณ์", emoji:"⚡🐱👑💜"}]},
+  // Rare
+  {id:"bl_ishida", name:"อุริว อิชิดะ — นักธนู Quincy", emoji:"🏹💙", rarity:"rare", element:"light",
+    base:{hp:155, atk:42, def:15, spd:19},
+    skill:{name:"ไลเค็น เซ็คเก็น — ลูกธนูแสงศักดิ์สิทธิ์", desc:"โจมตีเดี่ยว 210% ATK เจาะเกราะ 20% และลด DEF ศัตรู 15%", power:2.1, type:"single_pen", cost:40},
+    forms:[{name:"อิชิดะ Quincy", emoji:"🏹💙"},{name:"อิชิดะ Letzt Stil", emoji:"🏹💙⭐"},{name:"อิชิดะ Vollständig เต็มพลัง", emoji:"🏹💙⭐👑"}]},
+  {id:"bl_rangiku", name:"รังงิกุ มัตสึโมโตะ — เมฆเถ้าถ่าน", emoji:"🌸🌫️", rarity:"rare", element:"wind",
+    base:{hp:170, atk:36, def:18, spd:16},
+    skill:{name:"ฮาดินากิ — เมฆเถ้าตัดทุกสิ่ง", desc:"โจมตีศัตรูทั้งหมด 150% ATK และลด SPD ทุกศัตรู 20%", power:1.5, type:"aoe", cost:40},
+    forms:[{name:"รังงิกุ ฟูคุไทโจ", emoji:"🌸🌫️"},{name:"รังงิกุ ฮาดินากิ สมบูรณ์", emoji:"🌸🌫️⭐"},{name:"รังงิกุ สายลมมรณา", emoji:"🌸🌫️⭐👑"}]},
+  {id:"bl_soi_fon", name:"โซอิฟ็อง — หัวหน้าอองกิ", emoji:"🐝⚡", rarity:"rare", element:"thunder",
+    base:{hp:145, atk:46, def:16, spd:24},
+    skill:{name:"โอกาโซะ — พิษสองครั้งสังหาร", desc:"โจมตี 2 ครั้ง 90% ATK + วางพิษ 30% และเพิ่ม SPD ตัวเอง 20%", power:0.9, type:"double", cost:40},
+    forms:[{name:"โซอิฟ็อง กัปตัน", emoji:"🐝⚡"},{name:"โซอิฟ็อง แบงไค Jakuho Raikoben", emoji:"🐝⚡💣"},{name:"โซอิฟ็อง แบงไค เต็มรูปแบบ", emoji:"🐝⚡💣👑"}]},
+  // Common
+  {id:"bl_hanataro", name:"ฮานาทาโร ยามาดะ — แพทย์น้อย", emoji:"🏥💚", rarity:"common", element:"nature",
+    base:{hp:120, atk:14, def:12, spd:12},
+    skill:{name:"ฮิงาชี — ดาบรักษาบาดแผล", desc:"ฮีลพันธมิตร HP น้อยสุด 30% HP และโจมตีเดี่ยว 80% ATK", power:0.8, type:"heal_single", cost:25},
+    forms:[{name:"ฮานาทาโร ชินิกามิ", emoji:"🏥💚"},{name:"ฮานาทาโร นักรบแพทย์", emoji:"🏥💚✨"},{name:"ฮานาทาโร เต็มพลัง", emoji:"🏥💚✨🌟"}]},
+  {id:"bl_kon", name:"คอน — ตุ๊กตาสิงสู่", emoji:"🧸🦁", rarity:"common", element:"neutral",
+    base:{hp:110, atk:16, def:10, spd:18},
+    skill:{name:"ก้องเขาซ้าย เตะสายฟ้า", desc:"โจมตีเดี่ยว 120% ATK + ฮีลตัวเอง 10%", power:1.2, type:"single_lifesteal", cost:25},
+    forms:[{name:"คอน ตุ๊กตา", emoji:"🧸🦁"},{name:"คอน ร่างแท้ไม่ยั้ง", emoji:"🧸🦁🔥"},{name:"คอน ราชาไม่มีใครสกัด", emoji:"🧸🦁🔥👑"}]},
+  {id:"bl_jinta", name:"จินตะ ฮานาคาริ — ลูกน้องอุระฮาระ", emoji:"🧢👊", rarity:"common", element:"neutral",
+    base:{hp:105, atk:17, def:11, spd:15},
+    skill:{name:"หมัดตรง เคยชิน", desc:"โจมตีเดี่ยว 130% ATK", power:1.3, type:"single", cost:20},
+    forms:[{name:"จินตะ เด็กซน", emoji:"🧢👊"},{name:"จินตะ นักรบฝึกหัด", emoji:"🧢👊💪"},{name:"จินตะ ผู้ช่วยเต็มตัว", emoji:"🧢👊💪🌟"}]},
+  {id:"bl_ururu", name:"อุรุรุ สึมุกิยะ — หุ่นรบ", emoji:"🎀⚙️", rarity:"common", element:"earth",
+    base:{hp:130, atk:15, def:14, spd:13},
+    skill:{name:"กระบองเหล็กหุ่นรบ", desc:"โจมตีเดี่ยว 110% ATK และเพิ่ม DEF ตัวเอง 10%", power:1.1, type:"single_buff", cost:20},
+    forms:[{name:"อุรุรุ หุ่นรบ", emoji:"🎀⚙️"},{name:"อุรุรุ โหมดรบ", emoji:"🎀⚙️🔥"},{name:"อุรุรุ โหมดสมบูรณ์", emoji:"🎀⚙️🔥✨"}]},
+  {id:"bl_tessai", name:"เทสไซ สึกาบิชิ — จอมเวท Kido", emoji:"🧲🌀", rarity:"rare", element:"dark",
+    base:{hp:175, atk:34, def:20, spd:11},
+    skill:{name:"บาคุโด 99 ไซกิ เซ็น — คาถาจองจำสูงสุด", desc:"โจมตีเดี่ยว 180% ATK และมึนงงศัตรู 1 เทิร์น + ลด ATK 20%", power:1.8, type:"single_pen", cost:40},
+    forms:[{name:"เทสไซ Kido Corps", emoji:"🧲🌀"},{name:"เทสไซ บาคุโดเต็มพลัง", emoji:"🧲🌀⚡"},{name:"เทสไซ Kidoshu สมบูรณ์", emoji:"🧲🌀⚡👑"}]},
+  {id:"bl_nemu", name:"เนมุ คุโรสึจิ — หุ่นแห่งชินิกามิ", emoji:"🤍⚗️", rarity:"epic", element:"dark",
+    base:{hp:220, atk:44, def:26, spd:16},
+    skill:{name:"สารพิษ Nemuri — สารละลายมรณะ", desc:"โจมตีเดี่ยว 220% ATK + วางพิษไม่หาย 2 เทิร์น เจาะเกราะ 20%", power:2.2, type:"single_burn", cost:50},
+    forms:[{name:"เนมุ ฟูคุไทโจ", emoji:"🤍⚗️"},{name:"เนมุ ร่างพิษสมบูรณ์", emoji:"🤍⚗️💜"},{name:"เนมุ Nemu-2 สมบูรณ์แบบ", emoji:"🤍⚗️💜👑"}]},
+
+  // ---- Mythic ★★★★★ ----
+  {id:"n_madara", name:"มาดาระ อุชิฮะ", emoji:"🌑", rarity:"mythic", element:"dark",
+    base:{hp:520, atk:95, def:45, spd:16},
+    skill:{name:"เรียกอุกกาบาต รินเนกัน", desc:"เรียกอุกกาบาตถล่มศัตรูทั้งหมด 400% ATK เจาะเกราะ 50% สร้างสั่นสะเทือนทั่วสนาม!", power:4.0, type:"meteor_aoe", cost:70},
+    forms:[{name:"มาดาระ อุชิฮะ", emoji:"🌑"},{name:"มาดาระ โหมด รินเนกัน สมบูรณ์", emoji:"🌑🌀"},{name:"มาดาระ โหมดสิบหาง จุตสุกิ", emoji:"🌑🌀💀🌌"}]},
+
+  // =============================================
+  // DRAGON BALL SERIES
+  // =============================================
+  // ---- Common ----
+  {id:"db_krillin", name:"คริลลิน — นักรบหัวโล้", emoji:"👊🥚", rarity:"common", element:"neutral",
+    base:{hp:140, atk:22, def:14, spd:13},
+    skill:{name:"Destructo Disc เดสตรัคโต ดิส", desc:"โจมตีเดี่ยว 150% ATK เจาะเกราะ 20%", power:1.5, type:"single_pen", cost:28},
+    forms:[{name:"คริลลิน C-18 Club", emoji:"👊🥚"},{name:"คริลลิน สุดพลัง", emoji:"👊🥚⚡"},{name:"คริลลิน Kienzan สมบูรณ์", emoji:"👊🥚⚡🌀"}]},
+  {id:"db_yamcha", name:"ยัมชา — นักรบทะเลทราย", emoji:"🐺💨", rarity:"common", element:"wind",
+    base:{hp:120, atk:19, def:11, spd:14},
+    skill:{name:"Wolf Fang Fist หมาป่าเขี้ยวดาบ", desc:"โจมตี 2 ครั้ง 80% ATK ต่อครั้ง", power:0.8, type:"double", cost:22},
+    forms:[{name:"ยัมชา นักรบทะเลทราย", emoji:"🐺💨"},{name:"ยัมชา Saiyan Saga", emoji:"🐺💨🔥"},{name:"ยัมชา Spirit Ball Master", emoji:"🐺💨🔥🌀"}]},
+  {id:"db_tien", name:"เตียนชินฮัน — สามตา", emoji:"👁️👁️👁️", rarity:"common", element:"neutral",
+    base:{hp:155, atk:24, def:16, spd:11},
+    skill:{name:"Tri-Beam Cannon ไตรบีม", desc:"โจมตี AoE 130% ATK เสียสละ HP 10%", power:1.3, type:"aoe", cost:35},
+    forms:[{name:"เตียนชินฮัน สามตา", emoji:"👁️👁️👁️"},{name:"เตียนชินฮัน Ki Blast", emoji:"👁️👁️👁️💙"},{name:"เตียนชินฮัน Neo Tri-Beam", emoji:"👁️👁️👁️💙⚡"}]},
+  {id:"db_chiaotzu", name:"เชาซู — มิตรซูโม่", emoji:"🎎", rarity:"common", element:"neutral",
+    base:{hp:100, atk:16, def:12, spd:10},
+    skill:{name:"Psychic Paper ควบคุมจิต", desc:"ฮีลเพื่อนที่ HP ต่ำสุด +25% MaxHP", power:0.25, type:"heal_single", cost:30},
+    forms:[{name:"เชาซู ซูโม่จิ๋ว", emoji:"🎎"},{name:"เชาซู Psychic Master", emoji:"🎎🌟"},{name:"เชาซู Self-Destruct Legend", emoji:"🎎🌟💥"}]},
+  // ---- Rare ----
+  {id:"db_piccolo", name:"พิคโกโล่ — เจ้าปีศาจขาว", emoji:"👾💚", rarity:"rare", element:"dark",
+    base:{hp:200, atk:38, def:22, spd:13},
+    skill:{name:"Special Beam Cannon มะโกกันโซ", desc:"โจมตีเดี่ยว 220% ATK เจาะเกราะ 40%", power:2.2, type:"single_pen", cost:50},
+    forms:[{name:"พิคโกโล่ มาจูเนียร์", emoji:"👾💚"},{name:"พิคโกโล่ Fuse with Kami", emoji:"👾💚⚡"},{name:"พิคโกโล่ Orange Piccolo", emoji:"👾🟠⚡👑"}]},
+  {id:"db_gohan_kid", name:"โกฮัน เด็ก — ลูกโกคู", emoji:"😤👦", rarity:"rare", element:"neutral",
+    base:{hp:180, atk:35, def:19, spd:14},
+    skill:{name:"Masenko มาเซนโก", desc:"โจมตีเดี่ยว 200% ATK", power:2.0, type:"single", cost:40},
+    forms:[{name:"โกฮัน เด็ก", emoji:"😤👦"},{name:"โกฮัน SSJ Cell Games", emoji:"😤👦⚡"},{name:"โกฮัน Ultimate Beast", emoji:"😤👦⚡🐉"}]},
+  {id:"db_trunks", name:"ทรังส์ — นักรบจากอนาคต", emoji:"⚔️🔵", rarity:"rare", element:"wind",
+    base:{hp:190, atk:36, def:20, spd:15},
+    skill:{name:"Burning Attack เบิร์นนิ่งแอทแทค", desc:"โจมตีเดี่ยว 190% ATK + ลด SPD ศัตรู", power:1.9, type:"single_burn", cost:42},
+    forms:[{name:"ทรังส์ จากอนาคต", emoji:"⚔️🔵"},{name:"ทรังส์ SSJ Rage", emoji:"⚔️🔵⚡"},{name:"ทรังส์ เวลาที่ถูกเลือก", emoji:"⚔️🔵⚡🌌"}]},
+  {id:"db_android18", name:"แอนดรอยด์ 18 — นักรบไซบอร์ก", emoji:"💁‍♀️⚡", rarity:"rare", element:"neutral",
+    base:{hp:210, atk:40, def:24, spd:14},
+    skill:{name:"High Power Energy Blast", desc:"โจมตีหมู่ 150% ATK ทุกศัตรู", power:1.5, type:"aoe", cost:45},
+    forms:[{name:"แอนดรอยด์ 18 บัดเจ็ต", emoji:"💁‍♀️⚡"},{name:"แอนดรอยด์ 18 เต็มพลัง", emoji:"💁‍♀️⚡💥"},{name:"แอนดรอยด์ 18 Cell Absorbed", emoji:"💁‍♀️⚡💥🔩"}]},
+  // ---- Epic ----
+  {id:"db_beerus", name:"บีรัส — เทพแห่งการทำลาย", emoji:"😼💜", rarity:"epic", element:"dark",
+    base:{hp:320, atk:65, def:30, spd:18},
+    skill:{name:"Hakai 破壊 ทำลายล้างอย่างสมบูรณ์", desc:"โจมตีเดี่ยว 280% ATK + Instant Kill หากศัตรู HP ต่ำกว่า 20%", power:2.8, type:"execute", cost:55},
+    forms:[{name:"บีรัส เทพทำลาย", emoji:"😼💜"},{name:"บีรัส God of Destruction", emoji:"😼💜🔮"},{name:"บีรัส Destroyer Incarnate", emoji:"😼💜🔮⚡"}]},
+  {id:"db_frieza", name:"ฟรีซ่า — จักรพรรดิจักรวาล", emoji:"👽❄️", rarity:"epic", element:"dark",
+    base:{hp:300, atk:60, def:28, spd:16},
+    skill:{name:"Death Ball ลูกบอลมรณะ", desc:"โจมตีหมู่ 200% ATK เจาะเกราะ 30%", power:2.0, type:"aoe", cost:60},
+    forms:[{name:"ฟรีซ่า ร่างที่ 1", emoji:"👽❄️"},{name:"ฟรีซ่า Golden Form", emoji:"👽💛⚡"},{name:"ฟรีซ่า Black Frieza", emoji:"👽🖤⚡👑"}]},
+  {id:"db_cell", name:"เซลล์ — อสูรสมบูรณ์แบบ", emoji:"🦋🧬", rarity:"epic", element:"dark",
+    base:{hp:340, atk:68, def:34, spd:15},
+    skill:{name:"Solar Kamehameha โซล่าคาเมฮาเมฮา", desc:"โจมตีหมู่ 250% ATK + ฮีลตัวเอง 15% MaxHP", power:2.5, type:"aoe_drain", cost:65},
+    forms:[{name:"เซลล์ ร่างแรก", emoji:"🦋🧬"},{name:"เซลล์ Perfect Form", emoji:"🦋🧬💯"},{name:"เซลล์ Super Perfect", emoji:"🦋🧬💯⚡"}]},
+  {id:"db_whis", name:"วิส — นางฟ้าจักรวาล 7", emoji:"🪄👼", rarity:"epic", element:"wind",
+    base:{hp:280, atk:55, def:32, spd:22},
+    skill:{name:"Temporal Do-Over ย้อนเวลากลับ", desc:"ฮีลทีมทั้งหมด 30% MaxHP + เพิ่ม SPD ทุกคน", power:0.30, type:"heal_all_buff", cost:55},
+    forms:[{name:"วิส นางฟ้า", emoji:"🪄👼"},{name:"วิส Angelic Power", emoji:"🪄👼🌟"},{name:"วิส True Attendant", emoji:"🪄👼🌟⚡"}]},
+  // ---- Legendary ★★★★ ----
+  {id:"db_goku", name:"โกคู — ซูเปอร์ไซยาน สีฟ้า", emoji:"🔵🐉", rarity:"legendary", element:"neutral",
+    base:{hp:440, atk:80, def:38, spd:19},
+    skill:{name:"Kamehameha x10 คาเมฮาเมฮา ×10", desc:"โจมตีหมู่ 350% ATK เจาะเกราะ 40% ปลดปล่อยพลัง Ki เต็มจักรวาล!", power:3.5, type:"meteor_aoe", cost:70},
+    forms:[{name:"โกคู SSJ Blue", emoji:"🔵🐉"},{name:"โกคู Ultra Instinct Sign", emoji:"⚪🐉⚡"},{name:"โกคู Mastered Ultra Instinct", emoji:"⚪🐉⚡🌟"}]},
+  {id:"db_vegeta", name:"เบจิต้า — ราชาซูเปอร์ไซยาน", emoji:"🔵👑", rarity:"legendary", element:"neutral",
+    base:{hp:420, atk:78, def:40, spd:18},
+    skill:{name:"Final Flash ฟายนอล แฟลช", desc:"โจมตีเดี่ยว 400% ATK เจาะเกราะ 50% เสียสละ Ki ทั้งหมด!", power:4.0, type:"single_pen", cost:75},
+    forms:[{name:"เบจิต้า SSJ Blue Evolved", emoji:"🔵👑"},{name:"เบจิต้า Ultra Ego", emoji:"💜👑⚡"},{name:"เบจิต้า Super Saiyan God SS Evolved", emoji:"💜👑⚡🌟"}]},
+  // ---- Mythic Plus ★★★★★+ (Fusion Specials) ----
+  {id:"db_vegito", name:"เบจิโต้ — การหลอมรวมแหวนโปตาระ ★★★★★+", emoji:"💍🔵👑", rarity:"mythic", element:"neutral",
+    base:{hp:700, atk:130, def:60, spd:24},
+    skill:{name:"Final Kamehameha ฟายนอล คาเมฮาเมฮา", desc:"โจมตีหมู่ 600% ATK เจาะเกราะ 70% สร้างสั่นสะเทือนทั่วจักรวาล!! (ต้องการ: โกคู + เบจิต้า ในทีม)", power:6.0, type:"meteor_aoe", cost:80},
+    forms:[{name:"เบจิโต้ SSJ Blue", emoji:"💍🔵👑"},{name:"เบจิโต้ SSJ Blue Evolved", emoji:"💍🔵👑⚡"},{name:"เบจิโต้ Perfect Potara", emoji:"💍🔵👑⚡🌌"}],
+    isFusion:true, fusionRequires:["db_goku","db_vegeta"], fusionType:"vegito"},
+  {id:"db_gogeta", name:"โกจิต้า — การ Fusion Dance ★★★★★+", emoji:"🕺🔵💚", rarity:"mythic", element:"neutral",
+    base:{hp:680, atk:135, def:58, spd:26},
+    skill:{name:"Big Bang Kamehameha บิ๊กแบง คาเมฮาเมฮา", desc:"โจมตีหมู่ 650% ATK เจาะเกราะ 75% ระเบิดจักรวาล!! (ต้องการ: โกคู + เบจิต้า ในทีม)", power:6.5, type:"meteor_aoe", cost:80},
+    forms:[{name:"โกจิต้า SSJ Blue", emoji:"🕺🔵💚"},{name:"โกจิต้า SSJB Kaioken", emoji:"🕺🔴💚⚡"},{name:"โกจิต้า True Fusion", emoji:"🕺🔴💚⚡🌌"}],
+    isFusion:true, fusionRequires:["db_goku","db_vegeta"], fusionType:"gogeta"},
+  // ===== DEMON SLAYER — HUMAN SIDE =====
+  // ---- Mythic ★★★★★ ----
+  {id:"ds_tanjiro", name:"ทันจิโร่ คามาโดะ — ลมหายใจแห่งดวงอาทิตย์", emoji:"🌊🔥", rarity:"mythic", element:"fire",
+    base:{hp:500, atk:95, def:42, spd:20},
+    skill:{name:"日の呼吸・円舞 ลมหายใจอาทิตย์: เอ็นบุ", desc:"โจมตีหมู่ 380% ATK ทุกศัตรู ติดสถานะไหม้ 3 เทิร์น", power:3.8, type:"aoe_burn", cost:65},
+    forms:[{name:"ทันจิโร่ ลมหายใจน้ำ", emoji:"🌊🔥"},{name:"ทันจิโร่ ปลุกฮิโนคามิ", emoji:"🌊🔥⚡"},{name:"ทันจิโร่ ลมหายใจอาทิตย์", emoji:"🌊🔥⚡☀️"}]},
+  // ---- Legendary ★★★★ — เสาหลักทั้ง 9 ----
+  {id:"ds_giyu", name:"กิยู โทมิโอกะ — เสาน้ำ", emoji:"💧🗡️", rarity:"legendary", element:"water",
+    base:{hp:430, atk:80, def:44, spd:18},
+    skill:{name:"水の呼吸・凪 ลมหายใจน้ำ: นางิ", desc:"โจมตีเดี่ยว 350% ATK เจาะเกราะ 30%", power:3.5, type:"single_pen", cost:60},
+    forms:[{name:"กิยู เสาน้ำ", emoji:"💧🗡️"},{name:"กิยู สมาธิเต็มรูปแบบ", emoji:"💧🗡️⚡"},{name:"กิยู ลมหายใจสมบูรณ์", emoji:"💧🗡️⚡🌊"}]},
+  {id:"ds_shinobu", name:"ชิโนบุ โคโจ — เสาแมลง", emoji:"🦋💜", rarity:"legendary", element:"poison",
+    base:{hp:380, atk:75, def:36, spd:26},
+    skill:{name:"蟲の呼吸・蝙蝠施 ลมหายใจแมลง: ผีเสื้อพิษ", desc:"โจมตีเดี่ยว 320% ATK ติดพิษสะสม 4 เทิร์น (ดาเมจเพิ่มทุกเทิร์น)", power:3.2, type:"single_poison_stack", cost:55},
+    forms:[{name:"ชิโนบุ เสาแมลง", emoji:"🦋💜"},{name:"ชิโนบุ พิษวิสทีเรีย", emoji:"🦋💜☠️"},{name:"ชิโนบุ จิตวิญญาณคาแนะ", emoji:"🦋💜☠️🌸"}]},
+  {id:"ds_rengoku", name:"เคียวจูโร่ เร็นโกคุ — เสาเปลว", emoji:"🔥👑", rarity:"legendary", element:"fire",
+    base:{hp:460, atk:88, def:40, spd:19},
+    skill:{name:"炎の呼吸・奥義 ลมหายใจเปลว: อสูรเปลว", desc:"โจมตีหมู่ 360% ATK ทุกศัตรู + เพิ่ม ATK ตัวเองทุกเทิร์น (สแต็ค)", power:3.6, type:"aoe_self_buff", cost:62},
+    forms:[{name:"เร็นโกคุ เสาเปลว", emoji:"🔥👑"},{name:"เร็นโกคุ เต็มกำลัง", emoji:"🔥👑⚡"},{name:"เร็นโกคุ จิตวิญญาณไม่ดับ", emoji:"🔥👑⚡🌟"}]},
+  {id:"ds_tengen", name:"เทนเง็น อุซุย — เสาเสียง", emoji:"💥🎵", rarity:"legendary", element:"wind",
+    base:{hp:420, atk:82, def:38, spd:24},
+    skill:{name:"音の呼吸・型八 ลมหายใจเสียง: แบบที่แปด", desc:"โจมตีหมู่ 340% ATK + ทำให้ศัตรูสับสน (โอกาสพลาดเทิร์นถัดไป)", power:3.4, type:"aoe_confuse", cost:58},
+    forms:[{name:"เทนเง็น เสาเสียง", emoji:"💥🎵"},{name:"เทนเง็น ระเบิดสามชั้น", emoji:"💥🎵⚡"},{name:"เทนเง็น นินจาเทพ", emoji:"💥🎵⚡👑"}]},
+  {id:"ds_mitsuri", name:"มิตสึริ คันโรจิ — เสารัก", emoji:"💗⛓️", rarity:"legendary", element:"neutral",
+    base:{hp:450, atk:84, def:34, spd:23},
+    skill:{name:"恋の呼吸・乱れ Lacy ลมหายใจรัก: ปั่นป่วน", desc:"โจมตีเดี่ยว 330% ATK + ฮีลตัวเอง 20% ดาเมจที่สร้าง", power:3.3, type:"single_drain", cost:56},
+    forms:[{name:"มิตสึริ เสารัก", emoji:"💗⛓️"},{name:"มิตสึริ พลังกล้ามเนื้อพิเศษ", emoji:"💗⛓️⚡"},{name:"มิตสึริ หัวใจไร้ขีดจำกัด", emoji:"💗⛓️⚡💖"}]},
+  {id:"ds_obanai", name:"โอบานาอิ อิกุโร่ — เสางู", emoji:"🐍🩹", rarity:"legendary", element:"poison",
+    base:{hp:410, atk:80, def:42, spd:20},
+    skill:{name:"蛇の呼吸・蜷局 ลมหายใจงู: ขดวง", desc:"โจมตีเดี่ยว 340% ATK + ลด DEF ศัตรู 25% เป็น 3 เทิร์น", power:3.4, type:"single_defshred", cost:58},
+    forms:[{name:"โอบานาอิ เสางู", emoji:"🐍🩹"},{name:"โอบานาอิ ผูกพันคิจิโด", emoji:"🐍🩹⚡"},{name:"โอบานาอิ ลมหายใจสมบูรณ์", emoji:"🐍🩹⚡🌀"}]},
+  {id:"ds_himejima", name:"เกียวเมอิ ฮิเมจิม่า — เสาหิน", emoji:"🪨🙏", rarity:"legendary", element:"earth",
+    base:{hp:520, atk:78, def:55, spd:14},
+    skill:{name:"岩の呼吸・金剛 ลมหายใจหิน: คอนกอง", desc:"โจมตีหมู่ 300% ATK + เพิ่ม DEF ทีมทั้งหมด 25% เป็น 2 เทิร์น", power:3.0, type:"aoe_def_buff", cost:60},
+    forms:[{name:"เกียวเมอิ เสาหิน", emoji:"🪨🙏"},{name:"เกียวเมอิ เกราะหินเพชร", emoji:"🪨🙏⚡"},{name:"เกียวเมอิ พลังศรัทธา", emoji:"🪨🙏⚡✨"}]},
+  {id:"ds_muichiro", name:"มุอิจิโร่ โทคิโตะ — เสาหมอก", emoji:"🌫️🗡️", rarity:"legendary", element:"wind",
+    base:{hp:400, atk:90, def:32, spd:25},
+    skill:{name:"霧の呼吸・五月雨 ลมหายใจหมอก: ฝนพรำ", desc:"โจมตีเดี่ยว 400% ATK ความเร็วสูง โอกาสคริติคอล +30%", power:4.0, type:"single_crit", cost:64},
+    forms:[{name:"มุอิจิโร่ เสาหมอก", emoji:"🌫️🗡️"},{name:"มุอิจิโร่ ความจำตื่น", emoji:"🌫️🗡️⚡"},{name:"มุอิจิโร่ จิตวิญญาณยูอิจิโร่", emoji:"🌫️🗡️⚡🌙"}]},
+  {id:"ds_sanemi", name:"ซาเนมิ ชินาซึงาวะ — เสาลม", emoji:"🌪️⚔️", rarity:"legendary", element:"wind",
+    base:{hp:440, atk:86, def:40, spd:21},
+    skill:{name:"風の呼吸・つむじ風 ลมหายใจลม: พายุหมุน", desc:"โจมตีหมู่ 350% ATK + เลือดตัวเองฟื้นฟูเล็กน้อยจากความโกรธ", power:3.5, type:"aoe_lifesteal", cost:60},
+    forms:[{name:"ซาเนมิ เสาลม", emoji:"🌪️⚔️"},{name:"ซาเนมิ เลือดอสูรครึ่ง", emoji:"🌪️⚔️⚡"},{name:"ซาเนมิ พายุไร้เมตตา", emoji:"🌪️⚔️⚡🩸"}]},
+  // ---- Mythic Plus ★★★★★★ — Ultimate Fusion ----
+  {id:"ds_yoriichi", name:"โยริอิจิ สึกุยุโระ — ลมหายใจแรกกำเนิด ★★★★★★", emoji:"☀️⚔️👑", rarity:"mythic", element:"fire",
+    base:{hp:900, atk:180, def:75, spd:30},
+    skill:{name:"日の呼吸・神話 ลมหายใจอาทิตย์: เทพปกรณัม", desc:"โจมตีเดี่ยว 5000% ATK ทะลุ DEF/Immunity ทั้งหมด หากศัตรู HP ต่ำกว่า 30% = สังหารทันที (ต้องการ: ทันจิโร่ + เสาหลักทั้ง 9 ในทีม)", power:50.0, type:"execute_pierce", cost:100},
+    forms:[{name:"โยริอิจิ ลมหายใจแรก", emoji:"☀️⚔️👑"},{name:"โยริอิจิ ทรานสพาเรนต์เวิลด์", emoji:"☀️⚔️👑👁️"},{name:"โยริอิจิ เทพแห่งดาบ", emoji:"☀️⚔️👑👁️🌞"}],
+    isFusion:true, fusionRequires:["ds_tanjiro","ds_giyu","ds_shinobu","ds_rengoku","ds_tengen","ds_mitsuri","ds_obanai","ds_himejima","ds_muichiro","ds_sanemi"], fusionType:"yoriichi"},
+
+  // =============================================
+  // DEMON SLAYER — DEMON SIDE (ฝั่งอสูร)
+  // =============================================
+  // ---- Mythic ★★★★★ — ราชาอสูร ----
+  {id:"dm_muzan", name:"มุซัง คิบุตสึจิ — ราชาอสูร", emoji:"🌑🩸", rarity:"mythic", element:"dark",
+    base:{hp:620, atk:112, def:52, spd:22},
+    skill:{name:"เลือดอสูรมรณะ — สร้างอสูรสมบูรณ์", desc:"โจมตีหมู่ 460% ATK เจาะเกราะ 60% ฟื้นฟู HP 20% และสร้างสถานะ 'อสูรสมบูรณ์' เพิ่ม ATK 25% 3 เทิร์น!", power:4.6, type:"meteor_aoe", cost:80},
+    forms:[{name:"มุซัง ร่างมนุษย์", emoji:"🌑🩸"},{name:"มุซัง ร่างกลางคืน", emoji:"🌑🩸💀"},{name:"มุซัง ร่างสมบูรณ์แบบ", emoji:"🌑🩸💀👑"}]},
+
+  // ---- Legendary ★★★★ — Kizuki ขึ้น ----
+  {id:"dm_kokushibo", name:"โคคุชิโบะ — ขึ้นที่หนึ่ง ลมหายใจพระจันทร์", emoji:"🌙⚔️", rarity:"legendary", element:"dark",
+    base:{hp:540, atk:100, def:48, spd:20},
+    skill:{name:"月の呼吸・十六ノ型 ลมหายใจพระจันทร์: แบบที่สิบหก", desc:"โจมตีเดี่ยว 420% ATK เจาะเกราะ 55% ติดเลือดออกสะสม 3 เทิร์น และลด SPD ศัตรู 30%", power:4.2, type:"single_drain", cost:72},
+    forms:[{name:"โคคุชิโบะ ขึ้นที่หนึ่ง", emoji:"🌙⚔️"},{name:"โคคุชิโบะ ร่างดาบพระจันทร์", emoji:"🌙⚔️🩸"},{name:"โคคุชิโบะ จิตวิญญาณ Yoriichi", emoji:"🌙⚔️🩸👁️"}]},
+  {id:"dm_doma", name:"โดมะ — ขึ้นที่สอง น้ำแข็งมรณะ", emoji:"❄️😊", rarity:"legendary", element:"ice",
+    base:{hp:490, atk:92, def:44, spd:21},
+    skill:{name:"Scattering Lotuses — ดอกบัวพิษน้ำแข็ง", desc:"โจมตีหมู่ 380% ATK แช่แข็งศัตรูทั้งหมด 2 เทิร์น เจาะเกราะ 40% ดูดซับ HP จากน้ำแข็งพิษ", power:3.8, type:"aoe_drain", cost:68},
+    forms:[{name:"โดมะ ขึ้นที่สอง", emoji:"❄️😊"},{name:"โดมะ น้ำแข็งบัวมรณะ", emoji:"❄️😊💀"},{name:"โดมะ โจมตีเต็มกำลัง", emoji:"❄️😊💀🌸"}]},
+  {id:"dm_akaza", name:"อาคาซะ — ขึ้นที่สาม หมัดมังกร", emoji:"🔥👊", rarity:"legendary", element:"fire",
+    base:{hp:470, atk:96, def:42, spd:24},
+    skill:{name:"Destructive Death — หมัดทำลายล้างพลังอสูร", desc:"โจมตีเดี่ยว 400% ATK เจาะเกราะ 50% ฮีลตัวเอง 25% จากดาเมจที่สร้าง และเพิ่ม ATK ทุกเทิร์น", power:4.0, type:"single_lifesteal", cost:70},
+    forms:[{name:"อาคาซะ ขึ้นที่สาม", emoji:"🔥👊"},{name:"อาคาซะ Technique Expansion", emoji:"🔥👊⚡"},{name:"อาคาซะ ร่างที่แท้จริง", emoji:"🔥👊⚡💔"}]},
+  {id:"dm_hantengu", name:"ฮันเทนกุ — ขึ้นที่สี่ ผู้แตกร่าง", emoji:"👺🪄", rarity:"legendary", element:"thunder",
+    base:{hp:440, atk:82, def:40, spd:18},
+    skill:{name:"แตกร่างสี่อารมณ์ — พลังแห่งความรู้สึก", desc:"โจมตีหมู่ 320% ATK สร้างโคลน 2 ตัว โจมตีซ้ำ 2 ครั้ง 120% ATK ต่อครั้ง เจาะเกราะ 30%", power:3.2, type:"aoe_clone", cost:65},
+    forms:[{name:"ฮันเทนกุ ขึ้นที่สี่", emoji:"👺🪄"},{name:"ฮันเทนกุ ร่างหัวใจ", emoji:"👺🪄⚡"},{name:"ฮันเทนกุ ร่างสุดท้ายไข", emoji:"👺🪄⚡🥚"}]},
+  {id:"dm_gyutaro", name:"กิวทาโร่ — ขึ้นที่หก พี่ชายเคียว", emoji:"🩸🌙", rarity:"legendary", element:"poison",
+    base:{hp:420, atk:88, def:36, spd:22},
+    skill:{name:"Blood Sickle Dance — เคียวเลือดวนมรณะ", desc:"โจมตีหมู่ 340% ATK + พิษเจาะเกราะ 35% 4 เทิร์น ดูดซับ HP 20% จากศัตรูที่ติดพิษ", power:3.4, type:"aoe_poison", cost:62},
+    forms:[{name:"กิวทาโร่ ขึ้นที่หก", emoji:"🩸🌙"},{name:"กิวทาโร่ เคียวพิษ", emoji:"🩸🌙☠️"},{name:"กิวทาโร่ หลอมรวมกับดะกิ", emoji:"🩸🌙☠️🩷"}]},
+
+  // ---- Epic ★★★ — Kizuki ล่าง ----
+  {id:"dm_daki", name:"ดะกิ — ขึ้นที่หก น้องสาวผ้าไหม", emoji:"🩷🎀", rarity:"epic", element:"wind",
+    base:{hp:310, atk:68, def:32, spd:24},
+    skill:{name:"Obi Sash Manipulation — ผ้าไหมมรณะ", desc:"โจมตีหมู่ 260% ATK ดักจับศัตรูทั้งหมด ลด SPD 40% 2 เทิร์น เจาะเกราะ 25%", power:2.6, type:"aoe_slow", cost:58},
+    forms:[{name:"ดะกิ ขึ้นที่หก", emoji:"🩷🎀"},{name:"ดะกิ ผ้าไหมพันธนาการ", emoji:"🩷🎀⚡"},{name:"ดะกิ รวมพลังกิวทาโร่", emoji:"🩷🎀⚡🩸"}]},
+  {id:"dm_gyokko", name:"กิวกโก — ขึ้นที่ห้า เจ้าพ่อหม้อ", emoji:"🏺🐟", rarity:"epic", element:"water",
+    base:{hp:290, atk:70, def:30, spd:19},
+    skill:{name:"Killer Fish Scales — เกล็ดปลามรณะ", desc:"โจมตีหมู่ 250% ATK ฝังตะขอพิษ 3 เทิร์น เจาะเกราะ 20% และลด DEF ศัตรู 20%", power:2.5, type:"aoe_poison", cost:55},
+    forms:[{name:"กิวกโก ขึ้นที่ห้า", emoji:"🏺🐟"},{name:"กิวกโก ร่างสุดสวย", emoji:"🏺🐟✨"},{name:"กิวกโก อสูรศิลปินสมบูรณ์", emoji:"🏺🐟✨👑"}]},
+  {id:"dm_enmu", name:"เอนมุ — ล่างที่หนึ่ง ผู้สร้างฝัน", emoji:"💤🌙", rarity:"epic", element:"dark",
+    base:{hp:270, atk:60, def:26, spd:17},
+    skill:{name:"Forced Unconscious Hypnosis — สะกดนอนหลับ", desc:"โจมตีหมู่ 220% ATK สร้างสถานะหลับ 1 เทิร์น ศัตรูที่หลับรับดาเมจเพิ่ม 50% และลด ATK 20%", power:2.2, type:"aoe_sleep", cost:52},
+    forms:[{name:"เอนมุ ล่างที่หนึ่ง", emoji:"💤🌙"},{name:"เอนมุ หลอมรวมกับรถไฟ", emoji:"💤🌙🚂"},{name:"เอนมุ ฝันร้ายไม่สิ้นสุด", emoji:"💤🌙🚂👁️"}]},
+  {id:"dm_rui", name:"รุย — ล่างที่ห้า อสูรใยแมงมุม", emoji:"🕸️❤️", rarity:"epic", element:"dark",
+    base:{hp:250, atk:62, def:28, spd:20},
+    skill:{name:"Cutting Thread Cage — กรงใยแมงมุมมรณะ", desc:"โจมตีเดี่ยว 280% ATK ใยตัดลด DEF ศัตรู 30% 3 เทิร์น และดักจับผู้ถูกโจมตีไม่ให้หนีเทิร์นถัดไป", power:2.8, type:"single_defshred", cost:50},
+    forms:[{name:"รุย ล่างที่ห้า", emoji:"🕸️❤️"},{name:"รุย ครอบครัวแมงมุม", emoji:"🕸️❤️🕷️"},{name:"รุย ใยมรณะเต็มกำลัง", emoji:"🕸️❤️🕷️🩸"}]},
+
+  // ---- Rare ★★ ----
+  {id:"dm_kamanue", name:"คามานุเอะ — ล่างที่สอง อสูรน้ำ", emoji:"💧👿", rarity:"rare", element:"water",
+    base:{hp:185, atk:44, def:20, spd:16},
+    skill:{name:"น้ำไหลมรณะ — กระแสอสูร", desc:"โจมตีหมู่ 170% ATK แช่แข็งศัตรู 1 เทิร์น 25% และลด SPD 15%", power:1.7, type:"aoe", cost:42},
+    forms:[{name:"คามานุเอะ ล่างที่สอง", emoji:"💧👿"},{name:"คามานุเอะ น้ำวนมรณะ", emoji:"💧👿🌊"},{name:"คามานุเอะ อสูรน้ำสมบูรณ์", emoji:"💧👿🌊💀"}]},
+  {id:"dm_mukago", name:"มุคาโกะ — ล่างที่สี่ อสูรพิษ", emoji:"🍄☠️", rarity:"rare", element:"poison",
+    base:{hp:170, atk:46, def:18, spd:19},
+    skill:{name:"Explosive Blood — เลือดระเบิดพิษ", desc:"โจมตีเดี่ยว 200% ATK + พิษรุนแรง 3 เทิร์น โอกาสเลือดออก 25%", power:2.0, type:"single_burn", cost:40},
+    forms:[{name:"มุคาโกะ ล่างที่สี่", emoji:"🍄☠️"},{name:"มุคาโกะ พิษสะสม", emoji:"🍄☠️💀"},{name:"มุคาโกะ อสูรพิษร้ายแรง", emoji:"🍄☠️💀🍄"}]},
+  {id:"dm_hairo", name:"ไฮโระ — ล่างที่สาม อสูรดิน", emoji:"🪨💢", rarity:"rare", element:"earth",
+    base:{hp:200, atk:42, def:24, spd:14},
+    skill:{name:"Earthen Slam — กำปั้นหินมรณะ", desc:"โจมตีเดี่ยว 210% ATK เจาะเกราะ 25% และเพิ่ม DEF ตัวเอง 20% 2 เทิร์น", power:2.1, type:"single_buff", cost:40},
+    forms:[{name:"ไฮโระ ล่างที่สาม", emoji:"🪨💢"},{name:"ไฮโระ กำแพงหิน", emoji:"🪨💢🛡️"},{name:"ไฮโระ อสูรดินสมบูรณ์", emoji:"🪨💢🛡️⚡"}]},
+];
+
+// ตัวละครจากโคลแลบ (นารูโตะ + มาดาระ) — ออกเฉพาะตู้ของตัวเอง
+const NARUTO_IDS = ["n_naruto","n_sasuke","n_kakashi","n_sakura","n_gaara","n_itachi","n_rock_lee","n_neji","n_tsunade","n_orochimaru","n_minato","n_hinata","n_madara"];
+// ตัวละคร One Piece — ออกเฉพาะตู้ของตัวเอง
+const ONEPIECE_IDS = ["op_luffy_g5","op_kaido_100b","op_zoro","op_shanks","op_nami","op_robin","op_sanji","op_jinbe","op_usopp","op_chopper","op_brook","op_franky"];
+// ตัวละคร Bleach — ออกเฉพาะตู้ของตัวเอง
+const BLEACH_IDS = ["bl_ichigo_bankai","bl_aizen","bl_byakuya","bl_kenpachi","bl_rukia","bl_urahara","bl_renji","bl_toshiro","bl_orihime","bl_chad","bl_yoruichi","bl_ishida","bl_rangiku","bl_soi_fon","bl_hanataro","bl_kon","bl_jinta","bl_ururu","bl_tessai","bl_nemu"];
+// ตัวละคร Dragon Ball — ออกเฉพาะตู้ของตัวเอง
+const DRAGONBALL_IDS = ["db_goku","db_vegeta","db_vegito","db_gogeta","db_piccolo","db_gohan_kid","db_trunks","db_android18","db_beerus","db_frieza","db_cell","db_whis","db_krillin","db_yamcha","db_tien","db_chiaotzu"];
+// ตัวละคร Demon Slayer (ฝั่งคน) — ออกเฉพาะตู้ของตัวเอง
+const DEMONSLAYER_IDS = ["ds_tanjiro","ds_giyu","ds_shinobu","ds_rengoku","ds_tengen","ds_mitsuri","ds_obanai","ds_himejima","ds_muichiro","ds_sanemi","ds_yoriichi"];
+// ตัวละคร Demon Slayer (ฝั่งอสูร) — ออกเฉพาะตู้อสูร
+const DEMON_IDS = ["dm_muzan","dm_kokushibo","dm_doma","dm_akaza","dm_hantengu","dm_gyutaro","dm_daki","dm_gyokko","dm_enmu","dm_rui","dm_kamanue","dm_mukago","dm_hairo"];
+const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id)).map(h => h.id);
+
+// Gacha banners
+const BANNERS = [
+  {id:"standard", name:"ตู้มาตรฐาน", cls:"b-fire", desc:"ตู้พื้นฐานมีฮีโร่ทุกเรียกได้เสมอ ใช้ Gem หรือ Gold",
+   feature: null, cost:160, costType:"gem",
+   pool: STANDARD_POOL, rateUp:null},
+  {id:"flame", name:"ตู้เปลวเพลิงทมิฬ", cls:"b-fire", desc:"เพิ่มโอกาส 'จอมเทพหงส์ไฟ' (Legendary)",
+   feature:"h_phoenixlord", cost:160, costType:"gem",
+   pool: STANDARD_POOL, rateUp:"h_phoenixlord"},
+  {id:"frost", name:"ตู้ราชินีน้ำแข็ง", cls:"b-ice", desc:"เพิ่มโอกาส 'ราชินีสวรรค์' (Legendary)",
+   feature:"h_celestialqueen", cost:160, costType:"gem",
+   pool: STANDARD_POOL, rateUp:"h_celestialqueen"},
+  {id:"abyss", name:"ตู้ห้วงนรกมืด", cls:"b-dark", desc:"เพิ่มโอกาส 'ราชาเลวีอาธานมืด' (Legendary)",
+   feature:"h_voidleviathan", cost:160, costType:"gem",
+   pool: STANDARD_POOL, rateUp:"h_voidleviathan"},
+  {id:"naruto", name:"🍥 ตู้นินจาโลกนารูโตะ", cls:"b-naruto", desc:"สุ่มตัวละครอิงพลังจากนารูโตะ 12 ตัวเท่านั้น! Rate Up: นารูโตะ & มินาโตะ",
+   feature:"n_naruto", cost:160, costType:"gem",
+   pool: ["n_naruto","n_sasuke","n_kakashi","n_sakura","n_gaara","n_itachi","n_rock_lee","n_neji","n_tsunade","n_orochimaru","n_minato","n_hinata"],
+   rateUp:"n_naruto"},
+  {id:"madara", name:"🌑 ตู้มาดาระ — ราชาแห่งความมืด ★★★★★", cls:"b-madara", desc:"โอกาสได้รับ 'มาดาระ อุชิฮะ' ระดับ Mythic ★★★★★ ตัวเดียวในโลก! Rate Up Pity 80 ครั้ง",
+   feature:"n_madara", cost:200, costType:"gem",
+   pool: ["n_madara","n_naruto","n_sasuke","n_itachi","n_minato","n_kakashi","n_sakura","n_gaara","n_tsunade","n_orochimaru"],
+   rateUp:"n_madara", mythicBanner:true},
+  {id:"onepiece", name:"🏴‍☠️ ตู้แกรนด์ไลน์ — One Piece", cls:"b-onepiece", desc:"สุ่มตัวละครอิงพลังจาก One Piece 12 ตัวเท่านั้น! Rate Up: ลูฟี่ เกียร์ 5 & ไคโด ร้อยอสูร ★★★★★",
+   feature:"op_luffy_g5", cost:180, costType:"gem",
+   pool: ["op_luffy_g5","op_kaido_100b","op_zoro","op_shanks","op_nami","op_robin","op_sanji","op_jinbe","op_usopp","op_chopper","op_brook","op_franky"],
+   rateUp:"op_luffy_g5", mythicBanner:true},
+  {id:"bleach", name:"⬛ ตู้เทพมรณะ — Bleach บลีช", cls:"b-bleach", desc:"สุ่มตัวละครอิงพลังจาก Bleach 20 ตัวเท่านั้น! Rate Up: อิจิโกะ แบงไค & เบียคุยะ",
+   feature:"bl_ichigo_bankai", cost:160, costType:"gem",
+   pool: ["bl_ichigo_bankai","bl_byakuya","bl_kenpachi","bl_rukia","bl_urahara","bl_renji","bl_toshiro","bl_orihime","bl_chad","bl_yoruichi","bl_ishida","bl_rangiku","bl_soi_fon","bl_hanataro","bl_kon","bl_jinta","bl_ururu","bl_tessai","bl_nemu"],
+   rateUp:"bl_ichigo_bankai", mythicBanner:true},
+  {id:"aizen", name:"🦋 ตู้ไอเซ็น — ราชาแห่งการหลอกลวง ★★★★★", cls:"b-bleach-aizen", desc:"โอกาสได้รับ 'โซสุเกะ ไอเซ็น' ระดับ Mythic ★★★★★ ร่างโฮวกยอกุ! Rate Up Pity 80 ครั้ง",
+   feature:"bl_aizen", cost:200, costType:"gem",
+   pool: ["bl_aizen","bl_ichigo_bankai","bl_byakuya","bl_kenpachi","bl_rukia","bl_urahara","bl_yoruichi","bl_toshiro","bl_renji","bl_orihime"],
+   rateUp:"bl_aizen", mythicBanner:true},
+  // ===== DRAGON BALL BANNERS =====
+  {id:"dragonball", name:"🐉 ตู้ Dragon Ball — ศึกชี้ชะตาไซยาน", cls:"b-dragonball", desc:"สุ่มตัวละคร Dragon Ball 16 ตัว! Rate Up: โกคู SSJ Blue & เบจิต้า SSJ Blue ★★★★ + ปลดล็อคระบบฟิวชัน!",
+   feature:"db_goku", cost:180, costType:"gem",
+   pool: ["db_goku","db_vegeta","db_piccolo","db_gohan_kid","db_trunks","db_android18","db_beerus","db_frieza","db_cell","db_whis","db_krillin","db_yamcha","db_tien","db_chiaotzu"],
+   rateUp:"db_goku", mythicBanner:false, dragonballBanner:true},
+  // ===== DEMON SLAYER BANNER =====
+  {id:"demonslayer", name:"⚔️ ตู้ดาบพิฆาตอสูร — เหล่าเสาหลัก", cls:"b-demonslayer", desc:"สุ่มตัวละคร Demon Slayer ฝั่งคน 10 ตัว! Rate Up: ทันจิโร่ คามาโดะ ★★★★★ + ปลดล็อคระบบฟิวชันโยริอิจิ!",
+   feature:"ds_tanjiro", cost:200, costType:"gem",
+   pool: ["ds_tanjiro","ds_giyu","ds_shinobu","ds_rengoku","ds_tengen","ds_mitsuri","ds_obanai","ds_himejima","ds_muichiro","ds_sanemi"],
+   rateUp:"ds_tanjiro", mythicBanner:true, demonslayerBanner:true},
+  // ===== DEMON BANNER =====
+  {id:"demon", name:"🌑 ตู้มุซัง — อสูร Kizuki ทั้ง 13", cls:"b-muzan", desc:"สุ่มตัวละครอสูรทั้ง 13 ตัว! Rate Up: มุซัง คิบุตสึจิ ★★★★★ Pity 80 ครั้ง + Kizuki ขึ้น Legendary 4 ตัว!",
+   feature:"dm_muzan", cost:220, costType:"gem",
+   pool: ["dm_muzan","dm_kokushibo","dm_doma","dm_akaza","dm_hantengu","dm_gyutaro","dm_daki","dm_gyokko","dm_enmu","dm_rui","dm_kamanue","dm_mukago","dm_hairo"],
+   rateUp:"dm_muzan", mythicBanner:true, demonslayerBanner:true},
+];
+
+// Stages: chapters with story / farm / boss
+const STAGES = [
+  {ch:"บทที่ 1: ป่าแห่งจุดเริ่มต้น", stages:[
+    {id:"1-1", name:"ทางเข้าป่า", type:"story", enemyLv:1, reward:{gold:80, exp:30}, enemies:["h_swordling"]},
+    {id:"1-2", name:"ลานฝึกฝน (ฟาร์ม)", type:"farm", enemyLv:2, reward:{gold:120, exp:40}, enemies:["h_swordling","h_archerling"]},
+    {id:"1-3", name:"บอส: หัวหน้าโจรป่า", type:"boss", enemyLv:4, reward:{gold:250, exp:90, gem:30}, enemies:["h_shieldling","h_swordling"]},
+  ]},
+  {ch:"บทที่ 2: ดินแดนน้ำแข็ง", stages:[
+    {id:"2-1", name:"ธารน้ำแข็งเหนือ", type:"story", enemyLv:6, reward:{gold:140, exp:60}, enemies:["h_frostmage"]},
+    {id:"2-2", name:"ถ้ำคริสตัล (ฟาร์ม)", type:"farm", enemyLv:7, reward:{gold:180, exp:70}, enemies:["h_frostmage","h_archerling"]},
+    {id:"2-3", name:"บอส: ราชินีน้ำแข็งจำลอง", type:"boss", enemyLv:10, reward:{gold:350, exp:140, gem:40}, enemies:["h_frostmage","h_thunderfox","h_shieldling"]},
+  ]},
+  {ch:"บทที่ 3: หุบเหวมรณะ", stages:[
+    {id:"3-1", name:"ประตูแห่งเงามืด", type:"story", enemyLv:12, reward:{gold:220, exp:100}, enemies:["h_voidassassin"]},
+    {id:"3-2", name:"สนามรบนิรันดร์ (ฟาร์ม)", type:"farm", enemyLv:13, reward:{gold:260, exp:110}, enemies:["h_voidassassin","h_stormcaller"]},
+    {id:"3-3", name:"บอส: ราชาเลวีอาธานมืด", type:"boss", enemyLv:18, reward:{gold:500, exp:220, gem:60}, enemies:["h_voidleviathan","h_voidassassin","h_stormcaller"], bossRate:0.20},
+  ]},
+  {ch:"บทที่ 4: ดินแดนแห่งดวงดาวล่มสลาย", stages:[
+    {id:"4-1", name:"ทุ่งหินอุกกาบาต", type:"story", enemyLv:20, reward:{gold:300, exp:140}, enemies:["h_rockgolem","h_moonarcher"]},
+    {id:"4-2", name:"สมรภูมิเศษดาว (ฟาร์ม)", type:"farm", enemyLv:22, reward:{gold:340, exp:150}, enemies:["h_blazerider","h_runeknight","h_pixiebloom"]},
+    {id:"4-3", name:"บอส: ผู้สร้างดวงดาวเสื่อมสลาย", type:"boss", enemyLv:28, reward:{gold:650, exp:300, gem:80}, enemies:["h_starforger","h_runeknight","h_abysswitch"], bossRate:0.30},
+  ]},
+  {ch:"บทที่ 5: ห้วงอลวนแห่งจุดจบ", stages:[
+    {id:"5-1", name:"รอยแยกแห่งความว่างเปล่า", type:"story", enemyLv:30, reward:{gold:380, exp:180}, enemies:["h_abysswitch","h_moonarcher"]},
+    {id:"5-2", name:"สนามประลองอสูร (ฟาร์ม)", type:"farm", enemyLv:32, reward:{gold:420, exp:190}, enemies:["h_starforger","h_blazerider","h_rockgolem"]},
+    {id:"5-3", name:"บอส: มังกรอลวนผู้ทำลายล้าง", type:"boss", enemyLv:40, reward:{gold:900, exp:450, gem:120}, enemies:["h_chaosdragon","h_starforger","h_abysswitch"], bossRate:0.40},
+  ]},
+  {ch:"บทที่ 6: คาบสมุทรเรืองรอง", stages:[
+    {id:"6-1", name:"ชายฝั่งปะการังเรืองแสง", type:"story", enemyLv:42, reward:{gold:460, exp:210}, enemies:["h_coralguard","h_sandnomad"]},
+    {id:"6-2", name:"วิหารแสงเหนือ (ฟาร์ม)", type:"farm", enemyLv:45, reward:{gold:520, exp:230}, enemies:["h_windsylph","h_emberpriest","h_ironvalkyrie"]},
+    {id:"6-3", name:"บอส: ราชาห้วงนรกขุมลึก", type:"boss", enemyLv:55, reward:{gold:1100, exp:520, gem:150}, enemies:["h_abyssking","h_ironvalkyrie","h_spiritowl"], bossRate:0.35},
+  ]},
+  {ch:"บทที่ 7: ขอบฟ้าแห่งรุ่งอรุณ", stages:[
+    {id:"7-1", name:"ประตูแสงเหนือ", type:"story", enemyLv:58, reward:{gold:600, exp:260}, enemies:["h_spiritowl","h_windsylph"]},
+    {id:"7-2", name:"สมรภูมิเทพไททัน (ฟาร์ม)", type:"farm", enemyLv:62, reward:{gold:680, exp:290}, enemies:["h_auroratitan","h_ironvalkyrie","h_emberpriest"]},
+    {id:"7-3", name:"บอส: ไททันแสงเหนือผู้พิทักษ์", type:"boss", enemyLv:70, reward:{gold:1400, exp:650, gem:200}, enemies:["h_auroratitan","h_abyssking","h_chaosdragon"], bossRate:0.45},
+  ]},
+  {ch:"🍥 บทที่ 8: หมู่บ้านโคโนฮะ - จุดเริ่มต้นของนินจา", stages:[
+    {id:"8-1", name:"📖 สถาบันนินจาโคโนฮะ", type:"story", enemyLv:72, reward:{gold:750, exp:320}, enemies:["n_hinata","n_rock_lee"], story:"นารูโตะเด็กน้อยผู้ถูกรังเกียจฝึกฝนอย่างหนักเพื่อพิสูจน์ตัวเอง การสอบเลื่อนขั้นเจนินเริ่มต้น..."},
+    {id:"8-2", name:"🌿 ป่าแห่งความตาย", type:"farm", enemyLv:76, reward:{gold:900, exp:370}, enemies:["n_orochimaru","n_gaara","n_neji"], story:"การสอบจูนินในป่าอันตราย โอโรจิมารุซุ่มโจมตีทีม ศัตรูที่แข็งแกร่งรออยู่ทุกทิศ"},
+    {id:"8-3", name:"👹 บอส: โอโรจิมารุ ผู้ทรยศ", type:"boss", enemyLv:82, reward:{gold:1800, exp:800, gem:250}, enemies:["n_orochimaru","n_gaara","n_sasuke"], bossRate:0.35, story:"โอโรจิมารุเปิดเผยพลังที่แท้จริง ซาสุเกะตกอยู่ใต้ตราสยอง นารูโตะต้องสู้เพื่อเพื่อน!"},
+  ]},
+  {ch:"🔴 บทที่ 9: อาคาสึกิ - รุ่งอรุณแห่งความมืด", stages:[
+    {id:"9-1", name:"🦅 เงาของอาคาสึกิ", type:"story", enemyLv:85, reward:{gold:950, exp:400}, enemies:["n_itachi","n_kakashi"], story:"อิทาจิปรากฏตัวที่โคโนฮะเพื่อจับนารูโตะ คาคาชิสู้ปกป้องลูกศิษย์ด้วยชีวิต..."},
+    {id:"9-2", name:"🌀 ไล่ล่าซาสุเกะ", type:"farm", enemyLv:90, reward:{gold:1100, exp:450}, enemies:["n_sasuke","n_neji","n_rock_lee"], story:"ซาสุเกะหนีออกจากโคโนฮะ ทีมนารูโตะต้องไล่ตามก่อนสายเกินไป"},
+    {id:"9-3", name:"🍥 บอส: หุบเขาแห่งจุดจบ", type:"boss", enemyLv:99, reward:{gold:2500, exp:1100, gem:350}, enemies:["n_sasuke","n_itachi","n_minato"], bossRate:0.50, story:"นารูโตะ VS ซาสุเกะ! นารูโตะปลดปล่อยพลัง 9 หางเพื่อนำเพื่อนสนิทกลับมา มินาโตะวิญญาณช่วยลูกชาย!"},
+  ]},
+  {ch:"🌑 โหมดเรท: มาดาระ อุชิฮะ — บอสในตำนาน", stages:[
+    {id:"raid-madara-1", name:"🌑 ความมืดมิดของมาดาระ", type:"raid", enemyLv:120, reward:{gold:5000, exp:2000, gem:500}, enemies:["n_madara"], bossRate:0.05, isMadaraRaid:true, story:"มาดาระ อุชิฮะ จอมเวทผู้ยิ่งใหญ่ที่สุดปรากฏตัว! ทุกการโจมตีธรรมดาของเขาคือการโจมตีหมู่ สกิล 'เรียกอุกกาบาต' ทำลายล้างทุกสิ่ง! โอกาสดรอป 5%"},
+    {id:"raid-madara-2", name:"🌑☄️ มาดาระ — โหมดสมบูรณ์", type:"raid", enemyLv:150, reward:{gold:8000, exp:3500, gem:800}, enemies:["n_madara"], bossRate:0.05, isMadaraRaid:true, story:"มาดาระปลดปล่อยพลัง รินเนกัน เต็มรูปแบบ! เขาเรียกอุกกาบาตจากฟากฟ้าถล่มทีมคุณ! ต้องการทีมระดับ Legendary ขึ้นไปเท่านั้น!"},
+  ]},
+  {ch:"🏴‍☠️ บทที่ 10: เกาะวาโนะ - ศึกชี้ชะตา", stages:[
+    {id:"10-1", name:"⛩️ ท่าเรือลับแดนวาโนะ", type:"story", enemyLv:105, reward:{gold:1300, exp:480}, enemies:["op_usopp","op_chopper"], story:"หมวกฟางทั้งคณะแฝงตัวขึ้นฝั่งเกาะวาโนะ ดินแดนแห่งซามูไรที่ปกคลุมด้วยเงาของจักรพรรดิโจรสลัด ไคโด..."},
+    {id:"10-2", name:"🌸 ปราการโอนิกาชิม่า (ฟาร์ม)", type:"farm", enemyLv:110, reward:{gold:1500, exp:520}, enemies:["op_sanji","op_jinbe","op_nami"], story:"การโจมตีปราการโอนิกาชิม่าเริ่มขึ้น พันธมิตรจากทุกฝ่ายรวมตัวเพื่อบุกเข้าไปยังตัวปราการ"},
+    {id:"10-3", name:"🐲 บอส: ซันโตริว vs ราชาแห่งสัตว์ร้าย", type:"boss", enemyLv:120, reward:{gold:2800, exp:1200, gem:380}, enemies:["op_kaido_100b","op_zoro","op_shanks"], bossRate:0.40, story:"โซโรเปิดศึกฟันดาบกับไคโดผู้แปลงร่างเป็นมังกร! พลังฮากิปะทะกันสะเทือนทั่วปราการโอนิกาชิม่า!"},
+  ]},
+  {ch:"🐲 โหมดเรท: ไคโด ร้อยอสูร — บอสในตำนาน", stages:[
+    {id:"raid-kaido-1", name:"🐲⚡ ร่างมังกรสายฟ้าของไคโด", type:"raid", enemyLv:130, reward:{gold:5500, exp:2200, gem:550}, enemies:["op_kaido_100b"], bossRate:0.05, isKaidoRaid:true, story:"ไคโดแปลงร่างเป็นมังกรสายฟ้ายักษ์! สกิล 'กระแสไฟฟ้ามรณะ ร้อยอสูร' ทำให้ทีมศัตรูมึนงงทั้งหมด! โอกาสดรอป 5%"},
+    {id:"raid-kaido-2", name:"🐲🔥 ไคโด — จอมทรราชนิรันดร์", type:"raid", enemyLv:160, reward:{gold:9000, exp:3800, gem:850}, enemies:["op_kaido_100b"], bossRate:0.05, isKaidoRaid:true, story:"ไคโดปลดปล่อยพลังสูงสุดในฐานะหนึ่งในสี่จักรพรรดิทะเล! ต้องการทีมระดับ Legendary ขึ้นไปเท่านั้นจึงจะเอาชนะได้!"},
+  ]},
+  {ch:"⬛ บทที่ 11: โซล โซไซตี้ — จุดเริ่มต้นของเทพมรณะ", stages:[
+    {id:"11-1", name:"🌸 ทางเข้า Seireitei ประตูชาร์ป", type:"story", enemyLv:125, reward:{gold:1600, exp:560}, enemies:["bl_jinta","bl_ururu","bl_hanataro"], story:"อิจิโกะและเพื่อนๆ บุกเข้าสู่ Seireitei เมืองแห่งชินิกามิ เพื่อช่วยรูเกียที่ถูกตัดสินประหารชีวิต กำแพงสูงตระหง่านขวางหน้า กัปตันแห่ง Gotei 13 รออยู่ภายใน..."},
+    {id:"11-2", name:"⚡ ศึกกลางเมือง Seireitei (ฟาร์ม)", type:"farm", enemyLv:130, reward:{gold:1800, exp:600}, enemies:["bl_renji","bl_soi_fon","bl_rangiku"], story:"การสู้รบในเขต Seireitei ดำเนินไปอย่างดุเดือด แต่ละทีมแยกกันสู้กับชินิกามิระดับกัปตัน อิจิโกะต้องฝ่าฟันด้วยตัวเอง"},
+    {id:"11-3", name:"🌸⚔️ บอส: เบียคุยะ คุจิกิ — เซนบอนซากุระ", type:"boss", enemyLv:140, reward:{gold:3200, exp:1400, gem:420}, enemies:["bl_byakuya","bl_renji","bl_ishida"], bossRate:0.42, story:"เบียคุยะปล่อยแบงไค เซนบอนซากุระ กาเกโยชิ! ดอกซากุระพันกลีบกลายเป็นดาบมรณะ อิจิโกะต้องพิสูจน์ว่าแบงไคของตนยิ่งใหญ่พอ!"},
+  ]},
+  {ch:"💜 บทที่ 12: ไห้เป็นซอ — ดินแดนฮูเอโก มุนโด", stages:[
+    {id:"12-1", name:"🏜️ ทะเลทรายแห่ง Hueco Mundo", type:"story", enemyLv:145, reward:{gold:1900, exp:640}, enemies:["bl_ishida","bl_chad","bl_hanataro"], story:"โอริฮิเมะถูกจับตัวพาไป Hueco Mundo อาณาจักรแห่ง Hollow อิจิโกะ อิชิดะ และชาดบุกเข้าไปช่วย พายุทรายในดินแดนนิรันดร์รออยู่..."},
+    {id:"12-2", name:"🏰 Las Noches ปราสาทไห้เป็นซอ (ฟาร์ม)", type:"farm", enemyLv:152, reward:{gold:2100, exp:680}, enemies:["bl_toshiro","bl_rangiku","bl_soi_fon"], story:"ปราสาท Las Noches กว้างใหญ่ไพศาลราวกับโลกทั้งใบ เหล่า Arrancar ระดับ Espada คอยซุ่มโจมตีทุกทิศทาง"},
+    {id:"12-3", name:"🌀 บอส: อุลคิออร์รา คิเฟอร์ — Espada ที่ 4", type:"boss", enemyLv:162, reward:{gold:3600, exp:1600, gem:460}, enemies:["bl_ichigo_bankai","bl_orihime","bl_chad"], bossRate:0.38, story:"อุลคิออร์รา Espada ที่ 4 ปล่อยพลัง Ressurección Segunda Etapa! อิจิโกะตกอยู่ในสถานการณ์สิ้นหวัง แต่พลังมืดจากภายในปลดปล่อยตัวเอง!"},
+  ]},
+  {ch:"🦋 บทที่ 13: การทรยศ — ไอเซ็นเปิดเผยความจริง", stages:[
+    {id:"13-1", name:"🌙 เงามืดแห่งการหักหลัง", type:"story", enemyLv:168, reward:{gold:2300, exp:720}, enemies:["bl_urahara","bl_yoruichi","bl_tessai"], story:"ไอเซ็นเปิดเผยแผนการที่ซ่อนมาตลอด 100 ปี! เขาหลอกใช้ทุกคนเพื่อสร้าง Ōken กุญแจสู่ Soul King Palace อุระฮาระเผชิญหน้ากับอดีตลูกน้องที่ทรยศ..."},
+    {id:"13-2", name:"👁️ สมรภูมิ Fake Karakura (ฟาร์ม)", type:"farm", enemyLv:176, reward:{gold:2500, exp:760}, enemies:["bl_byakuya","bl_kenpachi","bl_toshiro"], story:"Gotei 13 ตั้งรับในเมืองคาราคุระจำลอง เหล่ากัปตันสู้กับ Espada ระดับสูงสุด ศึกครั้งนี้จะชี้ชะตาโลกของคนเป็นและวิญญาณ!"},
+    {id:"13-3", name:"🦋💜 บอส: ไอเซ็น โฮวกยอกุ ร่างแรก", type:"boss", enemyLv:188, reward:{gold:4200, exp:1900, gem:520}, enemies:["bl_aizen","bl_ichigo_bankai","bl_urahara"], bossRate:0.35, story:"ไอเซ็นหลอมรวมกับ Hōgyoku เพื่อเบ่งพลังเหนือธรรมชาติ! ไม่มีคาถาใดโจมตีเขาได้ ไม่มีดาบใดบาดเขา... จนกว่าอิจิโกะจะเปิดเผยพลังสุดท้าย!"},
+  ]},
+  {ch:"⬛ บทที่ 14: Final Getsuga Tenshō — จุดสิ้นสุดของอิจิโกะ", stages:[
+    {id:"14-1", name:"⬛ การฝึก Mugetsu ในโลกดาบ", type:"story", enemyLv:192, reward:{gold:2800, exp:820}, enemies:["bl_kon","bl_jinta","bl_ururu"], story:"อิจิโกะเข้าฝึกใน Dangai กับ Old Man Zangetsu เพื่อเรียน Final Getsuga Tenshō — เทคนิคที่ใช้แล้วจะสูญเสียพลังชินิกามิตลอดไป นี่คือการตัดสินใจครั้งสุดท้าย..."},
+    {id:"14-2", name:"🌑 ไห้เป็นซอ — ศึกสุดท้ายของ Espada (ฟาร์ม)", type:"farm", enemyLv:200, reward:{gold:3000, exp:880}, enemies:["bl_nemu","bl_orihime","bl_rukia"], story:"ขณะอิจิโกะฝึกฝน เหล่าสหายต่อสู้กับ Espada ที่เหลืออยู่ รูเกีย โอริฮิเมะ และเนมุต้องสู้เพื่อยื้อเวลาให้อิจิโกะ!"},
+    {id:"14-3", name:"☀️⬛ บอส: ไอเซ็น — Mugetsu vs Hougyoku สมบูรณ์", type:"boss", enemyLv:220, reward:{gold:5500, exp:2500, gem:650}, enemies:["bl_aizen","bl_ichigo_bankai","bl_byakuya"], bossRate:0.30, story:"อิจิโกะปลดปล่อย 'Mugetsu' — Final Getsuga Tenshō สุดท้ายในชีวิตชินิกามิ เงามืดท่วมทุกสิ่ง ไอเซ็นสูญเสียพลังศักดิ์สิทธิ์ แต่ยังต้องใช้ Urahara's Kido ปิดผนึกเขา! นี่คือจุดจบของสงคราม Arrancar!"},
+  ]},
+  {ch:"🦋 โหมดเรท: ไอเซ็น — ราชาแห่งการหลอกลวง", stages:[
+    {id:"raid-aizen-1", name:"🦋🌀 ไอเซ็น โฮวกยอกุ ร่างสมบูรณ์", type:"raid", enemyLv:170, reward:{gold:6000, exp:2500, gem:600}, enemies:["bl_aizen"], bossRate:0.05, isAizenRaid:true, story:"ไอเซ็นหลอมรวม Hōgyoku เต็มรูปแบบ! เขาไม่ต้องการคาถาชินิกามิอีกต่อไป ร่างกายหลอมรวมกับพลังแห่งการสร้างและทำลาย โอกาสดรอป 5%"},
+    {id:"raid-aizen-2", name:"🦋💜👁️ ไอเซ็น — จอมจักรวาล Transcendent", type:"raid", enemyLv:200, reward:{gold:10000, exp:4200, gem:950}, enemies:["bl_aizen","bl_ichigo_bankai"], bossRate:0.05, isAizenRaid:true, story:"ไอเซ็นก้าวข้ามขีดจำกัดของทั้งชินิกามิและ Hollow! เขาคือ Transcendent Being ที่ยืนเหนือทุกกฎ ต้องการทีม Mythic เท่านั้นจึงจะมีโอกาสชนะ!"},
+  ]},
+  // ===== DRAGON BALL CHAPTERS =====
+  {ch:"🐉 บทที่ 15: โลกซายาน — การมาถึงของนักรบต่างดาว", stages:[
+    {id:"15-1", name:"🌍 โลกแตกตื่น — ซายานจะมา", type:"story", enemyLv:230, reward:{gold:3200, exp:950}, enemies:["db_krillin","db_tien","db_piccolo"], story:"สัญญาณจากอวกาศเตือนโลก — ซายานกำลังบุกมา! ราดิตซ์ น้องชายโกคูปรากฏตัวและลักพาตัวโกฮัน! โกคูและพิคโกโล่ต้องร่วมมือกันแม้จะเป็นศัตรูตลอดมา..."},
+    {id:"15-2", name:"🌌 ซายานสองตัว — เวเจต้าและนัปป้า (ฟาร์ม)", type:"farm", enemyLv:240, reward:{gold:3600, exp:1000}, enemies:["db_yamcha","db_tien","db_chiaotzu"], story:"เวเจต้าและนัปป้าลงจอดบนโลก! ยัมชา เตียนชินฮัน และเชาซูเสียสละตัวเองเพื่อสกัดนัปป้า แต่ไม่มีใครสามารถสกัดพลังของซายานชั้นยอดได้!"},
+    {id:"15-3", name:"💫 บอส: เวเจต้า ซูเปอร์ไซยาน ร่างแรก", type:"boss", enemyLv:260, reward:{gold:6500, exp:2800, gem:700}, enemies:["db_vegeta","db_piccolo","db_gohan_kid"], bossRate:0.45, story:"เวเจต้าปล่อยพลังซายานชั้นยอดเต็มรูปแบบ! โกคู เวเจต้า โกฮัน และคริลลินต้องร่วมกันเอาชนะศัตรูที่ทรงพลังที่สุดที่โลกเคยเผชิญ! นี่คือจุดเปลี่ยนที่ทำให้โกฮันเป็นซูเปอร์ไซยานครั้งแรก!"},
+  ]},
+  {ch:"❄️ บทที่ 16: นาเมค — ดินแดนแห่งมังกรศักดิ์สิทธิ์", stages:[
+    {id:"16-1", name:"🌿 ดาวนาเมค ดินแดนสีเขียว", type:"story", enemyLv:265, reward:{gold:3800, exp:1050}, enemies:["db_krillin","db_gohan_kid","db_piccolo"], story:"โกคูและเพื่อนเดินทางสู่ดาวนาเมคเพื่อหาลูกแก้วมังกร ฟรีซ่ายึดครองดาวนาเมคด้วยกองทัพ กุ้ย เด็ดก้า และรีกูมรออยู่ข้างหน้า..."},
+    {id:"16-2", name:"🔴 กัปตันกิน่า — ฤๅษีผู้ตัดสินใจ (ฟาร์ม)", type:"farm", enemyLv:272, reward:{gold:4200, exp:1100}, enemies:["db_android18","db_trunks","db_cell"], story:"เวเจต้าที่ฟื้นขึ้นมาแข็งแกร่งกว่าเดิม กำลังสังหารล้างกองทัพฟรีซ่า ขณะที่โกคูอยู่ในแคปซูลฟื้นฟู ทีมต้องสู้สกัดเวลา!"},
+    {id:"16-3", name:"👽💥 บอส: ฟรีซ่า ร่างสุดท้าย 100%", type:"boss", enemyLv:290, reward:{gold:7500, exp:3200, gem:820}, enemies:["db_frieza","db_krillin","db_piccolo"], bossRate:0.42, story:"ฟรีซ่าปล่อยพลัง 100% ร่างสุดท้าย! คริลลินถูกสังหาร ความโกรธแค้นจุดประกายพลัง Super Saiyan ครั้งแรกในประวัติศาสตร์! โกคูแปลงร่างบนดาวนาเมค!"},
+  ]},
+  {ch:"🦋 บทที่ 17: Cell Games — เกมชีวิตและความตาย", stages:[
+    {id:"17-1", name:"📺 Cell ประกาศ Cell Games", type:"story", enemyLv:295, reward:{gold:4500, exp:1180}, enemies:["db_cell","db_android18","db_trunks"], story:"เซลล์สมบูรณ์แบบแล้วได้ทำการสร้างเวทีต่อสู้กลางโลก เขาท้าทายนักรบที่แข็งแกร่งที่สุดทั่วโลก โกฮันและโกคูออกจากห้องฝึก Hyperbolic Time Chamber พร้อมแล้ว..."},
+    {id:"17-2", name:"⚡ Cell Jr. ลูกชายมรณะ (ฟาร์ม)", type:"farm", enemyLv:305, reward:{gold:5000, exp:1250}, enemies:["db_beerus","db_whis","db_frieza"], story:"เซลล์สร้าง Cell Jr. เจ็ดตัวและโจมตีครอบครัวของโกฮันในสายตาต่อหน้าทุกคน ความโกรธแค้นสะสมอยู่ในใจโกฮัน..."},
+    {id:"17-3", name:"🌟 บอส: เซลล์ Perfect สมบูรณ์ — Father-Son Kamehameha", type:"boss", enemyLv:325, reward:{gold:8000, exp:3500, gem:900}, enemies:["db_cell","db_vegeta","db_gohan_kid"], bossRate:0.40, story:"โกฮัน SSJ2 ปล่อยพลังทั้งหมด! Father-Son Kamehameha กับวิญญาณโกคู — ลูกแก้วมังกรเต็มไปด้วยชีวิตชีวา เซลล์ถูกทำลายอย่างสมบูรณ์แบบ!"},
+  ]},
+  {ch:"💜 บทที่ 18: Majin Buu — ปีศาจโบราณตื่น", stages:[
+    {id:"18-1", name:"🔮 พลังของบาบิดี — ปลุกมาจิน บู", type:"story", enemyLv:330, reward:{gold:5500, exp:1320}, enemies:["db_beerus","db_whis","db_piccolo"], story:"บาบิดีลูกชายของบีบิดีใช้นักรบที่ถูกควบคุมโดยมาจิน หมุดประจุพลังให้มาจิน บู! โกคูและเวเจต้าต้องลงไปสู้ในห้วงอวกาศ แต่เวเจต้ายอมตกอยู่ใต้อำนาจมาจิน!"},
+    {id:"18-2", name:"💖 มาจิน บู แห่งความตาย — ฟาร์มยักษ์ (ฟาร์ม)", type:"farm", enemyLv:342, reward:{gold:6000, exp:1400}, enemies:["db_cell","db_frieza","db_android18"], story:"มาจิน บู ดูดซับ Gotenks และ Piccolo กลายเป็น Super Buu! ทีมนักรบต้องต้านทาน! ครั้งแรกที่ใช้ Potara — Vegito คือทางรอดเดียวเท่านั้น!"},
+    {id:"18-3", name:"💫👑 บอส: คิด บู ปีศาจบริสุทธิ์", type:"boss", enemyLv:360, reward:{gold:9000, exp:4000, gem:980}, enemies:["db_vegeta","db_gohan_kid","db_trunks"], bossRate:0.38, story:"มาจิน บู คืนร่างเป็น Kid Buu ร่างดั้งเดิมบริสุทธิ์และทรงพลังที่สุด! โกคู SSJ3 สู้จนหมดพลัง เวเจต้ายืนหยัด! ลูกแก้วมังกรสะสมพลังจากคนทั้งโลก!"},
+  ]},
+  {ch:"🐉 โหมดเรท: ฟรีซ่า — จักรพรรดิจักรวาล", stages:[
+    {id:"raid-frieza-1", name:"💛 ฟรีซ่า Golden Form เต็มพลัง", type:"raid", enemyLv:220, reward:{gold:7000, exp:3000, gem:700}, enemies:["db_frieza"], bossRate:0.05, story:"ฟรีซ่าฝึกฝนเป็นครั้งแรกในชีวิตและปลดล็อก Golden Form! พลังเหนือกว่าซูเปอร์ไซยานสีฟ้า! กองทัพ Frieza Force บุกโลก โอกาสดรอป 5%"},
+    {id:"raid-frieza-2", name:"🖤 ฟรีซ่า Black Frieza — เหนือกว่าทุกสิ่ง", type:"raid", enemyLv:280, reward:{gold:12000, exp:5000, gem:1100}, enemies:["db_frieza","db_cell"], bossRate:0.05, story:"ฟรีซ่าฝึกฝนใน Hyperbolic Time Chamber 10 ปีจากมุมมองเขา ปลดล็อก Black Frieza ที่ทำให้ Ultra Instinct Goku และ Ultra Ego Vegeta หมดสติในพริบตา! โอกาสดรอป 5%"},
+  ]},
+  {ch:"💍🕺 โหมดพิเศษ: Fusion — พลังแห่งการหลอมรวม", stages:[
+    {id:"raid-vegito-1", name:"💍🔵 เบจิโต้ — เผชิญหน้าพลังมาจิน", type:"raid", enemyLv:310, reward:{gold:8000, exp:3500, gem:800}, enemies:["db_vegito"], bossRate:0.08, isFusionRaid:true, story:"เบจิโต้ปรากฏตัวเพื่อหยุดยั้ง Super Buu! Potara Earrings หลอมรวมโกคูและเบจิต้าเป็นนักรบที่แข็งแกร่งที่สุดในจักรวาล! โอกาสดรอปเบจิโต้ 8%"},
+    {id:"raid-gogeta-1", name:"🕺💚 โกจิต้า — Stardust Breaker จักรวาล", type:"raid", enemyLv:320, reward:{gold:8500, exp:3800, gem:850}, enemies:["db_gogeta"], bossRate:0.08, isFusionRaid:true, story:"Fusion Dance สมบูรณ์แบบ! โกจิต้า SSJ Blue ปล่อย Big Bang Kamehameha ทำลายขีดจำกัดจักรวาล! Stardust Breaker ขจัดความชั่วร้ายออกจากวิญญาณ! โอกาสดรอปโกจิต้า 8%"},
+  ]},
+  // ===== DEMON SLAYER CHAPTERS =====
+  {ch:"⚔️ บทที่ 19: หมู่บ้านในขุนเขา — จุดเริ่มต้นของทันจิโร่", stages:[
+    {id:"19-1", name:"🌲 หมู่บ้านคามาโดะ — โศกนาฏกรรมยามค่ำคืน", type:"story", enemyLv:365, reward:{gold:9500, exp:4200}, enemies:["ds_giyu","ds_tanjiro"], story:"ทันจิโร่กลับบ้านมาพบว่าครอบครัวถูกอสูรสังหารหมด เหลือเพียงเนซึโกะน้องสาวที่กลายเป็นอสูร! กิยู โทมิโอกะ เสาน้ำ ปรากฏตัวขวางไม่ให้ทันจิโร่ฆ่าน้องสาวตัวเอง..."},
+    {id:"19-2", name:"🦋 สำนักของอุโรโคดาคิ — ฝึกฝนเพื่อแก้แค้น (ฟาร์ม)", type:"farm", enemyLv:372, reward:{gold:10500, exp:4400}, enemies:["ds_giyu","ds_shinobu"], story:"ทันจิโร่ฝึกฝนอย่างหนักภายใต้การดูแลของอุโรโคดาคิ เพื่อสอบเข้าเป็นนักล่าอสูร เป้าหมายเดียว: หาทางรักษาเนซึโกะให้กลับเป็นมนุษย์!"},
+    {id:"19-3", name:"🌊🔥 บอส: ทันจิโร่ ปลุกลมหายใจอาทิตย์ครั้งแรก", type:"boss", enemyLv:385, reward:{gold:14000, exp:6200, gem:1100}, enemies:["ds_tanjiro","ds_giyu"], bossRate:0.42, story:"ในศึกกับอสูรมือ ทันจิโร่ปลดล็อกลมหายใจฮิโนคามิที่สืบทอดจากพ่อเป็นครั้งแรก! พลังลึกลับที่ไหลอยู่ในสายเลือดคามาโดะตื่นขึ้น..."},
+  ]},
+  {ch:"🏰 บทที่ 20: รถไฟสู่นิรันดร์ — เร็นโกคุ เสาเปลว", stages:[
+    {id:"20-1", name:"🚂 รถไฟไร้นิรันดร์ — ผู้โดยสารหายตัวลึกลับ", type:"story", enemyLv:392, reward:{gold:11500, exp:4800}, enemies:["ds_rengoku","ds_tanjiro"], story:"เร็นโกคุ เสาเปลว นำทีมทันจิโร่ อิโนะสุเกะ และเซนิตสึ ขึ้นรถไฟไร้นิรันดร์เพื่อสืบหาผู้โดยสารที่หายตัวไปอย่างต่อเนื่อง..."},
+    {id:"20-2", name:"💤 เอนมุ — อสูรผู้สร้างความฝัน (ฟาร์ม)", type:"farm", enemyLv:400, reward:{gold:13000, exp:5000}, enemies:["ds_rengoku","ds_tengen"], story:"อสูรเอนมุสะกดวิญญาณผู้โดยสารทั้งหมดให้หลับ ทีมต้องตัดแกนวิญญาณเพื่อปลุกตัวเองและผู้คนนับร้อยให้ตื่น!"},
+    {id:"20-3", name:"🔥👑 บอส: เร็นโกคุ vs อาคาซะ — รุ่งอรุณที่ไม่มาถึง", type:"boss", enemyLv:418, reward:{gold:18000, exp:7800, gem:1400}, enemies:["ds_rengoku","ds_tanjiro","ds_tengen"], bossRate:0.35, story:"อาคาซะ อสูรขึ้นที่สาม ปรากฏตัวบนหลังคารถไฟ! เร็นโกคุต่อสู้สุดกำลังเพื่อปกป้องผู้โดยสารทุกคนจนรุ่งอรุณ... จิตวิญญาณของเสาเปลวจะคงอยู่ตลอดไป"},
+  ]},
+  {ch:"🎪 บทที่ 21: ย่านเริงรมย์ — เทนเง็นและภรรยาทั้งสาม", stages:[
+    {id:"21-1", name:"🎵 ย่านเริงรมย์ — ภารกิจสายลับ", type:"story", enemyLv:425, reward:{gold:14500, exp:6000}, enemies:["ds_tengen","ds_mitsuri"], story:"เทนเง็น อุซุย เสาเสียง ส่งภรรยาทั้งสามแฝงตัวในย่านเริงรมย์เพื่อตามหาอสูรขึ้นที่หก ทันจิโร่และทีมเข้าร่วมภารกิจปลอมตัว!"},
+    {id:"21-2", name:"🐍💖 ดะกิและกิวทาโร่ — พี่น้องอสูรคู่ (ฟาร์ม)", type:"farm", enemyLv:432, reward:{gold:15500, exp:6300}, enemies:["ds_tengen","ds_obanai"], story:"อสูรขึ้นที่หก ดะกิและกิวทาโร่ ซ่อนตัวอยู่ในคฤหาสน์ไดเมียว! ทีมต้องค้นหาแกนวิญญาณทั้งสองที่ซ่อนอยู่ในร่างเดียวกันให้พบ!"},
+    {id:"21-3", name:"💥🎵 บอส: เทนเง็น vs Upper Six — การต่อสู้สุดท้ายของนินจา", type:"boss", enemyLv:450, reward:{gold:21000, exp:9000, gem:1600}, enemies:["ds_tengen","ds_tanjiro","ds_mitsuri"], bossRate:0.32, story:"เทนเง็นเสียแขนซ้ายในการต่อสู้กับอสูรขึ้นที่หกทั้งคู่ แต่ทีมทันจิโร่ร่วมมือกันเอาชนะได้! เทนเง็นตัดสินใจเกษียณจากการเป็นเสาหลัก มอบหน้าที่ให้คนรุ่นใหม่..."},
+  ]},
+  {ch:"🏯 บทที่ 22: หมู่บ้านช่างตีดาบ — ภัยจากเสาหิมะ", stages:[
+    {id:"22-1", name:"🔨 หมู่บ้านลับช่างตีดาบ", type:"story", enemyLv:458, reward:{gold:16500, exp:6800}, enemies:["ds_muichiro","ds_mitsuri"], story:"ทันจิโร่เดินทางไปซ่อมดาบที่หมู่บ้านช่างตีดาบลับ ที่นั่นเขาพบมุอิจิโร่ เสาหมอก และมิตสึริ เสารัก ขณะที่หมู่บ้านถูกอสูรขึ้นที่สี่และห้าโจมตี!"},
+    {id:"22-2", name:"🌫️ ฮันตะนะกะ — อสูรคู่แฝงตัวในหุ่นยนต์ (ฟาร์ม)", type:"farm", enemyLv:466, reward:{gold:17500, exp:7100}, enemies:["ds_muichiro","ds_himejima"], story:"อสูรขึ้นที่สี่ ฮันตะนะกะ ซ่อนตัวอยู่ในหุ่นยนต์ยักษ์ของหมู่บ้าน! มุอิจิโร่ปลดล็อกความทรงจำในอดีตและพลังลมหายใจหมอกที่แท้จริง"},
+    {id:"22-3", name:"💗⛓️ บอส: มิตสึริ vs อสูรขึ้นที่ห้า — พลังหัวใจไร้ขีดจำกัด", type:"boss", enemyLv:480, reward:{gold:22000, exp:9500, gem:1700}, enemies:["ds_mitsuri","ds_muichiro","ds_tanjiro"], bossRate:0.30, story:"มิตสึริ เสารัก ปลดปล่อยพลังกล้ามเนื้อพิเศษเต็มที่! การต่อสู้ดำเนินไปอย่างดุเดือดจนรุ่งเช้า มิตสึริและโอบานาอิร่วมมือกันเอาชนะอสูรขึ้นที่ห้าได้สำเร็จ"},
+  ]},
+  {ch:"⛩️ บทที่ 23: หมู่บ้านนักฆ่าอสูร — เกียวเมอิและซาเนมิ", stages:[
+    {id:"23-1", name:"🪨 หมู่บ้านศักดิ์สิทธิ์แห่งเสาหิน", type:"story", enemyLv:488, reward:{gold:19000, exp:8200}, enemies:["ds_himejima","ds_sanemi"], story:"เกียวเมอิ ฮิเมจิม่า เสาหิน และซาเนมิ ชินาซึงาวะ เสาลม ปกป้องหมู่บ้านลับที่ซ่อนนักล่าอสูรผู้บาดเจ็บ! อสูรขึ้นสองและสามบุกโจมตีพร้อมกัน!"},
+    {id:"23-2", name:"🌪️🩸 ซาเนมิ — เลือดอสูรในกายมนุษย์ (ฟาร์ม)", type:"farm", enemyLv:496, reward:{gold:20000, exp:8500}, enemies:["ds_sanemi","ds_obanai"], story:"ซาเนมิเปิดเผยความลับ — เขามีเลือดอสูรไหลในกาย! พลังพิเศษนี้ทำให้เขาสามารถต้านทานพิษและฟื้นฟูร่างกายได้รวดเร็วกว่ามนุษย์ทั่วไป"},
+    {id:"23-3", name:"🪨🙏 บอส: เกียวเมอิ vs โดมะ — ศรัทธาที่ไม่สั่นคลอน", type:"boss", enemyLv:512, reward:{gold:26000, exp:11200, gem:1900}, enemies:["ds_himejima","ds_sanemi","ds_tanjiro"], bossRate:0.28, story:"โดมะ อสูรขึ้นที่สอง บุกทำลายหมู่บ้าน! เกียวเมอิต่อสู้ด้วยศรัทธาอันแข็งแกร่ง ขณะที่ทันจิโร่และซาเนมิร่วมสมรภูมิ ปกป้องผู้บาดเจ็บไว้ได้สำเร็จ!"},
+  ]},
+  {ch:"🌑 บทที่ 24: ปราการอนันต์ — ศึกสุดท้ายกับมุซัง", stages:[
+    {id:"24-1", name:"🏯 ปราการอนันต์ — มิติบ้านที่บิดเบี้ยว", type:"story", enemyLv:520, reward:{gold:28000, exp:12000}, enemies:["ds_tanjiro","ds_giyu","ds_tengen"], story:"มุซัง คิบุตสึจิเปิดปราการอนันต์ ดึงนักล่าอสูรทุกคนเข้าสู่มิติคฤหาสน์ไร้สิ้นสุด! เหล่าเสาหลักทั้งเก้าต้องต่อสู้กับ Kizuki ระดับสูงพร้อมกันทุกแห่ง!"},
+    {id:"24-2", name:"⚔️ อาคาซะ vs โคโยฮะชิ — แก้แค้นแห่งเร็นโกคุ (ฟาร์ม)", type:"farm", enemyLv:528, reward:{gold:30000, exp:12500}, enemies:["ds_tanjiro","ds_rengoku","ds_mitsuri"], story:"อาคาซะปะทะกับทีมทันจิโร่อีกครั้ง! ความทรงจำในอดีตของอาคาซะถูกเปิดเผย ทันจิโร่ใช้ลมหายใจฮิโนคามิเต็มรูปแบบต่อสู้สุดกำลัง!"},
+    {id:"24-3", name:"☀️👑 บอส: มุซัง คิบุตสึจิ — ราชาอสูรร่างสมบูรณ์", type:"boss", enemyLv:560, reward:{gold:45000, exp:20000, gem:3000}, enemies:["ds_tanjiro","ds_himejima","ds_sanemi","ds_giyu"], bossRate:0.20, story:"มุซังดูดซับพลังจากอสูรนับพันกลายเป็นร่างสมบูรณ์แบบ! เหล่าเสาหลักที่รอดชีวิตทั้งหมดร่วมมือกันต่อสู้สุดกำลังจนถึงรุ่งอรุณ ความหวังสุดท้ายของมนุษยชาติ!"},
+  ]},
+  {ch:"☀️⚔️ โหมดพิเศษ: Fusion — โยริอิจิ ลมหายใจแรกกำเนิด", stages:[
+    {id:"raid-yoriichi-1", name:"☀️⚔️👑 โยริอิจิ — เผชิญหน้าพลังเหนือมนุษย์", type:"raid", enemyLv:550, reward:{gold:35000, exp:15000, gem:2500}, enemies:["ds_yoriichi"], bossRate:0.05, isFusionRaid:true, story:"โยริอิจิ สึกุยุโระ ผู้ให้กำเนิดลมหายใจอาทิตย์ปรากฏตัว! พลังที่เหนือกว่านักล่าอสูรทุกคนในประวัติศาสตร์ ทรานสพาเรนต์เวิลด์มองเห็นทุกการเคลื่อนไหว! โอกาสดรอปโยริอิจิ 5%"},
+  ]},
+  // ===== DEMON SIDE CHAPTERS =====
+  {ch:"🩸 บทที่ 25: รุ่งอรุณแห่งอสูร — กำเนิด Kizuki", stages:[
+    {id:"25-1", name:"🌑 คืนแรกแห่งอสูร — เลือดของมุซัง", type:"story", enemyLv:370, reward:{gold:10000, exp:4500}, enemies:["dm_enmu","dm_rui"], story:"ในยุคสมัยเอโดะ มุซัง คิบุตสึจิสร้างอสูรกลุ่มแรก หัวใจของเขาผลักไสมนุษย์ทุกคน! รุยเด็กน้อยได้รับเลือดอสูรและถูกส่งไปก่อตั้งครอบครัวแมงมุม..."},
+    {id:"25-2", name:"🕸️ ภูเขาแมงมุม — ครอบครัวรุย (ฟาร์ม)", type:"farm", enemyLv:378, reward:{gold:11000, exp:4800}, enemies:["dm_rui","dm_hairo"], story:"รุยสร้างครอบครัวปลอมบนภูเขา บังคับอสูรอื่นๆ มาเป็นพ่อแม่พี่น้อง ทันจิโร่ต้องสู้กับใยมรณะที่แข็งแกร่งกว่าดาบธรรมดา!"},
+    {id:"25-3", name:"🕸️❤️ บอส: รุย — ครอบครัวในฝัน", type:"boss", enemyLv:392, reward:{gold:16000, exp:7000, gem:1200}, enemies:["dm_rui","dm_enmu","dm_mukago"], bossRate:0.45, story:"รุยอยากมีครอบครัวแท้จริง! ทันจิโร่เข้าใจความเจ็บปวดของรุย แต่ต้องสังหารเขาเพื่อปลดปล่อยวิญญาณ! ลมหายใจอาทิตย์ตัดใยมรณะได้สำเร็จ!"},
+  ]},
+  {ch:"💤 บทที่ 26: รถไฟนิรันดร์ — เอนมุ ฝันอสูร", stages:[
+    {id:"26-1", name:"🚂 ฝันร้ายไม่สิ้นสุด", type:"story", enemyLv:400, reward:{gold:12500, exp:5400}, enemies:["dm_enmu","dm_kamanue"], story:"เอนมุ ล่างที่หนึ่ง ได้รับเลือดพิเศษจากมุซังเพื่อสังหารเสาหลัก เขาหลอมรวมร่างกายกับรถไฟนิรันดร์ สะกดผู้โดยสารทุกคนให้หลับ!"},
+    {id:"26-2", name:"💤🌙 ฝันทำลายวิญญาณ (ฟาร์ม)", type:"farm", enemyLv:408, reward:{gold:13500, exp:5700}, enemies:["dm_enmu","dm_mukago"], story:"ลูกน้องของเอนมุเจาะเข้าสู่ความฝันของทันจิโร่ พยายามทำลายแกนวิญญาณ แต่ทันจิโร่ตัดหัวเองในฝันเพื่อตื่น!"},
+    {id:"26-3", name:"💤🚂 บอส: เอนมุ หลอมรวมรถไฟ", type:"boss", enemyLv:422, reward:{gold:20000, exp:8800, gem:1500}, enemies:["dm_enmu","dm_daki","dm_rui"], bossRate:0.38, story:"เอนมุกลายเป็นอสูรรถไฟยักษ์! ทันจิโร่และอิโนะสุเกะต้องหาและตัดคอที่ซ่อนอยู่ในซากรถไฟขนาดยักษ์ เร็นโกคุสู้กับอาคาซะพร้อมกัน!"},
+  ]},
+  {ch:"❄️ บทที่ 27: โดมะ — อสูรขึ้นสองแห่งลัทธิ", stages:[
+    {id:"27-1", name:"❄️😊 วัดลัทธิ — ศาสนาอสูร", type:"story", enemyLv:480, reward:{gold:18000, exp:7800}, enemies:["dm_doma","dm_gyokko"], story:"โดมะเป็นหัวหน้าลัทธิเพื่อล่อมนุษย์มากิน! ชิโนบุพบโดมะเป็นผู้สังหารพี่สาว คาแนะ! ความโกรธแค้นสุมอยู่ในใจ แต่โดมะแข็งแกร่งกว่าชิโนบุมาก..."},
+    {id:"27-2", name:"🌸💜 ชิโนบุ vs โดมะ — พิษสุดท้าย (ฟาร์ม)", type:"farm", enemyLv:492, reward:{gold:20000, exp:8500}, enemies:["dm_doma","dm_hantengu"], story:"ชิโนบุสาดพิษวิสทีเรียเข้าร่างกายตัวเองเพื่อเป็นระเบิดเวลา! โดมะดูดซับชิโนบุเป็นครั้งสุดท้าย แต่พิษกำลังทำงานจากภายในร่างโดมะ..."},
+    {id:"27-3", name:"❄️💀 บอส: โดมะ — น้ำแข็งมรณะเต็มรูปแบบ", type:"boss", enemyLv:510, reward:{gold:30000, exp:13000, gem:2200}, enemies:["dm_doma","dm_kokushibo","dm_gyutaro"], bossRate:0.28, story:"อิโนะสุเกะและคาแนะ (ผ่านร่างชิโนบุ) โจมตีโดมะที่อ่อนแอจากพิษ! โดมะสั่นสะเทือนพิษวิสทีเรียที่ฝังรากอยู่ในทุกเซลล์ร่างกาย!"},
+  ]},
+  {ch:"🌙 บทที่ 28: โคคุชิโบะ — ขึ้นที่หนึ่งและความเจ็บปวด", stages:[
+    {id:"28-1", name:"🌙⚔️ พระจันทร์แห่งความโกรธเคือง", type:"story", enemyLv:530, reward:{gold:24000, exp:10500}, enemies:["dm_kokushibo","dm_muzan"], story:"โคคุชิโบะ พี่ชายฝาแฝดของโยริอิจิ ละทิ้งความเป็นมนุษย์เพื่ออยากแข็งแกร่งกว่าน้องชาย! ลมหายใจพระจันทร์ถูกสร้างขึ้นจากความอิจฉาและความปรารถนา!"},
+    {id:"28-2", name:"🩸 กิวทาโร่-ดะกิ — พี่น้องแห่งเลือด (ฟาร์ม)", type:"farm", enemyLv:542, reward:{gold:26000, exp:11200}, enemies:["dm_gyutaro","dm_daki"], story:"กิวทาโร่และดะกิ — พี่น้องที่เกิดมายากจน ถูกเหยียดหยาม จนกลายเป็นอสูรร่วมร่างกัน! ความรักพี่น้องคือพลังสูงสุดของพวกเขา!"},
+    {id:"28-3", name:"🌙⚔️👁️ บอส: โคคุชิโบะ — ลมหายใจพระจันทร์เต็มรูปแบบ", type:"boss", enemyLv:558, reward:{gold:38000, exp:17000, gem:2800}, enemies:["dm_kokushibo","dm_muzan","dm_doma"], bossRate:0.22, story:"เกียวเมอิ ซาเนมิ มุอิจิโร่ เผชิญกับโคคุชิโบะ! มุอิจิโร่ตอกเสาแดดใส่โคคุชิโบะด้วยชีวิต! ความทรงจำของโยริอิจิปลุกจิตสำนึกมนุษย์ครั้งสุดท้ายในโคคุชิโบะ..."},
+  ]},
+  {ch:"🌑🩸 โหมดเรท: มุซัง คิบุตสึจิ — ราชาอสูรในตำนาน", stages:[
+    {id:"raid-muzan-1", name:"🌑🩸 มุซัง — เลือดอสูรแรก", type:"raid", enemyLv:500, reward:{gold:40000, exp:18000, gem:3000}, enemies:["dm_muzan"], bossRate:0.05, story:"มุซังในร่างมนุษย์ปกติปรากฏตัว! ทุกการโจมตีของเขาฝังเลือดอสูรสร้างสถานะพิษถาวร! ต้องการทีม Legendary ขึ้นไปเท่านั้น! โอกาสดรอป 5%"},
+    {id:"raid-muzan-2", name:"🌑💀👑 มุซัง ร่างสมบูรณ์แบบ — อสูรนิรันดร์", type:"raid", enemyLv:580, reward:{gold:65000, exp:28000, gem:4500}, enemies:["dm_muzan","dm_kokushibo"], bossRate:0.05, story:"มุซังปลดปล่อยร่างสมบูรณ์แบบ! พลังแห่งเลือดอสูรของเขาทำให้ฟื้นฟูตัวเองได้ไม่จำกัด! แสงอาทิตย์เท่านั้นที่หยุดเขาได้ — ต้องการทีม Mythic! โอกาสดรอป 5%"},
+  ]},
+];
+
+// Special repeatable farming stages (always unlocked, for resource grinding)
+const FARM_STAGES = [
+  {id:"farm-gold-1", name:"เหมืองทองคำ", type:"goldfarm", enemyLv:8, reward:{gold:400, exp:50}, enemies:["h_rockgolem","h_shieldling"]},
+  {id:"farm-gold-2", name:"คลังสมบัติโบราณ", type:"goldfarm", enemyLv:18, reward:{gold:900, exp:100}, enemies:["h_rockgolem","h_blazerider","h_shieldling"]},
+  {id:"farm-gem-1", name:"ถ้ำคริสตัลเพชร", type:"gemfarm", enemyLv:15, reward:{gold:150, exp:80, gem:25}, enemies:["h_moonarcher","h_pixiebloom"]},
+  {id:"farm-gem-2", name:"วิหารอัญมณีศักดิ์สิทธิ์", type:"gemfarm", enemyLv:25, reward:{gold:250, exp:130, gem:45}, enemies:["h_starforger","h_runeknight"]},
+];
+
+// Equipment templates
+const EQUIP_DB = [
+  {id:"sword1", name:"ดาบเหล็กกล้า", emoji:"🗡️", slot:"weapon", bonus:{atk:8}, rarity:"common"},
+  {id:"sword2", name:"ดาบมรกตวิเศษ", emoji:"🟢", slot:"weapon", bonus:{atk:18}, rarity:"rare"},
+  {id:"armor1", name:"เกราะหนัง", emoji:"🥋", slot:"armor", bonus:{def:6,hp:20}, rarity:"common"},
+  {id:"armor2", name:"เกราะมังกร", emoji:"🛡️", slot:"armor", bonus:{def:15,hp:60}, rarity:"epic"},
+  {id:"ring1", name:"แหวนแห่งความเร็ว", emoji:"💍", slot:"ring", bonus:{spd:5}, rarity:"rare"},
+];
+
+/* ---------- GAME STATE (in-memory, resets on reload) ---------- */
+let state = {
+  gem: 1500,
+  gold: 2000,
+  stamina: 200,
+  staminaMax: 450,
+  pity: {}, // per banner, count since last legendary
+  roster: [], // {uid, heroId, level, exp, dupes, form, equip:{weapon,armor,ring}}
+  team: [null,null,null,null,null,null],
+  clearedStages: {},
+  inventory: {}, // equip id -> count
+};
+BANNERS.forEach(b=> state.pity[b.id]=0);
+
+// give starter heroes
+function addStarterHero(heroId, dupes=0){
+  const uid = "u_"+heroId+"_"+Math.random().toString(36).slice(2,7);
+  state.roster.push({uid, heroId, level:1, exp:0, dupes, form:0, equip:{weapon:null,armor:null,ring:null}, levelBreak:0});
+  return uid;
+}
+addStarterHero("h_swordling");
+addStarterHero("h_archerling");
+addStarterHero("h_shieldling");
+addStarterHero("h_healthling");
+state.team[0]=state.roster[0].uid;
+state.team[1]=state.roster[1].uid;
+state.team[2]=state.roster[2].uid;
+state.team[3]=state.roster[3].uid;
+
+/* ---------- HELPERS ---------- */
+function heroDef(heroId){ return HERO_DB.find(h=>h.id===heroId); }
+function getUnit(uid){ return state.roster.find(r=>r.uid===uid); }
+function rarityInfo(r){ return RARITY[r]; }
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function showConfirm(message, onYes){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal" style="text-align:center;">
+      <p style="margin-bottom:14px;">${message}</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn danger" id="confirmYes">ยืนยัน</button>
+        <button class="btn secondary" id="confirmNo">ยกเลิก</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirmNo').onclick = ()=> overlay.remove();
+  overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
+  overlay.querySelector('#confirmYes').onclick = ()=>{ overlay.remove(); onYes(); };
+}
+function fmt(n){ return n.toLocaleString(); }
+
+// compute current stats for roster unit (with level + equip + form bonus)
+function computeStats(unit){
+  const def = heroDef(unit.heroId);
+  const lvlMul = 1 + (unit.level-1)*0.08;
+  const formMul = 1 + unit.form*0.15; // evolved form bonus
+  let hp = Math.round(def.base.hp * lvlMul * formMul);
+  let atk = Math.round(def.base.atk * lvlMul * formMul);
+  let dfn = Math.round(def.base.def * lvlMul * formMul);
+  let spd = Math.round(def.base.spd * (1 + (unit.level-1)*0.01));
+  // equipment
+  ['weapon','armor','ring'].forEach(slot=>{
+    const eid = unit.equip[slot];
+    if(eid){
+      const e = EQUIP_DB.find(x=>x.id===eid);
+      if(e.bonus.atk) atk += e.bonus.atk;
+      if(e.bonus.def) dfn += e.bonus.def;
+      if(e.bonus.hp) hp += e.bonus.hp;
+      if(e.bonus.spd) spd += e.bonus.spd;
+    }
+  });
+  // FUSION BONUS: if fusion hero and Goku+Vegeta both in team → +50% stats
+  if(def.isFusion && hasFusionInTeam()){
+    hp  = Math.round(hp  * 1.5);
+    atk = Math.round(atk * 1.5);
+    dfn = Math.round(dfn * 1.5);
+    spd = Math.round(spd * 1.5);
+  }
+  return {hp, atk, def:dfn, spd, maxhp:hp, mp:0, maxmp:100};
+}
+
+function expToNext(level){ return 50 + level*30; }
+// คำนวณค่าใช้จ่ายอัพ n เวล จากเลเวลปัจจุบัน
+function calcLevelUpCost(fromLevel, times){
+  let total = 0;
+  for(let i = 0; i < times; i++) total += (fromLevel + i) * 20;
+  return total;
+}
+const MAX_LEVEL = 60;
+const LEVEL_BREAK_CAPS = [60, 80, 100, 130, 160, 200, 450]; // ขีดจำกัดระดับแต่ละขั้น
+const LEVEL_BREAK_COST = {
+  60:  {gold:5000,  gem:50},
+  80:  {gold:12000, gem:120},
+  100: {gold:22000, gem:220},
+  130: {gold:35000, gem:350},
+  160: {gold:55000, gem:500},
+  200: {gold:80000, gem:750},
+}; // ค่าอัพ level break
+function levelBreakTier(level){
+  if(level < 60)  return 0;
+  if(level < 80)  return 1;
+  if(level < 100) return 2;
+  if(level < 130) return 3;
+  if(level < 160) return 4;
+  if(level < 200) return 5;
+  if(level < 450) return 6;
+  return 7; // max
+}
+function levelCapForUnit(unit){
+  const tier = unit.levelBreak || 0;
+  return LEVEL_BREAK_CAPS[tier] || 60;
+}
+
+/* ---------- NAVIGATION ---------- */
+const content = document.getElementById('content');
+let activeTab = 'home';
+document.querySelectorAll('.navbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    activeTab = btn.dataset.tab;
+    render();
+  });
+});
+
+function updateTopbar(){
+  document.getElementById('gemCount').textContent = fmt(state.gem);
+  document.getElementById('goldCount').textContent = fmt(state.gold);
+  document.getElementById('staminaCount').textContent = state.stamina;
+  document.getElementById('staminaMax').textContent = state.staminaMax;
+}
+
+function render(){
+  document.querySelectorAll('.navbtn').forEach(b=> b.classList.toggle('active', b.dataset.tab===activeTab));
+  updateTopbar();
+  if(activeTab==='home') renderHome();
+  else if(activeTab==='gacha') renderGachaHome();
+  else if(activeTab==='stages') renderStages();
+  else if(activeTab==='roster') renderRoster();
+  else if(activeTab==='team') renderTeam();
+}
+
+/* ============================================================
+   HOME TAB
+   ============================================================ */
+function renderHome(){
+  const totalHeroes = state.roster.length;
+  const legendCount = state.roster.filter(r=>heroDef(r.heroId).rarity==='legendary').length;
+  content.innerHTML = `
+    <div class="card" style="text-align:center; background:linear-gradient(135deg,#3a1c71,#5b3a99);">
+      <div style="font-size:38px;">🏰✨</div>
+      <h2 style="margin:6px 0 2px;">ยินดีต้อนรับ, ผู้บังคับการ!</h2>
+      <p class="small-muted">รวบรวมฮีโร่ ปลดล็อกร่างพิเศษ และพิชิตทุกด่าน!</p>
+    </div>
+    <div class="card">
+      <h2 class="section-title">📊 สรุปข้อมูล</h2>
+      <div class="row-between"><span>ฮีโร่ในคลัง</span><b>${totalHeroes}</b></div>
+      <div class="row-between"><span>ฮีโร่ Legendary</span><b style="color:var(--legend)">${legendCount}</b></div>
+      <div class="row-between"><span>ด่านที่ผ่านแล้ว</span><b>${Object.keys(state.clearedStages).length} / ${STAGES.reduce((a,c)=>a+c.stages.length,0)}</b></div>
+    </div>
+    <div class="card">
+      <h2 class="section-title">⚡ พลังกาย (Stamina)</h2>
+      <div class="bar-bg"><div class="bar-fill bar-mp" style="width:${(state.stamina/state.staminaMax*100)}%"></div></div>
+      <p class="small-muted">ใช้พลังกายเพื่อเข้าด่าน • ฟื้นฟูอัตโนมัติเมื่อเวลาผ่านไป</p>
+      <button class="btn secondary" id="refillStamina" style="margin-top:6px;">เติมพลังกาย (-100 💎)</button>
+    </div>
+    <div class="card">
+      <h2 class="section-title">🎁 ของขวัญรายวัน</h2>
+      <p class="small-muted" style="margin-bottom:8px;">รับ Gem และ Gold ฟรีทุกวัน!</p>
+      <button class="btn" id="claimDaily">รับรางวัล (+1,000💎 +100,000🪙)</button>
+    </div>
+    <div class="card">
+      <h2 class="section-title">🎰 ตู้กาชาแนะนำ</h2>
+      ${renderBannerPreview(BANNERS[1])}
+      <button class="btn" data-go="gacha" style="margin-top:6px;">ไปที่หน้ากาชา</button>
+    </div>
+  `;
+  content.querySelector('#refillStamina').onclick = ()=>{
+    if(state.gem<100){ showToast("Gem ไม่พอ!"); return; }
+    state.gem-=100; state.stamina=state.staminaMax;
+    showToast("เติมพลังกายเรียบร้อย!"); render();
+  };
+  content.querySelector('#claimDaily').onclick = (e)=>{
+    state.gem+=1000; state.gold+=100000;
+    showToast("รับของขวัญรายวันแล้ว! +1,000💎 +100,000🪙");
+    e.target.disabled=true; e.target.textContent="รับแล้ววันนี้";
+    updateTopbar();
+  };
+  content.querySelector('[data-go="gacha"]').onclick = ()=>{ activeTab='gacha'; render(); };
+}
+
+function renderBannerPreview(banner){
+  const feat = banner.feature ? heroDef(banner.feature) : null;
+  return `
+    <div class="banner-card ${banner.cls}" style="padding:10px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        ${feat? `<div class="feat-emoji" style="font-size:24px;width:40px;height:40px;">${feat.emoji}</div>`:''}
+        <div>
+          <h3 style="font-size:14px;">${banner.name}</h3>
+          <p style="margin:2px 0 0; font-size:10px;">${banner.desc}</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   GACHA TAB
+   ============================================================ */
+function renderGachaHome(){
+  content.innerHTML = `<h2 class="section-title">🎰 ตู้กาชา (Banner)</h2>` +
+    BANNERS.map(b=>{
+      const feat = b.feature ? heroDef(b.feature) : null;
+      return `
+      <div class="banner-card ${b.cls}">
+        ${feat?`<div class="banner-feature"><div class="feat-emoji">${feat.emoji}</div>
+          <div style="flex:1;">
+            <div style="font-weight:800; font-size:13px;">${feat.name}</div>
+            <span class="rarity-badge rarity-${feat.rarity}" style="background:var(--legend); color:#1a1a2e;">★ RATE UP LEGENDARY</span>
+          </div></div>`:''}
+        <h3>${b.name}</h3>
+        <p>${b.desc}<br>Pity: การันตี ${b.mythicBanner?'Mythic':'Legendary'} ภายใน ${b.mythicBanner?80:50} ครั้ง (สะสม: ${state.pity[b.id]}/${b.mythicBanner?80:50})</p>
+        <div class="btn-row">
+          <button class="btn" data-pull="${b.id}" data-n="1">สุ่ม 1 ครั้ง (${b.cost} 💎)</button>
+          <button class="btn secondary" data-pull="${b.id}" data-n="10">สุ่ม 10 ครั้ง (${b.cost*10-160} 💎)</button>
+        </div>
+        <div style="margin-top:8px;">
+          <button class="btn" data-showpool="${b.id}" style="width:100%; background:rgba(0,0,0,0.35); color:#ddd; box-shadow:none; border:1px solid rgba(255,255,255,0.2); font-size:11px;">📋 ดูตัวละครในตู้ & โอกาสออก</button>
+        </div>
+      </div>`;
+    }).join('');
+
+  content.querySelectorAll('[data-pull]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const bannerId = btn.dataset.pull;
+      const n = parseInt(btn.dataset.n);
+      const banner = BANNERS.find(b=>b.id===bannerId);
+      const cost = n===1 ? banner.cost : banner.cost*10-160;
+      if(state.gem < cost){ showToast("Gem ไม่พอสำหรับการสุ่ม!"); return; }
+      state.gem -= cost;
+      doGachaPull(banner, n);
+    };
+  });
+  content.querySelectorAll('[data-showpool]').forEach(btn=>{
+    btn.onclick = ()=> openBannerPool(BANNERS.find(b=>b.id===btn.dataset.showpool));
+  });
+}
+
+function openBannerPool(banner){
+  const pool = banner.pool.map(id=> HERO_DB.find(h=>h.id===id)).filter(Boolean);
+  const rarityGroups = {};
+  for(const r of ['mythic','legendary','epic','rare','common']){ rarityGroups[r] = pool.filter(h=>h.rarity===r); }
+  const baseRates = banner.mythicBanner
+    ? {mythic:0.5, legendary:3, epic:12, rare:30, common:54.5}
+    : {legendary:3, epic:12, rare:30, common:55};
+  const rarityColors = {mythic:'var(--mythic)', legendary:'var(--legend)', epic:'var(--epic)', rare:'var(--rare)', common:'var(--common)'};
+  const rarityEmoji = {mythic:'🌑', legendary:'👑', epic:'💜', rare:'💙', common:'⬜'};
+
+  function perHeroRate(h){
+    const groupSize = rarityGroups[h.rarity].length;
+    if(!groupSize) return 0;
+    if((h.rarity==='legendary'||h.rarity==='mythic') && banner.rateUp){
+      if(banner.rateUp === h.id) return (baseRates[h.rarity] * 0.5) + (baseRates[h.rarity] * 0.5 / groupSize);
+      return (baseRates[h.rarity] * 0.5) / groupSize;
+    }
+    return (baseRates[h.rarity]||0) / groupSize;
+  }
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <span class="modal-close" id="closePool">✕</span>
+      <h3>📋 ${banner.name}</h3>
+      <div class="card" style="margin-bottom:10px; padding:8px;">
+        <b style="font-size:12px;">อัตราโอกาสตาม Rarity</b>
+        <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:6px;">
+          ${Object.entries(baseRates).map(([r,w])=>`
+            <div style="display:flex;align-items:center;gap:4px;background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:8px;border-left:3px solid ${rarityColors[r]};">
+              <span style="font-size:11px;">${rarityEmoji[r]}</span>
+              <span style="font-size:11px;font-weight:700;color:${rarityColors[r]};">${RARITY[r].label}</span>
+              <span style="font-size:11px;">${w}%</span>
+              <span class="small-muted" style="font-size:10px;">(${rarityGroups[r].length} ตัว)</span>
+            </div>
+          `).join('')}
+        </div>
+        ${banner.rateUp ? `<div class="small-muted" style="margin-top:6px;color:var(--legend);">⭐ Rate Up: <b>${heroDef(banner.rateUp)?.name}</b> โอกาส 50% จาก Legendary ทั้งหมด</div>` : ''}
+        <div class="small-muted" style="margin-top:4px;">🔒 Pity: สะสม ${state.pity[banner.id]}/50 ครั้ง</div>
+      </div>
+      ${['mythic','legendary','epic','rare','common'].map(r=>{
+        const heroes = rarityGroups[r];
+        if(!heroes.length) return '';
+        return `
+          <div style="margin-bottom:12px;">
+            <div style="font-weight:800;font-size:12px;color:${rarityColors[r]};margin-bottom:6px;">
+              ${rarityEmoji[r]} ${RARITY[r].label} — ${baseRates[r]}% รวม / ${heroes.length} ตัว
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+              ${heroes.map(h=>{
+                const rate = perHeroRate(h).toFixed(2);
+                const isRateUp = banner.rateUp === h.id;
+                return `<div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:7px 8px;border:1px solid ${isRateUp?'var(--legend)':'rgba(255,255,255,0.08)'};display:flex;align-items:center;gap:6px;">
+                  <span style="font-size:22px;">${h.emoji}</span>
+                  <div style="flex:1;min-width:0;">
+                    <div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${isRateUp?'⭐ ':''}${h.name}</div>
+                    <div style="font-size:11px;color:${rarityColors[r]};">${rate}%</div>
+                    <div class="small-muted" style="font-size:9px;">${h.element} • ${h.skill.name}</div>
+                  </div>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+      }).join('')}
+      <button class="btn" id="closePool2" style="width:100%;margin-top:4px;">ปิด</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const close = ()=> overlay.remove();
+  overlay.querySelector('#closePool').onclick = close;
+  overlay.querySelector('#closePool2').onclick = close;
+  overlay.onclick = e=>{ if(e.target===overlay) close(); };
+}
+
+function rollRarity(banner){
+  const roll = Math.random()*100;
+  let acc=0;
+  // mythic only in mythic banner
+  const order = banner && banner.mythicBanner
+    ? ['common','rare','epic','legendary','mythic']
+    : ['common','rare','epic','legendary'];
+  for(const key of order){
+    acc += RARITY[key].weight;
+    if(roll <= acc) return key;
+  }
+  return 'common';
+}
+
+function doGachaPull(banner, n){
+  const results = [];
+  const pityMax = banner.mythicBanner ? 80 : 50;
+  for(let i=0;i<n;i++){
+    state.pity[banner.id]++;
+    let rarity;
+    if(state.pity[banner.id] >= pityMax){
+      rarity = banner.mythicBanner ? 'mythic' : 'legendary';
+      state.pity[banner.id] = 0;
+    } else {
+      rarity = rollRarity(banner);
+      if(rarity==='legendary' || rarity==='mythic') state.pity[banner.id]=0;
+    }
+    // pick hero
+    let candidates = HERO_DB.filter(h=>h.rarity===rarity && banner.pool.includes(h.id));
+    if(candidates.length===0) candidates = HERO_DB.filter(h=>h.rarity===rarity);
+    // fallback: mythic banner but rolled legendary, pick from pool
+    if(candidates.length===0) candidates = HERO_DB.filter(h=>h.rarity==='legendary' && banner.pool.includes(h.id));
+    if(candidates.length===0) candidates = HERO_DB.filter(h=>h.rarity==='legendary');
+    let chosen;
+    if((rarity==='legendary'||rarity==='mythic') && banner.rateUp && Math.random()<0.5){
+      const rateUpHero = heroDef(banner.rateUp);
+      if(rateUpHero && rateUpHero.rarity===rarity) chosen = rateUpHero;
+    }
+    if(!chosen) chosen = candidates[Math.floor(Math.random()*candidates.length)];
+    results.push(chosen);
+  }
+  // add to roster / dupes
+  const isNewList = [];
+  results.forEach(h=>{
+    let existing = state.roster.find(r=>r.heroId===h.id);
+    if(existing){
+      existing.dupes++;
+      // every 3 dupes -> evolve form (max forms-1)
+      if(existing.dupes % 3 === 0 && existing.form < h.forms.length-1){
+        existing.form++;
+      }
+      isNewList.push(false);
+    } else {
+      addStarterHero(h.id, 0);
+      isNewList.push(true);
+    }
+  });
+  showGachaResultModal(results, isNewList, banner);
+}
+
+function showGachaResultModal(results, isNewList, banner){
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <span class="modal-close" id="closeGacha">✕</span>
+      <h3>🎉 ผลการสุ่ม - ${banner.name}</h3>
+      <div id="gachaResults">
+        ${results.map((h,i)=>`
+          <div class="pull-card rarity-${h.rarity} ${isNewList[i]?'new':''}">
+            <div class="hero-emoji">${h.emoji}</div>
+            <div class="hero-name" style="font-size:9px;">${h.name}</div>
+            <span class="rarity-badge rarity-${h.rarity}">${RARITY[h.rarity].label}</span>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn" id="closeGacha2" style="width:100%;">ตกลง</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const close = ()=>{ overlay.remove(); render(); };
+  overlay.querySelector('#closeGacha').onclick = close;
+  overlay.querySelector('#closeGacha2').onclick = close;
+  overlay.onclick = (e)=>{ if(e.target===overlay) close(); };
+}
+
+/* ============================================================
+   STAGES TAB
+   ============================================================ */
+function renderStages(){
+  let html = `<h2 class="section-title">💰 ด่านฟาร์มทรัพยากร</h2>
+    <p class="small-muted" style="margin-bottom:8px;">ด่านพิเศษเล่นซ้ำได้ไม่จำกัด ใช้พลังกาย 10 ⚡ ต่อครั้ง</p>`;
+  FARM_STAGES.forEach(st=>{
+    const icon = st.type==='goldfarm' ? '🪙' : '💎';
+    html += `
+      <div class="stage-item ${st.type}" data-stage="${st.id}">
+        <div>
+          <div style="font-weight:700; font-size:13px;">${icon} ${st.name}</div>
+          <div class="small-muted">Lv. ศัตรู ${st.enemyLv} • รางวัล: ${st.reward.gold}🪙 ${st.reward.exp}EXP ${st.reward.gem?('+'+st.reward.gem+'💎'):''}</div>
+        </div>
+        <div class="stage-stars">▶️</div>
+      </div>
+    `;
+  });
+
+  html += `<h2 class="section-title" style="margin-top:18px;">🗺️ ด่านเนื้อเรื่อง / ฟาร์ม / บอส</h2>`;
+  let prevCleared = true;
+  STAGES.forEach(chapter=>{
+    html += `<div class="chapter-title">${chapter.ch}</div>`;
+    chapter.stages.forEach(st=>{
+      const cleared = !!state.clearedStages[st.id];
+      const locked = !prevCleared;
+      const icon = st.type==='boss'?'👹': st.type==='farm'?'🌾': st.type==='raid'?'💀':'📖';
+      html += `
+        <div class="stage-item ${st.type==='boss'?'boss': st.type==='raid'?'raid':''} ${locked?'locked':''}" data-stage="${locked?'':st.id}">
+          <div>
+            <div style="font-weight:700; font-size:13px;">${icon} ${st.name}</div>
+            <div class="small-muted">Lv. ศัตรู ${st.enemyLv} • รางวัล: ${st.reward.gold}🪙 ${st.reward.exp}EXP ${st.reward.gem?('+'+st.reward.gem+'💎'):''}</div>
+            ${st.type==='raid'?`<div class="small-muted" style="color:#ff2a6d;">⭐ โอกาสดรอปฮีโร่ตำนาน: ${Math.round((st.bossRate||0)*100)}% | สแตมิน่า 30 ⚡</div>`:''}
+          </div>
+          <div class="stage-stars">${cleared? '⭐⭐⭐':'🔒'.repeat(locked?1:0)}${(!locked && !cleared)?'▶️':''}</div>
+        </div>
+      `;
+      prevCleared = cleared;
+    });
+  });
+  content.innerHTML = html;
+  content.querySelectorAll('[data-stage]').forEach(el=>{
+    if(!el.dataset.stage) return;
+    el.onclick = ()=> openStageModal(el.dataset.stage);
+  });
+}
+
+function findStage(id){
+  for(const f of FARM_STAGES) if(f.id===id) return f;
+  for(const ch of STAGES) for(const s of ch.stages) if(s.id===id) return s;
+}
+
+// คืน stage ถัดไปในบทเดียวกัน หรือบทถัดไป (ข้าม raid chapter)
+function findNextStage(currentId){
+  // หา index ใน STAGES
+  for(let ci=0; ci<STAGES.length; ci++){
+    const ch = STAGES[ci];
+    for(let si=0; si<ch.stages.length; si++){
+      if(ch.stages[si].id === currentId){
+        // ด่านถัดไปในบทเดียวกัน
+        if(si+1 < ch.stages.length) return ch.stages[si+1];
+        // บทถัดไป (ข้ามบทที่เป็น raid ล้วน)
+        for(let ci2=ci+1; ci2<STAGES.length; ci2++){
+          const nonRaid = STAGES[ci2].stages.find(s=>s.type!=='raid');
+          if(nonRaid) return nonRaid;
+        }
+        return null; // จบเกมแล้ว
+      }
+    }
+  }
+  return null; // FARM stage หรือหาไม่เจอ
+}
+
+function openStageModal(stageId){
+  const st = findStage(stageId);
+  const teamUnits = state.team.filter(Boolean).map(getUnit);
+  const staminaCost = st.type==='raid' ? 30 : 10;
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal">
+      <span class="modal-close" id="closeStage">✕</span>
+      <h3>${st.name}</h3>
+      <p class="small-muted">ระดับศัตรู: ${st.enemyLv} • ใช้พลังกาย ${staminaCost} ⚡</p>
+      <p class="small-muted">รางวัล: 🪙${st.reward.gold} • EXP ${st.reward.exp} ${st.reward.gem?('• 💎'+st.reward.gem):''}</p>
+      ${st.bossRate?`<p class="small-muted" style="color:${st.type==='raid'?'#ff2a6d':'var(--legend)'};">⭐ โอกาสดรอปฮีโร่${st.type==='raid'?'ในตำนาน':''}: ${Math.round(st.bossRate*100)}%</p>`:''}
+      ${st.story ? `<div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:8px;font-size:11px;color:#c9c9ff;margin:8px 0;border-left:3px solid ${st.type==='raid'?'#ff2a6d':'var(--legend)'};">${st.story}</div>` : ''}
+      <h3 style="margin-top:10px;">ทีมของคุณ (${teamUnits.length}/6)</h3>
+      <div class="grid">
+        ${teamUnits.map(u=>{
+          const d = heroDef(u.heroId);
+          return `<div class="hero-tile rarity-${d.rarity}"><div class="hero-emoji">${d.forms[u.form].emoji}</div><div class="hero-name">${d.forms[u.form].name} Lv.${u.level}</div></div>`;
+        }).join('') || '<p class="small-muted">ยังไม่มีฮีโร่ในทีม! ไปจัดทีมก่อน</p>'}
+      </div>
+      <div class="btn-row" style="margin-top:10px;">
+        <button class="btn ${st.type==='raid'?'danger':''}" id="startBattle" ${teamUnits.length===0||state.stamina<staminaCost?'disabled':''}>⚔️ เริ่มต่อสู้ ${state.stamina<staminaCost?`(พลังกายไม่พอ ${staminaCost}⚡)`:''}</button>
+        <button class="btn secondary" id="closeStage2">ปิด</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#closeStage').onclick = ()=>overlay.remove();
+  overlay.querySelector('#closeStage2').onclick = ()=>overlay.remove();
+  overlay.querySelector('#startBattle').onclick = ()=>{
+    overlay.remove();
+    startBattle(st, staminaCost);
+  };
+}
+
+/* ============================================================
+   BATTLE SYSTEM
+   ============================================================ */
+function makeEnemy(heroId, lv){
+  const def = heroDef(heroId);
+  const mul = 1 + (lv-1)*0.12;
+  return {
+    name: def.name, emoji: def.emoji, rarity: def.rarity,
+    hp: Math.round(def.base.hp*mul), maxhp: Math.round(def.base.hp*mul),
+    atk: Math.round(def.base.atk*mul), def: Math.round(def.base.def*mul), spd: def.base.spd,
+    skill: def.skill, mp:0, maxmp:100, isEnemy:true, alive:true,
+    isMadara: heroId==='n_madara', // มาดาระตีธรรมดาเป็นหมู่
+    isAizen: heroId==='bl_aizen', // ไอเซ็นหลอกสายตาทีมศัตรู
+    isIchigoBankai: heroId==='bl_ichigo_bankai', // อิจิโกะแบงไคโจมตีรวดเร็ว
+    isFusion: heroId==='db_vegito'||heroId==='db_gogeta', // Fusion heroes
+  };
+}
+
+function startBattle(stage, staminaCost){
+  state.stamina -= (staminaCost||10);
+  const playerTeamUnits = state.team.filter(Boolean).map(uid=>{
+    const u = getUnit(uid);
+    const stats = computeStats(u);
+    const def = heroDef(u.heroId);
+    return {
+      uid:u.uid, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji, rarity:def.rarity,
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, isEnemy:false, alive:true, level:u.level,
+    };
+  });
+  const enemyUnits = stage.enemies.map(eid=>makeEnemy(eid, stage.enemyLv));
+
+  renderBattleScreen(playerTeamUnits, enemyUnits, stage);
+}
+
+function renderBattleScreen(allies, enemies, stage){
+  content.innerHTML = `
+    <h2 class="section-title">⚔️ ${stage.name}</h2>
+    <div style="text-align:center; font-size:11px; color:#ff9d3a; margin-bottom:6px;">ศัตรู</div>
+    <div class="battle-row" id="enemyRow"></div>
+    <div style="text-align:center; font-size:11px; color:#5bb8ff; margin:10px 0 6px;">ทีมของคุณ</div>
+    <div class="battle-row" id="allyRow"></div>
+    <div id="battleLog"></div>
+    <div style="text-align:center; margin-top:10px;">
+      <button class="btn" id="autoBtn">▶️ เริ่มต่อสู้อัตโนมัติ</button>
+    </div>
+  `;
+  drawUnits('enemyRow', enemies);
+  drawUnits('allyRow', allies);
+
+  const log = document.getElementById('battleLog');
+  const addLog = (txt)=>{
+    const d = document.createElement('div'); d.textContent = txt;
+    log.prepend(d);
+  };
+
+  document.getElementById('autoBtn').onclick = (e)=>{
+    e.target.disabled = true;
+    e.target.textContent = "กำลังต่อสู้...";
+    runBattleLoop(allies, enemies, addLog, stage);
+  };
+}
+
+function drawUnits(containerId, units){
+  const el = document.getElementById(containerId);
+  el.innerHTML = units.map(u=>`
+    <div class="unit ${u.alive?'':'dead'}" id="${containerId}_${u.uid||u.name+units.indexOf(u)}_${units.indexOf(u)}">
+      <div class="hero-emoji">${u.emoji}</div>
+      <div class="bar-bg"><div class="bar-fill bar-hp" style="width:${Math.max(0,u.hp/u.maxhp*100)}%"></div></div>
+      <div style="font-size:9px;">${u.name}</div>
+    </div>
+  `).join('');
+}
+
+function unitElement(containerId, units, idx){
+  return document.getElementById(`${containerId}_${units[idx].uid||units[idx].name+idx}_${idx}`);
+}
+
+async function runBattleLoop(allies, enemies, addLog, stage){
+  addLog(`⚔️ การต่อสู้เริ่มต้น! ${stage.name}`);
+  // build turn order by spd, repeated rounds until one side dead
+  let round=0;
+  while(allies.some(a=>a.alive) && enemies.some(e=>e.alive) && round<40){
+    round++;
+    const all = [...allies, ...enemies].filter(u=>u.alive).sort((a,b)=>b.spd-a.spd);
+    for(const actor of all){
+      if(!actor.alive) continue;
+      if(!allies.some(a=>a.alive) || !enemies.some(e=>e.alive)) break;
+      await sleep(220);
+      doAction(actor, allies, enemies, addLog);
+      drawUnits('allyRow', allies);
+      drawUnits('enemyRow', enemies);
+    }
+  }
+  await sleep(300);
+  const win = enemies.every(e=>!e.alive);
+  showBattleResult(win, stage, allies);
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function doAction(actor, allies, enemies, addLog){
+  const allyTeam = actor.isEnemy ? enemies : allies;
+  const enemyTeam = actor.isEnemy ? allies : enemies;
+  const aliveEnemies = enemyTeam.filter(u=>u.alive);
+  if(aliveEnemies.length===0) return;
+
+  actor.mp = (actor.mp||0) + 25;
+  const useSkill = actor.mp >= (actor.skill.cost||30);
+  const skill = actor.skill;
+  let dmgMul = useSkill ? skill.power : 1.0;
+  let type = useSkill ? skill.type : (actor.isMadara ? 'madara_normal_aoe' : 'single');
+  if(useSkill){ actor.mp -= skill.cost; addLog(`✨ ${actor.name} ใช้สกิล [${skill.name}]!`); }
+  else if(actor.isMadara){ addLog(`🌑 มาดาระ ตีหมู่ด้วยพลังชาคระ!`); }
+  else if(actor.isFusion){ addLog(`💥 ${actor.name} โจมตีด้วยพลัง Fusion!`); }
+
+  function dealDamage(target, mul, pen=0){
+    const rawAtk = actor.atk * mul;
+    const eff = Math.max(1, rawAtk - target.def*(1-pen));
+    const dmg = Math.round(eff * (0.9+Math.random()*0.2));
+    target.hp = Math.max(0, target.hp - dmg);
+    addLog(`${actor.emoji} ${actor.name} โจมตี ${target.emoji} ${target.name} ดาเมจ ${dmg}`);
+    if(target.hp<=0 && target.alive){ target.alive=false; addLog(`💀 ${target.name} ถูกกำจัด!`); }
+    return dmg;
+  }
+  function heal(target, mul){
+    const amt = Math.round(target.maxhp*mul);
+    target.hp = Math.min(target.maxhp, target.hp+amt);
+    addLog(`💚 ${actor.name} ฮีล ${target.name} +${amt} HP`);
+  }
+
+  switch(type){
+    case 'single': case 'single_buff': case 'single_burn': case 'single_pen': case 'single_lifesteal':{
+      const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
+      const pen = type==='single_pen' ? 0.3 : 0;
+      const dmg = dealDamage(target, dmgMul, pen);
+      if(type==='single_lifesteal'){ actor.hp = Math.min(actor.maxhp, actor.hp+Math.round(dmg*0.15)); }
+      break;
+    }
+    case 'double':{
+      for(let i=0;i<2;i++){
+        const t = aliveEnemies.filter(u=>u.alive)[Math.floor(Math.random()*aliveEnemies.filter(u=>u.alive).length)] || aliveEnemies[0];
+        if(t) dealDamage(t, dmgMul);
+      }
+      break;
+    }
+    case 'aoe': case 'aoe_drain':{
+      let total=0;
+      aliveEnemies.forEach(t=> total+=dealDamage(t, dmgMul));
+      if(type==='aoe_drain'){ actor.hp=Math.min(actor.maxhp, actor.hp+Math.round(total*0.1)); }
+      break;
+    }
+    case 'meteor_aoe':{
+      // ☄️ Madara meteor: massive AoE with armor pen
+      addLog(`☄️💥 อุกกาบาตพุ่งลงมาจากท้องฟ้า!!!`);
+      aliveEnemies.forEach(t=> dealDamage(t, dmgMul, 0.5));
+      break;
+    }
+    case 'madara_normal_aoe':{
+      // มาดาระตีธรรมดาเป็นหมู่
+      aliveEnemies.forEach(t=> dealDamage(t, 0.8));
+      break;
+    }
+    case 'execute':{
+      const t = aliveEnemies.reduce((a,b)=> a.hp<b.hp?a:b);
+      dealDamage(t, dmgMul);
+      break;
+    }
+    case 'heal_single':{
+      const aliveAllies = allyTeam.filter(u=>u.alive);
+      const t = aliveAllies.reduce((a,b)=> a.hp/a.maxhp < b.hp/b.maxhp ? a:b);
+      heal(t, dmgMul);
+      break;
+    }
+    case 'heal_all': case 'heal_all_buff':{
+      allyTeam.filter(u=>u.alive).forEach(t=>heal(t, dmgMul));
+      break;
+    }
+    default:{
+      const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
+      dealDamage(target, 1.0);
+    }
+  }
+}
+
+/* ============================================================
+   FAST BATTLE SIMULATION (ใช้สำหรับ Auto-Replay ไม่มี animation)
+   ============================================================ */
+function simulateBattleFast(stage, staminaCost){
+  state.stamina -= (staminaCost||10);
+
+  const allies = state.team.filter(Boolean).map(uid=>{
+    const u = getUnit(uid);
+    const stats = computeStats(u);
+    const def = heroDef(u.heroId);
+    return { name: def.forms[u.form].name, emoji: def.forms[u.form].emoji,
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, isEnemy:false, alive:true };
+  });
+  const enemies = stage.enemies.map(eid=>makeEnemy(eid, stage.enemyLv));
+
+  // จำลอง battle loop สูงสุด 40 รอบ
+  let round=0;
+  while(allies.some(a=>a.alive) && enemies.some(e=>e.alive) && round<40){
+    round++;
+    const all = [...allies, ...enemies].filter(u=>u.alive).sort((a,b)=>b.spd-a.spd);
+    for(const actor of all){
+      if(!actor.alive) continue;
+      if(!allies.some(a=>a.alive) || !enemies.some(e=>e.alive)) break;
+      doAction(actor, allies, enemies, ()=>{}); // ส่ง noop log
+    }
+  }
+
+  const win = enemies.every(e=>!e.alive);
+  if(!win) return { win:false };
+
+  const goldGain = stage.reward.gold;
+  const gemGain  = stage.reward.gem||0;
+  const expGain  = stage.reward.exp;
+
+  const equipDropChance = stage.type==='boss' ? 1.0 : 0.6;
+  let drop = null;
+  if(Math.random() < equipDropChance) drop = EQUIP_DB[Math.floor(Math.random()*EQUIP_DB.length)];
+
+  let heroDropped = false;
+  if((stage.type==='boss'||stage.type==='raid') && stage.bossRate && Math.random()<stage.bossRate) heroDropped = true;
+
+  state.clearedStages[stage.id] = true;
+  return { win:true, gold:goldGain, gem:gemGain, exp:expGain, drop, heroDropped };
+}
+
+function showBattleResult(win, stage, allies){
+  // restore HP for next time (simulate rest)
+  let expGain = stage.reward.exp;
+  let goldGain = stage.reward.gold;
+  let gemGain = stage.reward.gem||0;
+
+  if(win){
+    state.clearedStages[stage.id]=true;
+    state.gold += goldGain;
+    state.gem += gemGain;
+    // give EXP to team
+    state.team.filter(Boolean).forEach(uid=>{
+      const u = getUnit(uid);
+      const cap = levelCapForUnit(u);
+      if(u.level >= cap) return; // หยุดได้รับ EXP เมื่อถึงขีดจำกัด
+      u.exp += expGain;
+      while(u.exp >= expToNext(u.level) && u.level < cap){
+        u.exp -= expToNext(u.level);
+        u.level++;
+      }
+      if(u.level >= cap) u.exp = 0; // รีเซ็ต EXP ที่ขีดจำกัด
+    });
+    // chance to drop equipment (60% ปกติ, 100% บอส)
+    let dropEquip = null;
+    const equipDropChance = stage.type === 'boss' ? 1.0 : 0.6;
+    if(Math.random() < equipDropChance){
+      dropEquip = EQUIP_DB[Math.floor(Math.random()*EQUIP_DB.length)];
+      state.inventory[dropEquip.id] = (state.inventory[dropEquip.id]||0)+1;
+    }
+    // boss stages have a chance to drop a bonus hero shard/unit
+    let bossHero = null;
+    if((stage.type==='boss'||stage.type==='raid') && stage.bossRate && Math.random()<stage.bossRate){
+      const bossDef = heroDef(stage.enemies[0]);
+      bossHero = bossDef;
+      let existing = state.roster.find(r=>r.heroId===bossDef.id);
+      if(existing){
+        existing.dupes++;
+        if(existing.dupes % 3 === 0 && existing.form < bossDef.forms.length-1) existing.form++;
+      } else {
+        addStarterHero(bossDef.id, 0);
+      }
+    }
+
+    const nextStage = findNextStage(stage.id);
+    const staminaCostNext = nextStage && nextStage.type==='raid' ? 30 : 10;
+    const canGoNext = nextStage && state.stamina >= staminaCostNext;
+
+    const staminaCost = stage.type==='raid' ? 30 : 10;
+    const canReplay = state.stamina >= staminaCost;
+
+    const overlay = document.createElement('div');
+    overlay.className='modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal" style="text-align:center;">
+        <h3>🎉 ชนะ!</h3>
+        <div style="font-size:48px;">🏆</div>
+        <p>ได้รับ: 🪙 ${goldGain} ${gemGain?('• 💎 '+gemGain):''} • EXP ${expGain} (ทุกคนในทีม)</p>
+        ${dropEquip?`<p>🎁 ดรอปไอเทม: ${dropEquip.emoji} ${dropEquip.name} <span style="color:#9dff9d;">(เข้าคลังแล้ว ✓)</span></p>`:''}
+        ${bossHero?`<p style="color:${bossHero.rarity==='mythic'?'#ff2a6d':'var(--legend)'}; font-weight:${bossHero.rarity==='mythic'?'800':'400'};">${bossHero.rarity==='mythic'?'🌑☄️ ดรอปตำนาน!! ':'🌟 บอสดรอปฮีโร่: '}${bossHero.emoji} ${bossHero.name}${bossHero.rarity==='mythic'?' ★★★★★ เข้าคลังแล้ว!':'!'}</p>`:''}
+        ${stage.type==='raid' && !bossHero?`<p class="small-muted" style="color:#888;">💨 บอสหลบหนีไป... (โอกาส ${Math.round((stage.bossRate||0)*100)}%) ลองใหม่อีกครั้ง!</p>`:''}
+
+        <!-- AUTO-REPLAY SECTION -->
+        <div class="auto-replay-box">
+          <h4>🔁 ออโต้เล่นอีกครั้ง</h4>
+          <div class="repeat-selector">
+            <button id="arMinus">−</button>
+            <span id="arCount">3</span>
+            <button id="arPlus">+</button>
+            <span style="font-size:11px; color:#aaa; margin-left:4px;">ครั้ง</span>
+          </div>
+          <div style="display:flex; gap:6px; justify-content:center; margin-bottom:6px;">
+            <button class="btn secondary" style="font-size:11px; padding:5px 10px;" data-arset="3">3ครั้ง</button>
+            <button class="btn secondary" style="font-size:11px; padding:5px 10px;" data-arset="5">5ครั้ง</button>
+            <button class="btn secondary" style="font-size:11px; padding:5px 10px;" data-arset="10">10ครั้ง</button>
+            <button class="btn secondary" style="font-size:11px; padding:5px 10px;" data-arset="20">20ครั้ง</button>
+          </div>
+          <div class="auto-replay-progress" id="arProgress">
+            <div style="color:#7be3ff; font-size:12px; margin-bottom:4px;">กำลังเล่นซ้ำ... <span id="arRound">0</span>/<span id="arTotal">0</span></div>
+            <div class="auto-replay-bar-bg"><div class="auto-replay-bar-fill" id="arBarFill" style="width:0%"></div></div>
+            <div class="auto-replay-stat">
+              <span>🪙 <span id="arGold">0</span></span>
+              <span>💎 <span id="arGem">0</span></span>
+              <span>⭐ EXP <span id="arExp">0</span></span>
+              <span>🎁 ไอเทม <span id="arDrop">0</span></span>
+            </div>
+            ${stage.bossRate ? `<div class="auto-replay-stat" style="margin-top:4px;"><span>🌟 ฮีโร่บอสดรอป: <span id="arHero">0</span> ครั้ง</span></div>` : ''}
+          </div>
+          <button class="btn" id="autoReplayBtn" ${!canReplay?'disabled':''} style="width:100%; margin-top:4px;">
+            🔁 เริ่มออโต้เล่นอีกครั้ง ${!canReplay?`(พลังกายไม่พอ ${staminaCost}⚡)`:''}
+          </button>
+        </div>
+
+        ${nextStage ? `
+        <div style="background:rgba(0,0,0,0.3);padding:8px;border-radius:10px;margin:10px 0;border:1px solid rgba(255,255,255,0.1);">
+          <div class="small-muted" style="margin-bottom:6px;">ด่านถัดไป: ${nextStage.name}</div>
+          <div class="small-muted" style="margin-bottom:8px;">⚡ ${staminaCostNext} พลังกาย${!canGoNext?' (พลังกายไม่พอ)':''}</div>
+          <button class="btn" id="nextStageBtn" ${!canGoNext?'disabled style="opacity:0.4;"':''}>⚔️ ต่อสู้ด่านต่อไป</button>
+        </div>` : `<p class="small-muted" style="color:#ffd700;margin:8px 0;">🎊 คุณผ่านทุกด่านแล้ว! ยอดเยี่ยมมาก!</p>`}
+        <button class="btn secondary" id="resultClose" style="margin-top:6px;">กลับหน้าด่าน</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#resultClose').onclick = ()=>{ overlay.remove(); activeTab='stages'; render(); };
+    if(nextStage && canGoNext){
+      overlay.querySelector('#nextStageBtn').onclick = ()=>{
+        overlay.remove();
+        startBattle(nextStage, staminaCostNext);
+      };
+    }
+
+    // --- AUTO REPLAY LOGIC ---
+    let arRepeatCount = 3;
+    let arRunning = false;
+    let arStopping = false;
+
+    const arCountEl   = overlay.querySelector('#arCount');
+    const arPlusBtn   = overlay.querySelector('#arPlus');
+    const arMinusBtn  = overlay.querySelector('#arMinus');
+    const arBtn       = overlay.querySelector('#autoReplayBtn');
+    const arProgress  = overlay.querySelector('#arProgress');
+
+    const updateArCount = ()=> { arCountEl.textContent = arRepeatCount; };
+    arPlusBtn.onclick  = ()=>{ if(!arRunning){ arRepeatCount = Math.min(50, arRepeatCount+1); updateArCount(); }};
+    arMinusBtn.onclick = ()=>{ if(!arRunning){ arRepeatCount = Math.max(1, arRepeatCount-1); updateArCount(); }};
+    overlay.querySelectorAll('[data-arset]').forEach(btn=>{
+      btn.onclick = ()=>{ if(!arRunning){ arRepeatCount = parseInt(btn.dataset.arset); updateArCount(); }};
+    });
+
+    arBtn.onclick = async ()=>{
+      if(arRunning){
+        // ปุ่มกด "หยุด" ขณะกำลังรัน
+        arStopping = true;
+        arBtn.textContent = '⏸️ กำลังหยุด...';
+        arBtn.disabled = true;
+        return;
+      }
+      arRunning = true;
+      arStopping = false;
+      arBtn.classList.add('running');
+      arBtn.textContent = '⏹️ หยุด';
+      arProgress.classList.add('show');
+
+      // ล็อคปุ่มอื่น
+      overlay.querySelectorAll('#resultClose, #nextStageBtn, #arPlus, #arMinus, [data-arset]').forEach(b=>b.disabled=true);
+
+      let totalGold=0, totalGem=0, totalExp=0, totalDrop=0, totalHero=0;
+      const totalRuns = arRepeatCount;
+
+      for(let i=0; i<totalRuns; i++){
+        if(arStopping) break;
+
+        const costNow = stage.type==='raid' ? 30 : 10;
+        if(state.stamina < costNow){
+          showToast(`⚡ พลังกายไม่พอ! ออโต้หยุดที่รอบ ${i+1}`);
+          break;
+        }
+
+        // อัปเดต UI รอบ
+        overlay.querySelector('#arRound').textContent = i+1;
+        overlay.querySelector('#arTotal').textContent = totalRuns;
+        overlay.querySelector('#arBarFill').style.width = `${(i/totalRuns)*100}%`;
+
+        // จำลองการต่อสู้ (fast sim ไม่ render)
+        const result = simulateBattleFast(stage, costNow);
+
+        if(result.win){
+          totalGold += result.gold;
+          totalGem  += result.gem;
+          totalExp  += result.exp;
+          totalDrop += result.drop ? 1 : 0;
+          totalHero += result.heroDropped ? 1 : 0;
+
+          // อัปเดต state
+          state.gold += result.gold;
+          state.gem  += result.gem;
+          state.team.filter(Boolean).forEach(uid=>{
+            const u = getUnit(uid);
+            const cap = levelCapForUnit(u);
+            if(u.level >= cap) return;
+            u.exp += result.exp;
+            while(u.exp >= expToNext(u.level) && u.level < cap){ u.exp -= expToNext(u.level); u.level++; }
+            if(u.level >= cap) u.exp = 0;
+          });
+          if(result.drop){
+            state.inventory[result.drop.id] = (state.inventory[result.drop.id]||0)+1;
+          }
+          if(result.heroDropped){
+            const bossDef2 = heroDef(stage.enemies[0]);
+            let existing2 = state.roster.find(r=>r.heroId===bossDef2.id);
+            if(existing2){ existing2.dupes++; if(existing2.dupes%3===0 && existing2.form<bossDef2.forms.length-1) existing2.form++; }
+            else addStarterHero(bossDef2.id, 0);
+          }
+        }
+
+        // อัปเดตสถิติใน UI
+        overlay.querySelector('#arGold').textContent = totalGold.toLocaleString();
+        overlay.querySelector('#arGem').textContent  = totalGem;
+        overlay.querySelector('#arExp').textContent  = totalExp.toLocaleString();
+        overlay.querySelector('#arDrop').textContent = totalDrop;
+        if(overlay.querySelector('#arHero')) overlay.querySelector('#arHero').textContent = totalHero;
+
+        updateTopbar();
+        await sleep(180); // หน่วงนิดหนึ่งให้ดูสวย
+      }
+
+      // จบออโต้
+      overlay.querySelector('#arBarFill').style.width = '100%';
+      arRunning = false;
+      arBtn.classList.remove('running');
+      arBtn.textContent = '✅ เสร็จแล้ว — กลับหน้าด่าน';
+      arBtn.disabled = false;
+      arBtn.onclick = ()=>{ overlay.remove(); activeTab='stages'; render(); };
+
+      // ปลดล็อคปุ่มปิด
+      const closeBtn = overlay.querySelector('#resultClose');
+      if(closeBtn) closeBtn.disabled = false;
+
+      showToast(`🔁 ออโต้เสร็จ! รับ 🪙${totalGold.toLocaleString()} 💎${totalGem} EXP${totalExp.toLocaleString()} รวม ${Math.round(arRepeatCount-(arStopping?0:0))} รอบ`);
+    };
+  } else {
+    const overlay = document.createElement('div');
+    overlay.className='modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal" style="text-align:center;">
+        <h3>💔 พ่ายแพ้</h3>
+        <div style="font-size:48px;">😢</div>
+        <p>ทีมของคุณพ่ายแพ้... ลองอัปเกรดฮีโร่หรือเปลี่ยนทีมแล้วลองใหม่!</p>
+        <button class="btn" id="resultClose2" style="margin-top:10px;">ตกลง</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#resultClose2').onclick = ()=>{ overlay.remove(); activeTab='stages'; render(); };
+  }
+  updateTopbar();
+}
+
+/* ============================================================
+   ROSTER TAB
+   ============================================================ */
+let rosterFilter = 'all';
+function renderRoster(){
+  const filters = [['all','ทั้งหมด'],['common','Common'],['rare','Rare'],['epic','Epic'],['legendary','Legendary'],['mythic','★★★★★ Mythic']];
+  content.innerHTML = `
+    <h2 class="section-title">📖 คลังฮีโร่ (${state.roster.length})</h2>
+    <div class="btn-row" style="margin-bottom:10px;">
+      ${filters.map(([k,l])=>`<button class="btn ${rosterFilter===k?'':'secondary'}" data-filter="${k}" style="padding:6px 10px; font-size:11px;">${l}</button>`).join('')}
+    </div>
+    <div class="grid" id="rosterGrid"></div>
+  `;
+  content.querySelectorAll('[data-filter]').forEach(b=> b.onclick=()=>{ rosterFilter=b.dataset.filter; renderRoster(); });
+
+  const list = state.roster.filter(u=> rosterFilter==='all' || heroDef(u.heroId).rarity===rosterFilter)
+    .sort((a,b)=> RARITY[heroDef(b.heroId).rarity].stars - RARITY[heroDef(a.heroId).rarity].stars);
+
+  document.getElementById('rosterGrid').innerHTML = list.map(u=>{
+    const def = heroDef(u.heroId);
+    const form = def.forms[u.form];
+    return `
+      <div class="hero-tile rarity-${def.rarity}" data-uid="${u.uid}">
+        <span class="hero-stars">${'★'.repeat(RARITY[def.rarity].stars)}</span>
+        <span class="hero-lvl">Lv.${u.level}</span>
+        <div class="hero-emoji">${form.emoji}</div>
+        <div class="hero-name">${form.name}</div>
+      </div>
+    `;
+  }).join('') || '<p class="small-muted">ยังไม่มีฮีโร่ในหมวดนี้</p>';
+
+  content.querySelectorAll('[data-uid]').forEach(el=>{
+    el.onclick = ()=> openHeroDetail(el.dataset.uid);
+  });
+}
+
+function openHeroDetail(uid){
+  const u = getUnit(uid);
+  const def = heroDef(u.heroId);
+  const form = def.forms[u.form];
+  const stats = computeStats(u);
+  const nextExp = expToNext(u.level);
+
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  const cap = levelCapForUnit(u);
+  const breakTier = u.levelBreak || 0;
+  const nextBreakCost = LEVEL_BREAK_COST[cap];
+  const atCap = u.level >= cap;
+  const maxBreak = breakTier >= 6;
+  overlay.innerHTML = `
+    <div class="modal">
+      <span class="modal-close" id="closeDetail">✕</span>
+      <div style="text-align:center;">
+        <div style="font-size:64px;">${form.emoji}</div>
+        <h3>${form.name} <span class="rarity-badge rarity-${def.rarity}">${RARITY[def.rarity].label}</span></h3>
+        <div class="small-muted">${'★'.repeat(RARITY[def.rarity].stars)} • ธาตุ: ${def.element} • ร่างที่ ${u.form+1}/${def.forms.length}</div>
+      </div>
+      <div class="card" style="margin-top:10px;">
+        <div class="row-between"><b>Level ${u.level} / ${cap}</b><span class="small-muted">EXP ${u.exp}/${atCap?'MAX':nextExp}</span></div>
+        <div class="bar-bg"><div class="bar-fill bar-xp" style="width:${atCap?100:(u.exp/nextExp*100)}%"></div></div>
+        ${atCap ? `<div class="small-muted" style="color:var(--gold); margin-top:4px;">⚠️ ถึงขีดจำกัดเลเวล! ต้องทำ Level Break เพื่อเพิ่มต่อ</div>` : ''}
+        <div class="row-between" style="margin-top:8px;"><span>❤️ HP</span><b>${stats.maxhp}</b></div>
+        <div class="row-between"><span>⚔️ ATK</span><b>${stats.atk}</b></div>
+        <div class="row-between"><span>🛡️ DEF</span><b>${stats.def}</b></div>
+        <div class="row-between"><span>💨 SPD</span><b>${stats.spd}</b></div>
+      </div>
+      <div class="skill-card">
+        <b>${def.skill.name}</b>
+        <div class="small-muted">${def.skill.desc}</div>
+        <div class="small-muted">MP cost: ${def.skill.cost}</div>
+      </div>
+      <div class="card">
+        <div class="row-between"><b>ของซ้ำ (Dupes)</b><span>${u.dupes} / ${(def.forms.length-1)*3}</span></div>
+        <div class="bar-bg"><div class="bar-fill" style="background:var(--epic); width:${Math.min(100, (u.dupes%3)/3*100)}%"></div></div>
+        <div class="small-muted">สะสมของซ้ำครบ 3 ชิ้น เพื่อปลดล็อกร่างถัดไป!</div>
+        ${u.form < def.forms.length-1 ? `<div class="small-muted">ร่างถัดไป: ${def.forms[u.form+1].emoji} ${def.forms[u.form+1].name}</div>`:'<div class="small-muted">ปลดล็อกร่างสูงสุดแล้ว! 🌟</div>'}
+      </div>
+      <div class="card" style="border:1px solid rgba(255,216,107,0.3);">
+        <b>💥 Level Break</b>
+        <div class="small-muted" style="margin:4px 0;">ขีดจำกัดปัจจุบัน: <b style="color:var(--gold);">Lv.${cap}</b> (Tier ${breakTier}/6)</div>
+        ${!maxBreak ? `
+          <div class="small-muted">อัพขีดจำกัดถัดไป → Lv.${LEVEL_BREAK_CAPS[breakTier+1]}</div>
+          <div class="small-muted" style="color:#ff9d3a;">ค่าใช้จ่าย: 🪙 ${nextBreakCost?.gold||0} + 💎 ${nextBreakCost?.gem||0}</div>
+          <button class="btn" id="levelBreakBtn" style="margin-top:6px; width:100%;" ${atCap?'':'disabled'}>
+            ${atCap ? '🔓 Level Break!' : `⚠️ ต้องถึง Lv.${cap} ก่อน`}
+          </button>
+        ` : '<div class="small-muted" style="color:var(--legend);">🏆 Level Break สูงสุดแล้ว! (Lv.450)</div>'}
+      </div>
+      <div class="card">
+        <b>อุปกรณ์</b>
+        <div class="btn-row" style="margin-top:6px;">
+          ${['weapon','armor','ring'].map(slot=>{
+            const eid = u.equip[slot];
+            const e = eid ? EQUIP_DB.find(x=>x.id===eid) : null;
+            return `<div class="equip-slot ${e?'filled':''}" data-slot="${slot}">${e?e.emoji:'➕'}</div>`;
+          }).join('')}
+        </div>
+        <div class="small-muted" style="margin-top:4px;">แตะช่องเพื่อสวม/ถอดอุปกรณ์จากคลัง</div>
+      </div>
+      <div class="card" style="margin-top:10px; border:1px solid rgba(255,216,107,0.25);">
+        <b>⬆️ อัพเลเวล</b>
+        ${(()=>{
+          const cap2 = levelCapForUnit(u);
+          const rem = cap2 - u.level;
+          const cost1 = u.level*20;
+          const cost10 = calcLevelUpCost(u.level, Math.min(10, rem));
+          const cost100 = calcLevelUpCost(u.level, Math.min(100, rem));
+          return `
+          <div class="small-muted" style="margin:4px 0 8px;">ค่าอัพจะเพิ่มตามเลเวล (เลเวล × 20 🪙 ต่อครั้ง)</div>
+          <div class="btn-row" style="flex-wrap:wrap;">
+            <button class="btn" id="lvlUp1" ${atCap?'disabled':''} style="flex:1; min-width:80px; font-size:11px;">
+              +1 เวล<br><span style="font-size:10px; opacity:0.8;">${atCap?'เต็มแล้ว':fmt(cost1)+'🪙'}</span>
+            </button>
+            <button class="btn secondary" id="lvlUp10" ${rem<1?'disabled':''} style="flex:1; min-width:80px; font-size:11px;">
+              +${Math.min(10,rem)} เวล<br><span style="font-size:10px; opacity:0.8;">${rem<1?'เต็มแล้ว':fmt(cost10)+'🪙'}</span>
+            </button>
+            <button class="btn secondary" id="lvlUp100" ${rem<1?'disabled':''} style="flex:1; min-width:80px; font-size:11px;">
+              +${Math.min(100,rem)} เวล<br><span style="font-size:10px; opacity:0.8;">${rem<1?'เต็มแล้ว':fmt(cost100)+'🪙'}</span>
+            </button>
+          </div>
+          `;
+        })()}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#closeDetail').onclick = ()=>{ overlay.remove(); };
+  overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
+
+  function doLevelUp(times){
+    const cap2 = levelCapForUnit(u);
+    const canUp = Math.min(times, cap2 - u.level);
+    if(canUp <= 0){ showToast("ถึงขีดจำกัดเลเวลแล้ว! ต้องทำ Level Break ก่อน"); return; }
+    const totalCost = calcLevelUpCost(u.level, canUp);
+    if(state.gold < totalCost){ showToast(`Gold ไม่พอ! ต้องการ 🪙 ${fmt(totalCost)}`); return; }
+    state.gold -= totalCost;
+    u.level += canUp;
+    if(u.level >= cap2) u.exp = 0;
+    showToast(`${form.name} เพิ่มเป็น Lv.${u.level}! (🪙 -${fmt(totalCost)})`);
+    overlay.remove(); openHeroDetail(uid); updateTopbar();
+  }
+
+  overlay.querySelector('#lvlUp1').onclick = ()=> doLevelUp(1);
+  overlay.querySelector('#lvlUp10').onclick = ()=> doLevelUp(10);
+  overlay.querySelector('#lvlUp100').onclick = ()=> doLevelUp(100);
+
+  const lbBtn = overlay.querySelector('#levelBreakBtn');
+  if(lbBtn) lbBtn.onclick = ()=>{
+    const cap2 = levelCapForUnit(u);
+    const cost2 = LEVEL_BREAK_COST[cap2];
+    if(!cost2){ showToast("Level Break สูงสุดแล้ว!"); return; }
+    if(state.gold < cost2.gold){ showToast(`Gold ไม่พอ! ต้องการ 🪙 ${cost2.gold}`); return; }
+    if(state.gem < cost2.gem){ showToast(`Gem ไม่พอ! ต้องการ 💎 ${cost2.gem}`); return; }
+    state.gold -= cost2.gold;
+    state.gem -= cost2.gem;
+    u.levelBreak = (u.levelBreak||0) + 1;
+    const newCap = levelCapForUnit(u);
+    showToast(`🔓 Level Break! ขีดจำกัดใหม่ Lv.${newCap}!`);
+    overlay.remove(); openHeroDetail(uid); updateTopbar();
+  };
+
+  overlay.querySelectorAll('[data-slot]').forEach(slotEl=>{
+    slotEl.onclick = ()=> openEquipPicker(uid, slotEl.dataset.slot, overlay);
+  });
+}
+
+function openEquipPicker(uid, slot, parentOverlay){
+  const u = getUnit(uid);
+  const owned = EQUIP_DB.filter(e=> e.slot===slot && (state.inventory[e.id]||0)>0);
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.style.zIndex=250;
+  overlay.innerHTML = `
+    <div class="modal">
+      <span class="modal-close" id="closeEquip">✕</span>
+      <h3>เลือกอุปกรณ์ (${slot})</h3>
+      ${u.equip[slot] ? `<div class="skill-card" data-unequip="1">❌ ถอดอุปกรณ์ปัจจุบัน</div>`:''}
+      ${owned.length? owned.map(e=>`
+        <div class="skill-card" data-equip="${e.id}">
+          <b>${e.emoji} ${e.name}</b> <span class="rarity-badge rarity-${e.rarity}">${RARITY[e.rarity].label}</span>
+          <div class="small-muted">${Object.entries(e.bonus).map(([k,v])=>`${k.toUpperCase()} +${v}`).join(', ')} • คงเหลือ ${state.inventory[e.id]}</div>
+        </div>
+      `).join('') : '<p class="small-muted">ไม่มีอุปกรณ์ในคลังสำหรับช่องนี้ (ลองตีด่านเพื่อหาดรอป!)</p>'}
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#closeEquip').onclick = ()=> overlay.remove();
+  overlay.onclick=(e)=>{ if(e.target===overlay) overlay.remove(); };
+  const unequip = overlay.querySelector('[data-unequip]');
+  if(unequip) unequip.onclick = ()=>{
+    state.inventory[u.equip[slot]] = (state.inventory[u.equip[slot]]||0)+1;
+    u.equip[slot]=null;
+    overlay.remove(); parentOverlay.remove(); openHeroDetail(uid);
+  };
+  overlay.querySelectorAll('[data-equip]').forEach(el=>{
+    el.onclick = ()=>{
+      const eid = el.dataset.equip;
+      if(u.equip[slot]) state.inventory[u.equip[slot]] = (state.inventory[u.equip[slot]]||0)+1;
+      u.equip[slot]=eid;
+      state.inventory[eid]--;
+      overlay.remove(); parentOverlay.remove(); openHeroDetail(uid);
+    };
+  });
+}
+
+/* ============================================================
+   TEAM TAB
+   ============================================================ */
+function renderTeam(){
+  content.innerHTML = `
+    <h2 class="section-title">🛡️ จัดทีม (สูงสุด 6 ตัว)</h2>
+    <div class="team-slots" id="teamSlots"></div>
+    <h2 class="section-title">เลือกฮีโร่จากคลัง</h2>
+    <div class="grid" id="benchGrid"></div>
+  `;
+  const slotsEl = document.getElementById('teamSlots');
+  slotsEl.innerHTML = state.team.map((uid,i)=>{
+    if(!uid) return `<div class="team-slot" data-slot="${i}">➕</div>`;
+    const u = getUnit(uid); const def = heroDef(u.heroId); const form = def.forms[u.form];
+    return `<div class="hero-tile filled rarity-${def.rarity} team-slot filled" data-slot="${i}" data-uid="${uid}">
+      <span class="hero-stars">${'★'.repeat(RARITY[def.rarity].stars)}</span>
+      <span class="hero-lvl">Lv.${u.level}</span>
+      <div class="hero-emoji">${form.emoji}</div>
+      <div class="hero-name">${form.name}</div>
+    </div>`;
+  }).join('');
+
+  slotsEl.querySelectorAll('[data-slot]').forEach(el=>{
+    el.onclick = ()=>{
+      const i = parseInt(el.dataset.slot);
+      if(state.team[i]){ state.team[i]=null; renderTeam(); }
+    };
+  });
+
+  const bench = state.roster.filter(u=> !state.team.includes(u.uid));
+  document.getElementById('benchGrid').innerHTML = bench.map(u=>{
+    const def = heroDef(u.heroId); const form = def.forms[u.form];
+    return `<div class="hero-tile rarity-${def.rarity}" data-bench="${u.uid}">
+      <span class="hero-stars">${'★'.repeat(RARITY[def.rarity].stars)}</span>
+      <span class="hero-lvl">Lv.${u.level}</span>
+      <div class="hero-emoji">${form.emoji}</div>
+      <div class="hero-name">${form.name}</div>
+    </div>`;
+  }).join('') || '<p class="small-muted">ฮีโร่ทุกตัวอยู่ในทีมแล้ว</p>';
+
+  document.querySelectorAll('[data-bench]').forEach(el=>{
+    el.onclick = ()=>{
+      const emptyIdx = state.team.findIndex(s=>s===null);
+      if(emptyIdx===-1){ showToast("ทีมเต็มแล้ว (6 ตัว) — เอาตัวออกก่อน"); return; }
+      state.team[emptyIdx] = el.dataset.bench;
+      renderTeam();
+    };
+  });
+
+  // === FUSION PANEL ===
+  renderFusionPanel();
+}
+
+/* ============================================================
+   FUSION SYSTEM — เบจิโต้ & โกจิต้า
+   ============================================================ */
+function hasFusionHeroes(){
+  const inRoster = (id) => state.roster.find(r=>r.heroId===id);
+  return inRoster('db_goku') && inRoster('db_vegeta');
+}
+function hasFusionInTeam(){
+  const teamHeroIds = state.team.filter(Boolean).map(uid=>{ const u=getUnit(uid); return u?heroDef(u.heroId).id:''; });
+  return teamHeroIds.includes('db_goku') && teamHeroIds.includes('db_vegeta');
+}
+function getFusionHero(fusionType){
+  return state.roster.find(r=>r.heroId === (fusionType==='vegito'?'db_vegito':'db_gogeta'));
+}
+// Generic check: does roster contain ALL required ingredient heroes for a fusion def?
+function hasAllFusionIngredients(fusionDef){
+  return fusionDef.fusionRequires.every(id => !!state.roster.find(r=>r.heroId===id));
+}
+function hasYoriichiIngredients(){
+  return hasAllFusionIngredients(heroDef('ds_yoriichi'));
+}
+function hasYoriichiInTeam(){
+  const yoriDef = heroDef('ds_yoriichi');
+  const teamHeroIds = state.team.filter(Boolean).map(uid=>{ const u=getUnit(uid); return u?heroDef(u.heroId).id:''; });
+  return yoriDef.fusionRequires.every(id => teamHeroIds.includes(id));
+}
+
+function renderFusionPanel(){
+  // remove old fusion panel if any
+  const old = document.getElementById('fusionPanel');
+  if(old) old.remove();
+
+  const hasDB = hasFusionHeroes();
+  const gokuDef  = heroDef('db_goku');
+  const vegDef   = heroDef('db_vegeta');
+  const vegitoDef= heroDef('db_vegito');
+  const gogetaDef= heroDef('db_gogeta');
+  const hasVegito = !!state.roster.find(r=>r.heroId==='db_vegito');
+  const hasGogeta = !!state.roster.find(r=>r.heroId==='db_gogeta');
+  const inTeam = hasFusionInTeam();
+
+  const yoriichiDef = heroDef('ds_yoriichi');
+  const yoriIngredientDefs = yoriichiDef.fusionRequires.map(id=>heroDef(id));
+  const hasYori = hasYoriichiIngredients();
+  const hasYoriichi = !!state.roster.find(r=>r.heroId==='ds_yoriichi');
+  const yoriInTeam = hasYoriichiInTeam();
+
+  const panel = document.createElement('div');
+  panel.id = 'fusionPanel';
+  panel.className = 'fusion-panel';
+  panel.innerHTML = `
+    <h3>💍🕺 ระบบ Fusion — การหลอมรวมสูงสุด</h3>
+    <p class="small-muted" style="margin-bottom:10px; font-size:11px;">ต้องการ <b>โกคู ★★★★</b> + <b>เบจิต้า ★★★★</b> ในคลังพร้อมกัน เพื่อหลอมรวม! <span style="color:#ff8888;">⚠️ ทั้งสองตัวจะถูกใช้ไปในการฟิวชั่น (หายจากคลัง)</span></p>
+
+    <!-- Vegito -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:13px; font-weight:700; color:#ffcc00; margin-bottom:6px;">💍 Potara Fusion → เบจิโต้</div>
+      <div class="fusion-slot-row">
+        <div class="fusion-hero-box ${hasDB?'has':''}">
+          <div style="font-size:28px;">${gokuDef.emoji}</div>
+          <div style="font-size:10px; margin-top:2px; color:${hasDB?'#ffd86b':'#888'};">${hasDB?'✓ มีแล้ว':'ต้องการ'}</div>
+          <div style="font-size:9px; color:#aaa;">โกคู</div>
+        </div>
+        <div class="fusion-plus">+</div>
+        <div class="fusion-hero-box ${hasDB?'has':''}">
+          <div style="font-size:28px;">${vegDef.emoji}</div>
+          <div style="font-size:10px; margin-top:2px; color:${hasDB?'#ffd86b':'#888'};">${hasDB?'✓ มีแล้ว':'ต้องการ'}</div>
+          <div style="font-size:9px; color:#aaa;">เบจิต้า</div>
+        </div>
+        <div class="fusion-arrow">→</div>
+        <div class="fusion-result-box ${hasVegito?'':'fusion-locked'}">
+          <div style="font-size:32px;">${vegitoDef.emoji}</div>
+          <div class="mythic-plus-badge">★★★★★+</div>
+          <div style="font-size:9px; margin-top:2px; color:#ffcc00;">เบจิโต้</div>
+        </div>
+      </div>
+      ${hasVegito
+        ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-bottom:6px;">✅ เบจิโต้ปลดล็อกแล้ว! ฟิวชั่นซ้ำได้ไม่จำกัดเพื่อเพิ่ม Dupe</div>
+          <button class="btn" id="fusionVegitoBtn" style="width:100%; background:linear-gradient(180deg,#ffe066,#ff8c00); color:#1a1a2e;"
+            ${!hasDB ? 'disabled' : ''}>
+            💍 Potara Fusion! (Dupe เพิ่ม)
+          </button>`
+        : `<button class="btn" id="fusionVegitoBtn" style="width:100%; background:linear-gradient(180deg,#ffe066,#ff8c00); color:#1a1a2e;"
+            ${!hasDB ? 'disabled' : ''}>
+            💍 Potara Fusion! (ต้องมีโกคู + เบจิต้า ในคลัง)
+          </button>`
+      }
+    </div>
+
+    <!-- Gogeta -->
+    <div>
+      <div style="font-size:13px; font-weight:700; color:#00ff88; margin-bottom:6px;">🕺 Fusion Dance → โกจิต้า</div>
+      <div class="fusion-slot-row">
+        <div class="fusion-hero-box ${hasDB?'has':''}">
+          <div style="font-size:28px;">${gokuDef.emoji}</div>
+          <div style="font-size:10px; margin-top:2px; color:${hasDB?'#ffd86b':'#888'};">${hasDB?'✓ มีแล้ว':'ต้องการ'}</div>
+          <div style="font-size:9px; color:#aaa;">โกคู</div>
+        </div>
+        <div class="fusion-plus" style="color:#00ff88;">+</div>
+        <div class="fusion-hero-box ${hasDB?'has':''}">
+          <div style="font-size:28px;">${vegDef.emoji}</div>
+          <div style="font-size:10px; margin-top:2px; color:${hasDB?'#ffd86b':'#888'};">${hasDB?'✓ มีแล้ว':'ต้องการ'}</div>
+          <div style="font-size:9px; color:#aaa;">เบจิต้า</div>
+        </div>
+        <div class="fusion-arrow" style="color:#00ff88;">→</div>
+        <div class="fusion-result-box ${hasGogeta?'':'fusion-locked'}" style="border-color:#00ff88; box-shadow:0 0 12px rgba(0,255,136,0.4);">
+          <div style="font-size:32px;">${gogetaDef.emoji}</div>
+          <div class="mythic-plus-badge" style="background:linear-gradient(90deg,#00ff88,#00cc66);">★★★★★+</div>
+          <div style="font-size:9px; margin-top:2px; color:#00ff88;">โกจิต้า</div>
+        </div>
+      </div>
+      ${hasGogeta
+        ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-bottom:6px;">✅ โกจิต้าปลดล็อกแล้ว! ฟิวชั่นซ้ำได้ไม่จำกัดเพื่อเพิ่ม Dupe</div>
+          <button class="btn" id="fusionGogetaBtn" style="width:100%; background:linear-gradient(180deg,#88ffcc,#00aa55); color:#1a1a2e;"
+            ${!hasDB ? 'disabled' : ''}>
+            🕺 Fusion Dance! (Dupe เพิ่ม)
+          </button>`
+        : `<button class="btn" id="fusionGogetaBtn" style="width:100%; background:linear-gradient(180deg,#88ffcc,#00aa55); color:#1a1a2e;"
+            ${!hasDB ? 'disabled' : ''}>
+            🕺 Fusion Dance! (ต้องมีโกคู + เบจิต้า ในคลัง)
+          </button>`
+      }
+    </div>
+
+    ${inTeam ? `
+    <div style="background:rgba(255,200,0,0.1); border:1px solid rgba(255,200,0,0.4); border-radius:10px; padding:8px; margin-top:10px; text-align:center;">
+      <div style="font-size:12px; color:#ffcc00; font-weight:700;">⚡ Fusion Active! โกคู + เบจิต้าอยู่ในทีม</div>
+      <div style="font-size:11px; color:#aaa; margin-top:2px;">พลังของเบจิโต้/โกจิต้าในทีมจะเพิ่มขึ้น 50% เมื่อทั้งคู่อยู่ในทีมพร้อมกัน!</div>
+    </div>` : ''}
+
+    <!-- Yoriichi -->
+    <div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1);">
+      <div style="font-size:13px; font-weight:700; color:#ffee00; margin-bottom:6px;">☀️ ลมหายใจแรกกำเนิด → โยริอิจิ</div>
+      <p class="small-muted" style="margin-bottom:8px; font-size:11px;">ต้องการ <b>ทันจิโร่ ★★★★★</b> + <b>เสาหลักทั้ง 9 ตน ★★★★</b> ในคลังพร้อมกัน (รวม 10 ตัว)! <span style="color:#ff8888;">⚠️ ทุกตัวจะถูกใช้ไปในการฟิวชั่น (หายจากคลัง)</span></p>
+      <div class="fusion-slot-row" style="flex-wrap:wrap; gap:4px;">
+        ${yoriIngredientDefs.map(d=>`
+          <div class="fusion-hero-box ${hasYori?'has':''}" style="padding:4px;">
+            <div style="font-size:20px;">${d.emoji}</div>
+            <div style="font-size:8px; color:${hasYori?'#ffee99':'#888'};">${d.name.split(' ')[0]}</div>
+          </div>
+        `).join('')}
+        <div class="fusion-arrow" style="color:#ffee00;">→</div>
+        <div class="fusion-result-box ${hasYoriichi?'':'fusion-locked'}" style="border-color:#ffee00; box-shadow:0 0 12px rgba(255,220,0,0.4);">
+          <div style="font-size:32px;">${yoriichiDef.emoji}</div>
+          <div class="mythic-plus-badge" style="background:linear-gradient(90deg,#ffee00,#ff8c00);">★★★★★★</div>
+          <div style="font-size:9px; margin-top:2px; color:#ffee00;">โยริอิจิ</div>
+        </div>
+      </div>
+      ${hasYoriichi
+        ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin:6px 0;">✅ โยริอิจิปลดล็อกแล้ว! ฟิวชั่นซ้ำได้ไม่จำกัดเพื่อเพิ่ม Dupe</div>
+          <button class="btn" id="fusionYoriichiBtn" style="width:100%; background:linear-gradient(180deg,#ffee66,#ff8c00); color:#1a1a2e;"
+            ${!hasYori ? 'disabled' : ''}>
+            ☀️ ลมหายใจแรกกำเนิด! (Dupe เพิ่ม)
+          </button>`
+        : `<button class="btn" id="fusionYoriichiBtn" style="width:100%; background:linear-gradient(180deg,#ffee66,#ff8c00); color:#1a1a2e; margin-top:6px;"
+            ${!hasYori ? 'disabled' : ''}>
+            ☀️ ลมหายใจแรกกำเนิด! (ต้องมีทันจิโร่ + เสาหลัก 9 ตน ในคลัง)
+          </button>`
+      }
+      ${yoriInTeam ? `
+      <div style="background:rgba(255,220,0,0.1); border:1px solid rgba(255,220,0,0.4); border-radius:10px; padding:8px; margin-top:10px; text-align:center;">
+        <div style="font-size:12px; color:#ffee00; font-weight:700;">☀️ Fusion Active! ทันจิโร่ + เสาหลักทั้ง 9 อยู่ในทีม</div>
+      </div>` : ''}
+    </div>
+  `;
+  content.appendChild(panel);
+
+  // Fusion buttons
+  const vBtn = panel.querySelector('#fusionVegitoBtn');
+  const gBtn = panel.querySelector('#fusionGogetaBtn');
+  const yBtn = panel.querySelector('#fusionYoriichiBtn');
+  if(vBtn) vBtn.onclick = ()=> doFusion('vegito');
+  if(gBtn) gBtn.onclick = ()=> doFusion('gogeta');
+  if(yBtn) yBtn.onclick = ()=> doYoriichiFusion();
+}
+
+function doFusion(fusionType){
+  const id = fusionType==='vegito' ? 'db_vegito' : 'db_gogeta';
+  const name = fusionType==='vegito' ? 'เบจิโต้' : 'โกจิต้า';
+  const def = heroDef(id);
+  showConfirm(`ใช้ Fusion สร้าง "${def.emoji} ${def.name}"? <b style="color:#ff6666;">โกคูและเบจิต้าจะถูกใช้ไปในการหลอมรวม (หายจากคลัง)</b> และ${name}จะถูกเพิ่ม/เพิ่ม Dupe ระดับ ★★★★★+!`, ()=>{
+    // remove one Goku and one Vegeta from roster (consumed by fusion)
+    ['db_goku','db_vegeta'].forEach(heroId=>{
+      const idx = state.roster.findIndex(r=>r.heroId===heroId);
+      if(idx !== -1){
+        const uid = state.roster[idx].uid;
+        // remove from team slots if equipped
+        for(let i=0;i<state.team.length;i++){ if(state.team[i]===uid) state.team[i]=null; }
+        state.roster.splice(idx,1);
+      }
+    });
+
+    const existing = state.roster.find(r=>r.heroId===id);
+    if(existing){
+      existing.dupes++;
+      if(existing.dupes % 3 === 0 && existing.form < def.forms.length-1) existing.form++;
+      showToast(`💍 ${name} ได้รับ Dupe! (${existing.dupes} dupes)`);
+    } else {
+      addStarterHero(id, 0);
+      showToast(`🌟✨ ${def.emoji} ${name} ★★★★★+ ปลดล็อกสำเร็จ! เพิ่มในทีมทันที!`);
+    }
+    renderTeam();
+  });
+}
+
+function doYoriichiFusion(){
+  const id = 'ds_yoriichi';
+  const name = 'โยริอิจิ';
+  const def = heroDef(id);
+  showConfirm(`ใช้ Fusion สร้าง "${def.emoji} ${def.name}"? <b style="color:#ff6666;">ทันจิโร่ + เสาหลักทั้ง 9 ตน จะถูกใช้ไปในการหลอมรวม (หายจากคลังทั้งหมด)</b> และ${name}จะถูกเพิ่ม/เพิ่ม Dupe ระดับ ★★★★★★!`, ()=>{
+    // remove all 10 ingredient heroes from roster (consumed by fusion)
+    def.fusionRequires.forEach(heroId=>{
+      const idx = state.roster.findIndex(r=>r.heroId===heroId);
+      if(idx !== -1){
+        const uid = state.roster[idx].uid;
+        for(let i=0;i<state.team.length;i++){ if(state.team[i]===uid) state.team[i]=null; }
+        state.roster.splice(idx,1);
+      }
+    });
+
+    const existing = state.roster.find(r=>r.heroId===id);
+    if(existing){
+      existing.dupes++;
+      if(existing.dupes % 3 === 0 && existing.form < def.forms.length-1) existing.form++;
+      showToast(`☀️ ${name} ได้รับ Dupe! (${existing.dupes} dupes)`);
+    } else {
+      addStarterHero(id, 0);
+      showToast(`🌟✨ ${def.emoji} ${name} ★★★★★★ ปลดล็อกสำเร็จ! เพิ่มในทีมทันที!`);
+    }
+    renderTeam();
+  });
+}
+
+/* ---------- PLAYER PROFILES (Local) ---------- */
+const PROFILES_KEY = "hero_collector_profiles_v1";
+let currentProfile = null;
+
+function getProfiles(){
+  try{ return JSON.parse(localStorage.getItem(PROFILES_KEY) || "[]"); }catch(e){ return []; }
+}
+function saveProfiles(list){
+  try{ localStorage.setItem(PROFILES_KEY, JSON.stringify(list)); }catch(e){}
+}
+function addProfile(name){
+  const list = getProfiles();
+  if(!list.includes(name)){ list.push(name); saveProfiles(list); }
+}
+function deleteProfile(name){
+  saveProfiles(getProfiles().filter(p=>p!==name));
+  localStorage.removeItem(getSaveKeyFor(name));
+}
+
+/* ---------- SAVE / LOAD ---------- */
+const SAVE_KEY_BASE = "hero_collector_save_v1";
+function getSaveKeyFor(profile){ return SAVE_KEY_BASE + "__" + profile; }
+function getSaveKey(){ return getSaveKeyFor(currentProfile); }
+
+function saveGame(silent){
+  if(!currentProfile) return;
+  try{
+    localStorage.setItem(getSaveKey(), JSON.stringify(state));
+    if(!silent) showToast("💾 บันทึกเกมเรียบร้อย!");
+  }catch(e){
+    showToast("บันทึกไม่สำเร็จ");
+  }
+}
+
+function loadGame(){
+  try{
+    const raw = localStorage.getItem(getSaveKey());
+    if(!raw) return false;
+    const loaded = JSON.parse(raw);
+    state = loaded;
+    return true;
+  }catch(e){ return false; }
+}
+
+function hasSave(){
+  return !!localStorage.getItem(getSaveKey());
+}
+
+document.getElementById('saveBtn').onclick = ()=> saveGame(false);
+document.getElementById('logoutBtn').onclick = ()=>{
+  showConfirm("ออกจากไอดีปัจจุบัน? เกมจะบันทึกให้อัตโนมัติก่อนออก", ()=>{
+    saveGame(true);
+    currentProfile = null;
+    document.getElementById('playerTag').textContent = "";
+    showProfileScreen();
+  });
+};
+
+/* ---------- PROFILE SELECT SCREEN ---------- */
+function showProfileScreen(){
+  const screen = document.getElementById('startScreen');
+  const btns = document.getElementById('startBtns');
+  const msg = document.getElementById('startMsg');
+  screen.style.display = 'flex';
+  document.getElementById('startTitle').textContent = "HERO COLLECTOR";
+  document.getElementById('startSub').textContent = "เลือกหรือสร้างไอดีผู้เล่น";
+
+  const profiles = getProfiles();
+  btns.innerHTML = `
+    ${profiles.map(p=>`
+      <div class="btn-row" style="width:100%;">
+        <button class="btn secondary" style="flex:1; text-align:left;" data-profile="${p}">👤 ${p}</button>
+        <button class="btn danger" data-delprofile="${p}" style="flex:0 0 auto; padding:10px 12px;">🗑️</button>
+      </div>
+    `).join('')}
+    <div style="display:flex; gap:6px; margin-top:6px;">
+      <input id="newProfileName" type="text" placeholder="ชื่อไอดีใหม่..." maxlength="16"
+        style="flex:1; border-radius:10px; border:none; padding:10px; font-size:13px; background:rgba(0,0,0,0.3); color:#fff;">
+      <button class="btn" id="createProfile">➕ สร้าง</button>
+    </div>
+  `;
+  msg.textContent = profiles.length ? "เลือกไอดีของคุณ หรือสร้างไอดีใหม่" : "ยังไม่มีไอดีผู้เล่น — สร้างไอดีแรกของคุณ!";
+
+  btns.querySelectorAll('[data-profile]').forEach(el=>{
+    el.onclick = ()=>{
+      currentProfile = el.dataset.profile;
+      showStartScreen();
+    };
+  });
+  btns.querySelectorAll('[data-delprofile]').forEach(el=>{
+    el.onclick = (e)=>{
+      e.stopPropagation();
+      const name = el.dataset.delprofile;
+      showConfirm(`ลบไอดี "${name}" และข้อมูลเซฟทั้งหมดของไอดีนี้? การลบนี้ไม่สามารถย้อนกลับได้`, ()=>{
+        deleteProfile(name);
+        showProfileScreen();
+      });
+    };
+  });
+  document.getElementById('createProfile').onclick = ()=>{
+    const input = document.getElementById('newProfileName');
+    const name = input.value.trim();
+    if(!name){ showToast("กรุณาตั้งชื่อไอดีก่อน"); return; }
+    if(getProfiles().includes(name)){ showToast("มีไอดีนี้อยู่แล้ว"); return; }
+    addProfile(name);
+    currentProfile = name;
+    showStartScreen();
+  };
+}
+
+/* ---------- START SCREEN ---------- */
+function showStartScreen(){
+  const screen = document.getElementById('startScreen');
+  const btns = document.getElementById('startBtns');
+  const msg = document.getElementById('startMsg');
+  screen.style.display = 'flex';
+  document.getElementById('startTitle').textContent = "HERO COLLECTOR";
+  document.getElementById('startSub').textContent = `👤 ไอดี: ${currentProfile}`;
+
+  const continueAvailable = hasSave();
+  btns.innerHTML = `
+    ${continueAvailable ? '<button class="btn" id="continueGame">▶️ เล่นต่อ (Continue)</button>' : ''}
+    <button class="btn ${continueAvailable?'secondary':''}" id="newGame">🆕 เริ่มเกมใหม่</button>
+    <button class="btn secondary" id="switchProfile">🔄 เปลี่ยนไอดีผู้เล่น</button>
+  `;
+  msg.textContent = continueAvailable ? "พบข้อมูลเซฟล่าสุด" : "ยังไม่มีข้อมูลเซฟ — เริ่มการเดินทางใหม่!";
+
+  if(continueAvailable){
+    document.getElementById('continueGame').onclick = ()=>{
+      if(loadGame()){
+        showToast("โหลดข้อมูลเรียบร้อย!");
+      }
+      enterGame();
+    };
+  }
+  document.getElementById('newGame').onclick = ()=>{
+    if(continueAvailable){
+      showConfirm("เริ่มเกมใหม่จะลบข้อมูลเซฟเดิมของไอดีนี้ ต้องการดำเนินการต่อหรือไม่?", ()=>{
+        localStorage.removeItem(getSaveKey());
+        resetState();
+        enterGame();
+      });
+      return;
+    }
+    resetState();
+    enterGame();
+  };
+  document.getElementById('switchProfile').onclick = ()=>{
+    currentProfile = null;
+    showProfileScreen();
+  };
+}
+
+function enterGame(){
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('playerTag').textContent = "👤 " + currentProfile;
+  activeTab = 'home';
+  render();
+}
+
+function resetState(){
+  state = {
+    gem: 1500, gold: 2000, stamina: 200, staminaMax: 200,
+    pity:{}, roster:[], team:[null,null,null,null,null,null],
+    clearedStages:{}, inventory:{},
+  };
+  BANNERS.forEach(b=> state.pity[b.id]=0);
+  addStarterHero("h_swordling");
+  addStarterHero("h_archerling");
+  addStarterHero("h_shieldling");
+  addStarterHero("h_healthling");
+  state.team[0]=state.roster[0].uid;
+  state.team[1]=state.roster[1].uid;
+  state.team[2]=state.roster[2].uid;
+  state.team[3]=state.roster[3].uid;
+}
+
+/* ---------- INIT ---------- */
+showProfileScreen();
+
+// passive stamina regen (every 20s, +1, for demo purposes)
+setInterval(()=>{
+  if(state.stamina < state.staminaMax){ state.stamina++; updateTopbar(); }
+}, 20000);
+
+// autosave every 60s
+setInterval(()=> saveGame(true), 60000);
+window.addEventListener('beforeunload', ()=> saveGame(true));
+</script>
+</body>
+</html>
