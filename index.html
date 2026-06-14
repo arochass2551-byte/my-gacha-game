@@ -2300,7 +2300,7 @@ function openEquipPicker(uid, slot, parentOverlay){
   const owned = EQUIP_DB.filter(e=> e.slot===slot && (state.inventory[e.id]||0)>0);
   const overlay = document.createElement('div');
   overlay.className='modal-overlay';
-  overlay.style.zIndex=250;
+  overlay.style.zIndex=900;
   overlay.innerHTML = `
     <div class="modal">
       <span class="modal-close" id="closeEquip">✕</span>
