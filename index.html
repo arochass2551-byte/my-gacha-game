@@ -908,6 +908,30 @@ const HERO_DB = [
     forms:[{name:"เอนซ์ นักผจญภัย", emoji:"💀👑🌑"},{name:"เอนซ์ Sorcerer King", emoji:"💀👑🌑⚡"},{name:"เอนซ์ TRUE OVERLORD", emoji:"💀👑🌑⚡🌌"}],
     isFusion:true, fusionRequires:["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"], fusionType:"ainz",
     isAinz:true},
+
+  // =============================================
+  // JUJUTSU KAISEN — ภาคแรก (Cursed Womb)
+  // =============================================
+  {id:"jjk_yuji", name:"อิตาโดริ ยูจิ", emoji:"🩸👊", rarity:"legendary", element:"neutral",
+    base:{hp:300, atk:62, def:26, spd:19},
+    skill:{name:"Divergent Fist — หมัดเหลื่อมเวลา", desc:"โจมตีเดี่ยว 320% ATK เจาะเกราะ 35% และมีโอกาสทำให้ศัตรูสะดุ้งพลาดเทิร์นถัดไป", power:3.2, type:"single_pen", cost:55},
+    forms:[{name:"ยูจิ นักเรียนมือใหม่", emoji:"🩸👊"},{name:"ยูจิ ร่างซุคุนะบางส่วน", emoji:"🩸👊🔴"},{name:"ยูจิ Black Flash", emoji:"🩸👊⚡⚫"}]},
+
+  {id:"jjk_megumi", name:"ฟุชิงุโระ เมงุมิ", emoji:"🐺🌑", rarity:"legendary", element:"dark",
+    base:{hp:270, atk:58, def:30, spd:20},
+    skill:{name:"Divine Dogs — หมาเทพคู่กัด", desc:"เรียกหมาเงาสองตัวโจมตีศัตรูทั้งหมด 230% ATK และดูดเลือด 10%", power:2.3, type:"aoe_drain", cost:52},
+    forms:[{name:"เมงุมิ นักเรียนมือใหม่", emoji:"🐺🌑"},{name:"เมงุมิ เรียกนกอนเสือนาคา", emoji:"🐺🌑🦅"},{name:"เมงุมิ Mahoraga ตื่น", emoji:"🐺🌑🦅⚙️"}]},
+
+  {id:"jjk_nobara", name:"คุงิซากิ โนบาระ", emoji:"📍🔨", rarity:"legendary", element:"earth",
+    base:{hp:255, atk:65, def:24, spd:18},
+    skill:{name:"Hairpin — ตอกตะปูสะท้อนคำสาป", desc:"โจมตีเดี่ยว 350% ATK เจาะเกราะ 30% และติดสถานะ Resonance สะท้อนดาเมจเพิ่ม 15% เทิร์นถัดไป", power:3.5, type:"single_pen", cost:58},
+    forms:[{name:"โนบาระ นักเรียนมือใหม่", emoji:"📍🔨"},{name:"โนบาระ Straw Doll Technique", emoji:"📍🔨🪆"},{name:"โนบาระ Resonance เต็มกำลัง", emoji:"📍🔨🪆💥"}]},
+
+  // ---- Mahito — Mythic บอสพิเศษ JJK ----
+  {id:"jjk_mahito", name:"มาฮิโตะ — วิญญาณสาปแช่งแปลงกาย", emoji:"😈🩷", rarity:"mythic", element:"dark",
+    base:{hp:560, atk:102, def:42, spd:17},
+    skill:{name:"Idle Transfiguration — เปลี่ยนศัตรูเป็นพวกเดียวกัน", desc:"มาฮิโตะแปลงร่างศัตรู 1 ตัว ให้กลายมาเป็นพวกเดียวกันชั่วคราว 2 เทิร์น ก่อนจะกลับเป็นปกติ", power:1.0, type:"enemy_charm", cost:65},
+    forms:[{name:"มาฮิโตะ วิญญาณสาปแช่ง", emoji:"😈🩷"},{name:"มาฮิโตะ Self-Embodiment", emoji:"😈🩷🌀"},{name:"มาฮิโตะ Domain Expansion", emoji:"😈🩷🌀⚫"}]},
 ];
 
 // ตัวละครจากโคลแลบ (นารูโตะ + มาดาระ) — ออกเฉพาะตู้ของตัวเอง
@@ -1158,6 +1182,17 @@ const STAGES = [
   {ch:"💀👑 โหมดพิเศษ OVERLORD: เอนซ์ โออัล กาวน์ — ราชาผู้ยิ่งใหญ่แห่งนาซาริค", stages:[
     {id:"raid-ainz-1", name:"💀🏰 นาซาริค ชั้น 10 — ปราสาทแห่งความตาย", type:"raid", enemyLv:600, reward:{gold:50000, exp:22000, gem:3500}, enemies:["ol_albedo","ol_shalltear"], bossRate:0.08, story:"ผู้พิทักษ์สูงสุดแห่งนาซาริคปกป้องราชาของพวกเขา! อัลเบโด้และชาลเทียร์ยืนขวางทาง! โอกาสดรอปผู้พิทักษ์ 8% — ต้องการทีม Mythic!"},
     {id:"raid-ainz-2", name:"💀👑🌑 เอนซ์ โออัล กาวน์ — ราชาแห่งความตาย TRUE OVERLORD", type:"raid", enemyLv:700, reward:{gold:80000, exp:35000, gem:5500}, enemies:["ol_ainz","ol_albedo"], bossRate:0.04, isAinzRaid:true, story:"เอนซ์ โออัล กาวน์ Sorcerer King of Ainz Ooal Gown ปรากฏตัวในร่างสมบูรณ์แบบ! มนตรา [The Goal of All Life is Death] ทำให้ทุกการโจมตีมีโอกาส Instant Kill! ลูกแพะแห่งนาซาริคล้อมรอบเขา! ต้องการทีม Fusion เท่านั้น! โอกาสดรอป: 🔱💀 คทา + 🔮💎 เพชรม่วง ✕ 4%"},
+  ]},
+  // =============================================
+  // JUJUTSU KAISEN — ภาคแรก (Cursed Womb)
+  // =============================================
+  {ch:"🩷 บทที่ 29: โรงเรียนเวทมนตร์โตเกียว — จุดเริ่มต้นของยูจิ", stages:[
+    {id:"29-1", name:"🩷 นิ้วของซุคุนะ — จุดเริ่มต้นของคำสาป", type:"story", enemyLv:650, reward:{gold:50000, exp:23000}, enemies:["jjk_megumi","jjk_yuji"], story:"อิตาโดริ ยูจิ นักเรียนมัธยมธรรมดา ช่วยเพื่อนจากวิญญาณสาปแช่งโดยกลืนนิ้วของซุคุนะเข้าไป! เมงุมิจากโรงเรียนเวทมนตร์โตเกียวปรากฏตัว..."},
+    {id:"29-2", name:"🐺 ภารกิจปราบวิญญาณสาปแช่ง (ฟาร์ม)", type:"farm", enemyLv:670, reward:{gold:54000, exp:24000}, enemies:["jjk_megumi","jjk_nobara","jjk_yuji"], story:"ยูจิ เมงุมิ และโนบาระ ทีมเด็กปีหนึ่งออกปฏิบัติภารกิจปราบวิญญาณสาปแช่งระดับ 1 ทั่วเมือง ฝึกฝนการใช้พลังคำสาปของตนเอง!"},
+    {id:"29-3", name:"😈🩷 บอส: มาฮิโตะ — รอยยิ้มแห่งความโกลาหล", type:"boss", enemyLv:700, reward:{gold:72000, exp:31000, gem:3800}, enemies:["jjk_mahito","jjk_megumi"], bossRate:0.25, story:"มาฮิโตะ วิญญาณสาปแช่งที่เกิดจากความเกลียดชังมนุษย์ ปรากฏตัวพร้อมพลัง Idle Transfiguration! มันท้าทายยูจิด้วยรอยยิ้มเยาะเย้ย..."},
+  ]},
+  {ch:"🩷 โหมดเรท: มาฮิโตะ — วิญญาณสาปแช่งแปลงกาย", stages:[
+    {id:"raid-mahito-1", name:"😈🩷 มาฮิโตะ — Self-Embodiment of Perfection", type:"raid", enemyLv:750, reward:{gold:85000, exp:36000, gem:4800}, enemies:["jjk_mahito"], bossRate:0.06, story:"มาฮิโตะปลดปล่อยพลัง Self-Embodiment of Perfection! มันเปลี่ยนวิญญาณของศัตรูไปมาอย่างอิสระ ความโกลาหลปกคลุมสนามรบ! โอกาสดรอป 6%"},
   ]},
 ];
 
@@ -1699,7 +1734,8 @@ const RAID_ORDER = [
   "raid-vegito-1","raid-gogeta-1",
   "raid-yoriichi-1",
   "raid-muzan-1","raid-muzan-2",
-  "raid-ainz-1","raid-ainz-2"
+  "raid-ainz-1","raid-ainz-2",
+  "raid-mahito-1"
 ];
 
 // คืนเรทบอสถัดไปตามลำดับ RAID_ORDER (null ถ้าเป็นเรทสุดท้ายแล้ว)
@@ -1862,11 +1898,33 @@ function unitElement(containerId, units, idx){
   return document.getElementById(`${containerId}_${units[idx].uid||units[idx].name+idx}_${idx}`);
 }
 
+// ตรวจสอบและคืนค่าหน่วยที่ถูก "ครอบงำ" (Mahito) กลับสู่ทีมเดิมเมื่อครบ 2 เทิร์น
+function tickCharms(allies, enemies, addLog){
+  // ตรวจทั้งสองทีม หาหน่วยที่ charmed=true
+  [...allies, ...enemies].forEach(u=>{
+    if(!u.charmed || !u.alive) return;
+    u.charmTurnsLeft--;
+    if(u.charmTurnsLeft <= 0){
+      // คืนกลับสู่ทีมเดิม
+      const fromTeam = u.isEnemy ? enemies : allies;
+      const toTeam = u.isEnemy ? allies : enemies;
+      const idx = fromTeam.indexOf(u);
+      if(idx !== -1) fromTeam.splice(idx,1);
+      u.isEnemy = !u.isEnemy;
+      u.charmed = false;
+      delete u.charmTurnsLeft;
+      toTeam.push(u);
+      addLog(`✨ ${u.emoji} ${u.name} หลุดพ้นจากการครอบงำของมาฮิโตะ และกลับสู่ฝั่งเดิม!`);
+    }
+  });
+}
+
 async function runBattleLoop(allies, enemies, addLog, stage){
   addLog(`⚔️ การต่อสู้เริ่มต้น! ${stage.name}`);
   let round=0;
   while(allies.some(a=>a.alive) && enemies.some(e=>e.alive) && round<60){
     round++;
+    tickCharms(allies, enemies, addLog);
     // สร้าง turn order ใหม่ทุกรอบ (รองรับแพะที่เพิ่งถูกเรียก)
     const all = [...allies, ...enemies].filter(u=>u.alive).sort((a,b)=>b.spd-a.spd);
     for(const actor of all){
@@ -1989,6 +2047,25 @@ function doAction(actor, allies, enemies, addLog){
       dealDamage(t, dmgMul);
       break;
     }
+    case 'enemy_charm':{
+      // 🎭 มาฮิโตะ: เปลี่ยนศัตรู 1 ตัวให้มาเป็นพวกเดียวกันชั่วคราว 2 เทิร์น
+      const candidates = aliveEnemies.filter(u=>!u.charmed);
+      if(candidates.length === 0){
+        addLog(`🎭 ${actor.name} พยายามครอบงำจิตใจ แต่ไม่มีเป้าหมาย!`);
+        break;
+      }
+      const target = candidates[Math.floor(Math.random()*candidates.length)];
+      const fromTeam = target.isEnemy ? enemyTeam : allyTeam;
+      const toTeam = target.isEnemy ? allyTeam : enemyTeam;
+      const idx = fromTeam.indexOf(target);
+      if(idx !== -1) fromTeam.splice(idx,1);
+      target.isEnemy = !target.isEnemy;
+      target.charmed = true;
+      target.charmTurnsLeft = 2;
+      toTeam.push(target);
+      addLog(`🎭✨ ${actor.name} ใช้ [Idle Transfiguration] เปลี่ยน ${target.emoji} ${target.name} ให้มาเป็นพวกเดียวกันชั่วคราว 2 เทิร์น!`);
+      break;
+    }
     // ===== AINZ SPECIAL SKILLS =====
     case 'ainz_summon_goats':{
       // เช็คจำนวนแพะที่ยังมีชีวิตอยู่ในทีม
@@ -2092,6 +2169,7 @@ function simulateBattleFast(stage, staminaCost){
   let round=0;
   while(allies.some(a=>a.alive) && enemies.some(e=>e.alive) && round<60){
     round++;
+    tickCharms(allies, enemies, ()=>{});
     // สร้าง turn order ใหม่ทุกรอบ รองรับแพะที่อาจถูก push เข้า allies
     const all = [...allies, ...enemies].filter(u=>u.alive).sort((a,b)=>b.spd-a.spd);
     for(const actor of all){
