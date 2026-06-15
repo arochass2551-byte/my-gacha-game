@@ -1690,6 +1690,26 @@ function findStage(id){
   for(const ch of STAGES) for(const s of ch.stages) if(s.id===id) return s;
 }
 
+// ลำดับของเรทบอส (raid) ทั้งหมดตามลำดับในเกม
+const RAID_ORDER = [
+  "raid-madara-1","raid-madara-2",
+  "raid-kaido-1","raid-kaido-2",
+  "raid-aizen-1","raid-aizen-2",
+  "raid-frieza-1","raid-frieza-2",
+  "raid-vegito-1","raid-gogeta-1",
+  "raid-yoriichi-1",
+  "raid-muzan-1","raid-muzan-2",
+  "raid-ainz-1","raid-ainz-2"
+];
+
+// คืนเรทบอสถัดไปตามลำดับ RAID_ORDER (null ถ้าเป็นเรทสุดท้ายแล้ว)
+function findNextRaid(currentId){
+  const idx = RAID_ORDER.indexOf(currentId);
+  if(idx === -1) return null;
+  if(idx+1 < RAID_ORDER.length) return findStage(RAID_ORDER[idx+1]);
+  return null; // เรทสุดท้ายแล้ว ไม่มีต่อ
+}
+
 // คืน stage ถัดไปในบทเดียวกัน หรือบทถัดไป (ข้าม raid chapter)
 function findNextStage(currentId){
   // หา index ใน STAGES
@@ -2191,7 +2211,7 @@ function showBattleResult(win, stage, allies){
       }
     }
 
-    const nextStage = stage.type==='raid' ? stage : findNextStage(stage.id);
+    const nextStage = stage.type==='raid' ? findNextRaid(stage.id) : findNextStage(stage.id);
     const staminaCostNext = nextStage && nextStage.type==='raid' ? 30 : 10;
     const canGoNext = nextStage && state.stamina >= staminaCostNext;
 
