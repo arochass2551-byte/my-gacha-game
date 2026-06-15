@@ -1813,7 +1813,7 @@ function makeEnemy(heroId, lv){
     name: def.name, emoji: def.emoji, rarity: def.rarity,
     hp: Math.round(def.base.hp*mul), maxhp: Math.round(def.base.hp*mul),
     atk: Math.round(def.base.atk*mul), def: Math.round(def.base.def*mul), spd: def.base.spd,
-    skill: def.skill, mp:0, maxmp:100, isEnemy:true, alive:true,
+    skill: def.skill, mp:0, maxmp:100, isEnemy:true, alive:true, origSide:'enemy',
     isMadara: heroId==='n_madara', // มาดาระตีธรรมดาเป็นหมู่
     isAizen: heroId==='bl_aizen', // ไอเซ็นหลอกสายตาทีมศัตรู
     isIchigoBankai: heroId==='bl_ichigo_bankai', // อิจิโกะแบงไคโจมตีรวดเร็ว
@@ -1831,7 +1831,7 @@ function startBattle(stage, staminaCost){
     return {
       uid:u.uid, heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji, rarity:def.rarity,
       ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, skill2: def.skill2||null,
-      isEnemy:false, alive:true, level:u.level,
+      isEnemy:false, alive:true, origSide:'ally', level:u.level,
       isAinz: !!def.isAinz,
       isFusion: !!def.isFusion,
       shield:0, maxshield:0,
@@ -1898,41 +1898,42 @@ function unitElement(containerId, units, idx){
   return document.getElementById(`${containerId}_${units[idx].uid||units[idx].name+idx}_${idx}`);
 }
 
-// ตรวจสอบและคืนค่าหน่วยที่ถูก "ครอบงำ" (Mahito) กลับสู่ทีมเดิมเมื่อครบ 2 เทิร์น
-function tickCharms(allies, enemies, addLog){
-  // ตรวจทั้งสองทีม หาหน่วยที่ charmed=true
-  [...allies, ...enemies].forEach(u=>{
-    if(!u.charmed || !u.alive) return;
+// ตรวจสอบว่าฝั่งผู้เล่น "แพ้" หรือยัง — แพ้เมื่อไม่มีตัวที่ยังมีชีวิตในทีม
+// และไม่มีตัวที่ถูกมาฮิโตะจับตัวไป (เพราะตัวที่ถูกจับจะกลับมาในอีก 2 เทิร์น)
+function allyDefeated(allies, capturedUnits){
+  return allies.every(u=>!u.alive) && capturedUnits.length===0;
+}
+
+// ลดเทิร์นของหน่วยที่ถูกมาฮิโตะ "จับตัวไป" — เมื่อครบ 2 เทิร์น จะกลับเข้าทีมผู้เล่นตามปกติ
+function tickCharms(allies, capturedUnits, addLog){
+  for(let i=capturedUnits.length-1; i>=0; i--){
+    const u = capturedUnits[i];
     u.charmTurnsLeft--;
     if(u.charmTurnsLeft <= 0){
-      // คืนกลับสู่ทีมเดิม
-      const fromTeam = u.isEnemy ? enemies : allies;
-      const toTeam = u.isEnemy ? allies : enemies;
-      const idx = fromTeam.indexOf(u);
-      if(idx !== -1) fromTeam.splice(idx,1);
-      u.isEnemy = !u.isEnemy;
-      u.charmed = false;
+      capturedUnits.splice(i,1);
+      delete u.charmed;
       delete u.charmTurnsLeft;
-      toTeam.push(u);
-      addLog(`✨ ${u.emoji} ${u.name} หลุดพ้นจากการครอบงำของมาฮิโตะ และกลับสู่ฝั่งเดิม!`);
+      allies.push(u);
+      addLog(`✨ ${u.emoji} ${u.name} หลุดพ้นจากการครอบงำของมาฮิโตะ และกลับเข้าทีม!`);
     }
-  });
+  }
 }
 
 async function runBattleLoop(allies, enemies, addLog, stage){
   addLog(`⚔️ การต่อสู้เริ่มต้น! ${stage.name}`);
+  const capturedUnits = [];
   let round=0;
-  while(allies.some(a=>a.alive) && enemies.some(e=>e.alive) && round<60){
+  while(!allyDefeated(allies,capturedUnits) && enemies.some(e=>e.alive) && round<60){
     round++;
-    tickCharms(allies, enemies, addLog);
+    tickCharms(allies, capturedUnits, addLog);
     // สร้าง turn order ใหม่ทุกรอบ (รองรับแพะที่เพิ่งถูกเรียก)
     const all = [...allies, ...enemies].filter(u=>u.alive).sort((a,b)=>b.spd-a.spd);
     for(const actor of all){
       if(!actor.alive) continue;
-      if(!allies.some(a=>a.alive) || !enemies.some(e=>e.alive)) break;
+      if(allyDefeated(allies,capturedUnits) || !enemies.some(e=>e.alive)) break;
       await sleep(220);
-      doAction(actor, allies, enemies, addLog);
-      // วาดใหม่ทั้งหมด (รองรับกรณีแพะถูกเพิ่มเข้า allies)
+      doAction(actor, allies, enemies, addLog, capturedUnits);
+      // วาดใหม่ทั้งหมด (รองรับกรณีแพะถูกเพิ่มเข้า allies / ตัวที่ถูกจับหายไป)
       drawUnits('allyRow', allies);
       drawUnits('enemyRow', enemies);
     }
@@ -1944,7 +1945,7 @@ async function runBattleLoop(allies, enemies, addLog, stage){
 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-function doAction(actor, allies, enemies, addLog){
+function doAction(actor, allies, enemies, addLog, capturedUnits){
   const allyTeam = actor.isEnemy ? enemies : allies;
   const enemyTeam = actor.isEnemy ? allies : enemies;
   const aliveEnemies = enemyTeam.filter(u=>u.alive);
@@ -2048,22 +2049,19 @@ function doAction(actor, allies, enemies, addLog){
       break;
     }
     case 'enemy_charm':{
-      // 🎭 มาฮิโตะ: เปลี่ยนศัตรู 1 ตัวให้มาเป็นพวกเดียวกันชั่วคราว 2 เทิร์น
-      const candidates = aliveEnemies.filter(u=>!u.charmed);
+      // 🎭 มาฮิโตะ: จับตัวฮีโร่ฝั่งผู้เล่น 1 ตัวไปอยู่กับมัน — ตัวนั้นจะหายไปจากทีม 2 เทิร์น แล้วกลับมาเอง
+      const candidates = allies.filter(u=>u.alive && !u.charmed);
       if(candidates.length === 0){
         addLog(`🎭 ${actor.name} พยายามครอบงำจิตใจ แต่ไม่มีเป้าหมาย!`);
         break;
       }
       const target = candidates[Math.floor(Math.random()*candidates.length)];
-      const fromTeam = target.isEnemy ? enemyTeam : allyTeam;
-      const toTeam = target.isEnemy ? allyTeam : enemyTeam;
-      const idx = fromTeam.indexOf(target);
-      if(idx !== -1) fromTeam.splice(idx,1);
-      target.isEnemy = !target.isEnemy;
+      const idx = allies.indexOf(target);
+      if(idx !== -1) allies.splice(idx,1);
       target.charmed = true;
       target.charmTurnsLeft = 2;
-      toTeam.push(target);
-      addLog(`🎭✨ ${actor.name} ใช้ [Idle Transfiguration] เปลี่ยน ${target.emoji} ${target.name} ให้มาเป็นพวกเดียวกันชั่วคราว 2 เทิร์น!`);
+      if(capturedUnits) capturedUnits.push(target);
+      addLog(`🎭✨ ${actor.name} ใช้ [Idle Transfiguration] จับตัว ${target.emoji} ${target.name} ไปอยู่ฝั่งมัน! (จะกลับมาในอีก 2 เทิร์น)`);
       break;
     }
     // ===== AINZ SPECIAL SKILLS =====
@@ -2110,6 +2108,7 @@ function doAction(actor, allies, enemies, addLog){
           skill: { name:'พุ่งชน', power:1.2, type:'single', cost:30 },
           isEnemy: false,
           alive: true,
+          origSide: 'ally',
           isGoat: true,
           goatIndex: g,
           shield: 0, maxshield: 0,
@@ -2159,23 +2158,24 @@ function simulateBattleFast(stage, staminaCost){
     return {
       heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji,
       ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, skill2: def.skill2||null,
-      isEnemy:false, alive:true, isAinz:!!def.isAinz, isFusion:!!def.isFusion,
+      isEnemy:false, alive:true, origSide:'ally', isAinz:!!def.isAinz, isFusion:!!def.isFusion,
       shield:0, maxshield:0,
     };
   });
   const enemies = stage.enemies.map(eid=>makeEnemy(eid, stage.enemyLv));
 
   // จำลอง battle loop สูงสุด 60 รอบ (รองรับแพะที่ join กลางเกม)
+  const capturedUnits = [];
   let round=0;
-  while(allies.some(a=>a.alive) && enemies.some(e=>e.alive) && round<60){
+  while(!allyDefeated(allies,capturedUnits) && enemies.some(e=>e.alive) && round<60){
     round++;
-    tickCharms(allies, enemies, ()=>{});
+    tickCharms(allies, capturedUnits, ()=>{});
     // สร้าง turn order ใหม่ทุกรอบ รองรับแพะที่อาจถูก push เข้า allies
     const all = [...allies, ...enemies].filter(u=>u.alive).sort((a,b)=>b.spd-a.spd);
     for(const actor of all){
       if(!actor.alive) continue;
-      if(!allies.some(a=>a.alive) || !enemies.some(e=>e.alive)) break;
-      doAction(actor, allies, enemies, ()=>{}); // noop log
+      if(allyDefeated(allies,capturedUnits) || !enemies.some(e=>e.alive)) break;
+      doAction(actor, allies, enemies, ()=>{}, capturedUnits); // noop log
     }
   }
 
