@@ -3462,7 +3462,8 @@ function doAinzFusion(){
    ต้องการ ยูจิ 7 ตัว + เมงุมิ 7 ตัว
    ============================================================ */
 function countHeroInRoster(heroId){
-  return state.roster.filter(r=>r.heroId===heroId).length;
+  // นับตัวหลัก + dupes ทั้งหมด (dupe แต่ละชิ้นถือเป็น 1 ตัว)
+  return state.roster.filter(r=>r.heroId===heroId).reduce((sum, r)=> sum + 1 + (r.dupes||0), 0);
 }
 function hasSukunaIngredients(){
   return countHeroInRoster('jjk_yuji') >= 7 && countHeroInRoster('jjk_megumi') >= 7;
@@ -3579,26 +3580,33 @@ function doSukunaFusion(){
   showConfirm(
     `ใช้ Fusion สร้าง "${def.emoji} ${def.name}"?\n<b style="color:#ff8888;">ยูจิ 7 ตัว + เมงุมิ 7 ตัว จะถูกใช้ไปในการหลอมรวม (หายจากคลัง)</b>\nซุคุนะ UR จะถูกเพิ่มในคลัง!`,
     ()=>{
-      // ลบ ยูจิ 7 ตัว
-      let removedYuji = 0;
-      for(let i = state.roster.length-1; i >= 0 && removedYuji < 7; i--){
-        if(state.roster[i].heroId === 'jjk_yuji'){
-          const uid = state.roster[i].uid;
-          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-          state.roster.splice(i,1);
-          removedYuji++;
+      // ฟังก์ชันช่วย: ลบ N ตัวจากคลัง โดยนับ dupes ด้วย
+      const consumeHero = (heroId, needed) => {
+        let remaining = needed;
+        for(let i = state.roster.length-1; i >= 0 && remaining > 0; i--){
+          const r = state.roster[i];
+          if(r.heroId !== heroId) continue;
+          const available = 1 + (r.dupes||0);
+          if(available <= remaining){
+            const uid = r.uid;
+            for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+            state.roster.splice(i,1);
+            remaining -= available;
+          } else {
+            r.dupes = (r.dupes||0) - (remaining - 1);
+            if(r.dupes < 0){
+              const uid = r.uid;
+              for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+              state.roster.splice(i,1);
+            }
+            remaining = 0;
+          }
         }
-      }
-      // ลบ เมงุมิ 7 ตัว
-      let removedMegumi = 0;
-      for(let i = state.roster.length-1; i >= 0 && removedMegumi < 7; i--){
-        if(state.roster[i].heroId === 'jjk_megumi'){
-          const uid = state.roster[i].uid;
-          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-          state.roster.splice(i,1);
-          removedMegumi++;
-        }
-      }
+      };
+      // ลบ ยูจิ 7 ตัว (นับ dupes)
+      consumeHero('jjk_yuji', 7);
+      // ลบ เมงุมิ 7 ตัว (นับ dupes)
+      consumeHero('jjk_megumi', 7);
       const existing = state.roster.find(r=>r.heroId===id);
       if(existing){
         existing.dupes++;
@@ -3767,25 +3775,31 @@ function doSukunaEvo(stage){
     `<b style="color:#ff8888;">ใช้ ยูจิ ${evoDef.require.yuji} ตัว + เมงุมิ ${evoDef.require.megumi} ตัว + 🩸นิ้วซุคุนะ ${evoDef.require.sukuna_finger} + 🪙${fmt(evoDef.require.gold)} + 💎${fmt(evoDef.require.gem)}</b>\n` +
     `ซุคุนะ UR จะแข็งแกร่งขึ้น ${evoDef.statBonus} และเปลี่ยนสกิลทั้งหมด!`,
     ()=>{
-      // หักวัตถุดิบ
-      let removedYuji = 0;
-      for(let i = state.roster.length-1; i >= 0 && removedYuji < evoDef.require.yuji; i--){
-        if(state.roster[i].heroId === 'jjk_yuji'){
-          const uid = state.roster[i].uid;
-          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-          state.roster.splice(i,1);
-          removedYuji++;
+      // หักวัตถุดิบ (นับ dupes ด้วย)
+      const consumeHeroEvo = (heroId, needed) => {
+        let remaining = needed;
+        for(let i = state.roster.length-1; i >= 0 && remaining > 0; i--){
+          const r = state.roster[i];
+          if(r.heroId !== heroId) continue;
+          const available = 1 + (r.dupes||0);
+          if(available <= remaining){
+            const uid = r.uid;
+            for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+            state.roster.splice(i,1);
+            remaining -= available;
+          } else {
+            r.dupes = (r.dupes||0) - (remaining - 1);
+            if(r.dupes < 0){
+              const uid = r.uid;
+              for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+              state.roster.splice(i,1);
+            }
+            remaining = 0;
+          }
         }
-      }
-      let removedMegumi = 0;
-      for(let i = state.roster.length-1; i >= 0 && removedMegumi < evoDef.require.megumi; i--){
-        if(state.roster[i].heroId === 'jjk_megumi'){
-          const uid = state.roster[i].uid;
-          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-          state.roster.splice(i,1);
-          removedMegumi++;
-        }
-      }
+      };
+      consumeHeroEvo('jjk_yuji', evoDef.require.yuji);
+      consumeHeroEvo('jjk_megumi', evoDef.require.megumi);
       state.gold -= evoDef.require.gold;
       state.gem  -= evoDef.require.gem;
       state.inventory['sukuna_finger'] = (state.inventory['sukuna_finger']||0) - evoDef.require.sukuna_finger;
