@@ -930,7 +930,7 @@ const HERO_DB = [
   // ---- Mahito — Mythic บอสพิเศษ JJK ----
   {id:"jjk_mahito", name:"มาฮิโตะ — วิญญาณสาปแช่งแปลงกาย", emoji:"😈🩷", rarity:"mythic", element:"dark",
     base:{hp:560, atk:102, def:42, spd:17},
-    skill:{name:"Idle Transfiguration — ขโมยศัตรูมาเป็นพวก", desc:"มาฮิโตะแปลงร่างศัตรู 1 ตัว ดึงตัวนั้นมาสู้ให้ฝ่ายมาฮิโตะ 2 เทิร์น ก่อนจะกลับฝั่งตัวเองตามปกติ", power:1.0, type:"enemy_charm", cost:65},
+    skill:{name:"Idle Transfiguration — ขโมยศัตรูมาเป็นพวกถาวร", desc:"มาฮิโตะแปลงจิตใจศัตรู 1 ตัว ดึงตัวนั้นมาสู้ให้ฝ่ายมาฮิโตะถาวรตลอดการต่อสู้!", power:1.0, type:"enemy_charm", cost:65},
     forms:[{name:"มาฮิโตะ วิญญาณสาปแช่ง", emoji:"😈🩷"},{name:"มาฮิโตะ Self-Embodiment", emoji:"😈🩷🌀"},{name:"มาฮิโตะ Domain Expansion", emoji:"😈🩷🌀⚫"}]},
 ];
 
@@ -2061,24 +2061,20 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
       break;
     }
     case 'enemy_charm':{
-      // 🎭 มาฮิโตะ: ขโมยศัตรู 1 ตัวมาสู้ให้ฝ่ายมาฮิโตะ 2 เทิร์น แล้วกลับฝั่งตัวเองตามปกติ
+      // 🎭 มาฮิโตะ: ขโมยศัตรู 1 ตัวมาเป็นพวกถาวรตลอดการต่อสู้
       const candidates = aliveEnemies.filter(u=>!u.charmed);
       if(candidates.length === 0){
-        addLog(`🎭 ${actor.name} พยายามแปลงร่างศัตรู แต่ไม่มีเป้าหมาย!`);
+        addLog(`🎭 ${actor.name} พยายามแปลงจิตใจศัตรู แต่ไม่มีเป้าหมาย!`);
         break;
       }
       const target = candidates[Math.floor(Math.random()*candidates.length)];
-      // ย้ายออกจาก enemyTeam ชั่วคราว
+      // ย้ายออกจาก enemyTeam ถาวร
       const idxE = enemyTeam.indexOf(target);
       if(idxE !== -1) enemyTeam.splice(idxE, 1);
       target.charmed = true;
-      target.charmTurnsLeft = 2;
-      target._origIsEnemy = target.isEnemy;
       target.isEnemy = actor.isEnemy; // เปลี่ยนฝั่งให้เป็นฝั่งเดียวกับมาฮิโตะ
-      // เพิ่มเข้าทีมมาฮิโตะ
       allyTeam.push(target);
-      if(capturedUnits) capturedUnits.push({unit: target, returnTo: enemyTeam});
-      addLog(`🎭✨ ${actor.name} ใช้ [Idle Transfiguration] ขโมย ${target.emoji} ${target.name} มาสู้ให้ฝั่งตัวเอง 2 เทิร์น!`);
+      addLog(`🎭✨ ${actor.name} ใช้ [Idle Transfiguration] ขโมย ${target.emoji} ${target.name} มาเป็นพวกถาวร!`);
       break;
     }
     // ===== AINZ SPECIAL SKILLS =====
