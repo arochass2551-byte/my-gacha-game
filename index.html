@@ -149,6 +149,52 @@
     border:1px solid #6600cc; display:inline-block;
   }
 
+  /* UR RARITY — ซุคุนะ */
+  :root { --ur:#ff4444; }
+  .rarity-ur{ --rc: var(--ur); }
+  .ur-badge{
+    font-size:9px; font-weight:900; padding:2px 7px; border-radius:6px;
+    background:linear-gradient(90deg,#ff2200,#ff6600,#ffcc00,#ff2200);
+    background-size:200% auto; animation:ur-shine 1.5s linear infinite;
+    color:#1a0000; text-transform:uppercase; display:inline-block; letter-spacing:1px;
+  }
+  @keyframes ur-shine{to{background-position:200% center;}}
+  .banner-card.b-sukuna-ur{
+    background:linear-gradient(135deg,#1a0000,#3a0010,#8b0000,#ff2200,#1a0000);
+    border:2px solid #ff4400; box-shadow:0 0 32px rgba(255,60,0,1);
+    animation:sukuna-ur-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes sukuna-ur-glow{
+    from{box-shadow:0 0 22px rgba(255,60,0,0.8);}
+    to{box-shadow:0 0 70px rgba(255,80,0,1), 0 0 100px rgba(200,0,0,0.7), 0 0 140px rgba(255,150,0,0.3);}
+  }
+  .sukuna-fusion-panel{
+    background:linear-gradient(135deg,#1a0000,#3a0010,#5a0020);
+    border-radius:14px; padding:14px; border:2px solid #ff4400;
+    box-shadow:0 0 30px rgba(255,60,0,0.8); margin:16px 0;
+    animation:sukuna-ur-glow 2s ease-in-out infinite alternate;
+  }
+
+  /* JJK / JUJUTSU KAISEN STYLES */
+  .banner-card.b-jjk{
+    background:linear-gradient(135deg,#0a0010,#1a0030,#3a0060,#7700cc,#0a0010);
+    border:2px solid #cc00ff; box-shadow:0 0 28px rgba(180,0,255,0.9);
+    animation:jjk-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes jjk-glow{
+    from{box-shadow:0 0 20px rgba(150,0,220,0.7), 0 0 30px rgba(0,0,50,0.5);}
+    to{box-shadow:0 0 60px rgba(200,0,255,1), 0 0 90px rgba(120,0,200,0.6), 0 0 120px rgba(80,0,150,0.3);}
+  }
+  .banner-card.b-jjk-sukuna{
+    background:linear-gradient(135deg,#1a0000,#3a0010,#8b0000,#ff2a2a,#1a0000);
+    border:2px solid #ff4444; box-shadow:0 0 30px rgba(255,50,50,0.9);
+    animation:sukuna-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes sukuna-glow{
+    from{box-shadow:0 0 22px rgba(200,0,0,0.7);}
+    to{box-shadow:0 0 65px rgba(255,60,60,1), 0 0 95px rgba(180,0,0,0.6), 0 0 130px rgba(255,100,100,0.3);}
+  }
+
 
   /* FUSION SYSTEM */
   .fusion-panel{
@@ -932,6 +978,90 @@ const HERO_DB = [
     base:{hp:560, atk:102, def:42, spd:17},
     skill:{name:"Idle Transfiguration — ขโมยศัตรูมาเป็นพวกถาวร", desc:"มาฮิโตะแปลงจิตใจศัตรู 1 ตัว ดึงตัวนั้นมาสู้ให้ฝ่ายมาฮิโตะถาวรตลอดการต่อสู้!", power:1.0, type:"enemy_charm", cost:65},
     forms:[{name:"มาฮิโตะ วิญญาณสาปแช่ง", emoji:"😈🩷"},{name:"มาฮิโตะ Self-Embodiment", emoji:"😈🩷🌀"},{name:"มาฮิโตะ Domain Expansion", emoji:"😈🩷🌀⚫"}]},
+
+  // =============================================
+  // JUJUTSU KAISEN UD2 — Hidden Inventory / Gojo Past Arc
+  // =============================================
+  // ★★★★★ Mythic
+  {id:"jjk_gojo", name:"ซาโตรุ โกโจ — อินฟินิตี้ผู้ยิ่งใหญ่สุด", emoji:"🌀👁️", rarity:"mythic", element:"light",
+    base:{hp:580, atk:115, def:50, spd:26},
+    skill:{name:"無量空処 — Unlimited Void โดเมนแห่งความว่างเปล่า", desc:"โกโจเปิด Domain Expansion! ศัตรูทั้งหมดรับข้อมูลอนันต์ มึนงง 2 เทิร์น โจมตีหมู่ 450% ATK เจาะเกราะ 60% ทีมพันธมิตรฮีล 25%!", power:4.5, type:"meteor_aoe", cost:80},
+    skill2:{name:"術式順転『蒼』 — Blue Convergence ดึงทุกสิ่งเข้าหา", desc:"[Passive] Infinity ดูดซับดาเมจ 30% ทุกเทิร์น + Active: โจมตีเดี่ยวบีบอัด 400% ATK เจาะเกราะ 55%", power:4.0, type:"single_pen", cost:70},
+    forms:[{name:"โกโจ นักเรียนมือใหม่", emoji:"🌀👁️"},{name:"โกโจ Six Eyes เต็มรูปแบบ", emoji:"🌀👁️⭐"},{name:"โกโจ Hollow Purple — โหมดสมบูรณ์", emoji:"🌀👁️⭐💜"}],
+    isAinz:false},
+
+  // ★ UR — ซุคุนะ UR ได้เฉพาะจาก Fusion เท่านั้น (ยูจิ 7 + เมงุมิ 7)
+  {id:"jjk_sukuna", name:"ริวโอเมน ซุคุนะ — ราชาแห่งคำสาป UR", emoji:"👹🔴🌑", rarity:"mythic", element:"dark",
+    base:{hp:1800, atk:300, def:120, spd:28},
+    skill:{name:"Malevolent Shrine — ศาลเจ้าแห่งความชั่วร้าย", desc:"ซุคุนะเปิด Domain Expansion! ตัดทุกสิ่งในรัศมี โจมตีศัตรูทั้งหมด 600% ATK เจาะเกราะ 70% มีโอกาส Instant Kill 20%!", power:6.0, type:"meteor_aoe", cost:85},
+    skill2:{name:"Reverse Cursed Technique — คืนชีพด้วยพลังสาปกลับ", desc:"[Passive] ฟื้นฟู HP 15% ทุกเทิร์น + Active: ฮีลตัวเองเต็ม HP และลด ATK ศัตรูทุกตัว 30% 2 เทิร์น", power:1.0, type:"ainz_team_shield", cost:80},
+    forms:[{name:"ซุคุนะ ในร่างยูจิ", emoji:"👹🔴"},{name:"ซุคุนะ 15 นิ้ว — เปลวคำสาปชิบุยะ", emoji:"👹🔥⚡"},{name:"ซุคุนะ ร่างสมบูรณ์ 20 นิ้ว — ราชาผู้เรืองแสง", emoji:"👹✨👑"}],
+    // ===== EVO ELEMENT/SKILL PROGRESSION (3 ธาตุ: มืด → ไฟ → แสง) =====
+    // index ตรงกับ unit.evo (0,1,2) — แต่ละขั้นมีธาตุและสกิลของตัวเองไม่ซ้ำกัน
+    evoForms:[
+      { // EVO 0 — ร่างเริ่มต้น (ธาตุ: มืด)
+        element:"dark",
+        skill:{name:"Malevolent Shrine — ศาลเจ้าแห่งความชั่วร้าย", desc:"เปิด Domain Expansion! ตัดทุกสิ่งในรัศมี โจมตีศัตรูทั้งหมด 600% ATK เจาะเกราะ 70% มีโอกาส Instant Kill 20%!", power:6.0, type:"meteor_aoe", cost:85},
+        skill2:{name:"Reverse Cursed Technique — คืนชีพด้วยพลังสาปกลับ", desc:"[Passive] ฟื้นฟู HP 15% ทุกเทิร์น + Active: ฮีลตัวเองเต็ม HP และลด ATK ศัตรูทุกตัว 30% 2 เทิร์น", power:1.0, type:"ainz_team_shield", cost:80}
+      },
+      { // EVO 1 — คืนชิบุยะ 15 นิ้ว (ธาตุ: ไฟ)
+        element:"fire",
+        skill:{name:"Fire Arrow — ลูกธนูเพลิงทะลวงมิติ", desc:"ยิง Fire Arrow ทะลวงโดเมน! โจมตีเดี่ยวศัตรูที่อันตรายที่สุด 750% ATK เจาะเกราะ 80% เผาไหม้ 3 เทิร์น (ดาเมจ DOT 10%/เทิร์น)", power:7.5, type:"single_pen_burn", cost:90},
+        skill2:{name:"Domain Amplification — ขยายโดเมนด้วยเปลวคำสาป", desc:"[Passive] ฟื้นฟู HP 20% ทุกเทิร์น + Active: ปลดปล่อยคลื่นเพลิงคำสาป โจมตีศัตรูทั้งหมด 350% ATK และลด DEF ศัตรูทั้งหมด 40% 3 เทิร์น", power:3.5, type:"aoe_burn_debuff", cost:88}
+      },
+      { // EVO 2 — ร่างสมบูรณ์ 20 นิ้ว ยุคเฮอัน (ธาตุ: แสง)
+        element:"light",
+        skill:{name:"Dismantle + Cleave — แยกสลายและจอมเซน", desc:"ปล่อยพลังคำสาปบริสุทธิ์ดุจรังสีแสง! ตัดทุกสิ่งในมิติ 2 ครั้ง โจมตีศัตรูทั้งหมด 500% ATK ต่อครั้ง เจาะเกราะ 90% มีโอกาส Instant Kill 35%! เปิดทาง World Cutting Slash", power:10.0, type:"double_meteor_aoe", cost:100},
+        skill2:{name:"Resurrection — รังสีฟื้นคืนชีพราชา", desc:"[Passive] ฟื้นฟู HP 30% ทุกเทิร์น + ภูมิคุ้มกัน Instant Kill 100% + Active: ฮีลทีมทั้งหมด 50% Max HP และเพิ่ม ATK ทีมทั้งหมด 40% 3 เทิร์น", power:5.0, type:"light_team_heal_buff", cost:95}
+      }
+    ],
+    isFusion:true, fusionRequires:["jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi"], fusionType:"sukuna",
+    isSukuna:true},
+
+
+  // ★★★★ Legendary
+  {id:"jjk_nanami", name:"เคนโตะ นานามิ — นักเวทมนตร์เกรด 1", emoji:"👔⚔️", rarity:"legendary", element:"neutral",
+    base:{hp:340, atk:75, def:38, spd:17},
+    skill:{name:"Ratio Technique — ตัดจุด 7:3 ยุทธวิธีแท้จริง", desc:"โจมตีเดี่ยว 380% ATK เจาะเกราะ 50% + ติดสถานะ Ratio Break ทำให้ดาเมจเพิ่ม 20% 2 เทิร์น", power:3.8, type:"single_pen", cost:65},
+    forms:[{name:"นานามิ พนักงานออฟฟิศ", emoji:"👔⚔️"},{name:"นานามิ เกรด 1 เต็มกำลัง", emoji:"👔⚔️🔥"},{name:"นานามิ โหมดโอเวอร์ไทม์", emoji:"👔⚔️🔥💀"}]},
+
+  {id:"jjk_todo", name:"อาโออิ โทโด — Boogie Woogie เทพแห่งการแลกที่", emoji:"💪🎵", rarity:"legendary", element:"thunder",
+    base:{hp:360, atk:72, def:35, spd:21},
+    skill:{name:"Boogie Woogie — สลับตำแหน่งสายฟ้า", desc:"โจมตีเดี่ยว 360% ATK + สลับตำแหน่งทีมและศัตรู โจมตีซ้ำ 2 ครั้ง 180% ATK เจาะเกราะ 30%", power:3.6, type:"single_pen", cost:62},
+    forms:[{name:"โทโด นักเวทมนตร์", emoji:"💪🎵"},{name:"โทโด Boogie Woogie เต็มกำลัง", emoji:"💪🎵⚡"},{name:"โทโด หัวใจเดียวกัน", emoji:"💪🎵⚡🩵"}]},
+
+  {id:"jjk_geto", name:"ซุงุรุ เก็ตโต้ — นักเวทมนตร์ผู้ตกต่ำ", emoji:"🌑🕸️", rarity:"legendary", element:"dark",
+    base:{hp:300, atk:68, def:30, spd:20},
+    skill:{name:"Maximum Uzumaki — ปล่อยวิญญาณสาปแช่งทั้งหมด", desc:"โจมตีศัตรูทั้งหมด 340% ATK ปล่อยวิญญาณสาปจากสะสม ลด ATK ศัตรูทั้งหมด 25% 2 เทิร์น", power:3.4, type:"aoe_drain", cost:68},
+    forms:[{name:"เก็ตโต้ นักเรียน", emoji:"🌑🕸️"},{name:"เก็ตโต้ ผู้ล้างเผ่าพันธุ์", emoji:"🌑🕸️💀"},{name:"เก็ตโต้ Maximum Uzumaki", emoji:"🌑🕸️💀🌀"}]},
+
+  {id:"jjk_haibara", name:"ยู ไฮบาระ — นักเวทมนตร์เกรด 2 เพื่อนนานามิ", emoji:"🌟💚", rarity:"legendary", element:"nature",
+    base:{hp:280, atk:60, def:32, spd:19},
+    skill:{name:"Healing Cursed Technique — คำสาปรักษา", desc:"ฮีลทีมทั้งหมด 40% HP + โจมตีเดี่ยว 280% ATK เจาะเกราะ 20% และเพิ่ม DEF ทีม 15% 2 เทิร์น", power:2.8, type:"heal_all_buff", cost:60},
+    forms:[{name:"ไฮบาระ นักเรียนใหม่", emoji:"🌟💚"},{name:"ไฮบาระ เกรด 2 เต็มกำลัง", emoji:"🌟💚⭐"},{name:"ไฮบาระ จิตวิญญาณนักรบ", emoji:"🌟💚⭐💫"}]},
+
+  // ★★★ Epic
+  {id:"jjk_ino", name:"อาโออิ อิโนะ — ลูกศิษย์นานามิ", emoji:"🎭⚔️", rarity:"epic", element:"wind",
+    base:{hp:240, atk:55, def:26, spd:22},
+    skill:{name:"Frontline Position — โจมตีแนวหน้าด้วยพลังคำสาป", desc:"โจมตีเดี่ยว 260% ATK เจาะเกราะ 25% + ลด DEF ศัตรู 20% 2 เทิร์น และเพิ่ม SPD ตัวเอง 15%", power:2.6, type:"single_pen", cost:50},
+    forms:[{name:"อิโนะ เกรด 3", emoji:"🎭⚔️"},{name:"อิโนะ เลื่อนเกรด 1", emoji:"🎭⚔️⭐"},{name:"อิโนะ เต็มกำลังสาปแช่ง", emoji:"🎭⚔️⭐💥"}]},
+
+  {id:"jjk_mei_mei", name:"เมอิ เมอิ — นักเวทมนตร์อิสระเกรด 1", emoji:"🦅💰", rarity:"epic", element:"dark",
+    base:{hp:250, atk:62, def:22, spd:23},
+    skill:{name:"Black Bird Manipulation — กาดำมรณะ", desc:"โจมตีเดี่ยว 270% ATK + เรียกกาดำโจมตีซ้ำ 2 ครั้ง 100% ATK มีโอกาสเลือดออก 25%", power:2.7, type:"double", cost:52},
+    forms:[{name:"เมอิ เมอิ นักรบอิสระ", emoji:"🦅💰"},{name:"เมอิ เมอิ กาดำโจมตี", emoji:"🦅💰🌑"},{name:"เมอิ เมอิ Bird Strike เต็มกำลัง", emoji:"🦅💰🌑💀"}]},
+
+  // ★★ Rare
+  {id:"jjk_ijichi", name:"อิจิจิ — ผู้ประสานงานโรงเรียน", emoji:"📋🚗", rarity:"rare", element:"neutral",
+    base:{hp:160, atk:30, def:20, spd:14},
+    skill:{name:"Curtain Barrier — ม่านป้องกัน", desc:"สร้าง Shield ให้ทีมทั้งหมด 15% Max HP + โจมตีเดี่ยว 150% ATK", power:1.5, type:"single_buff", cost:38},
+    forms:[{name:"อิจิจิ ผู้ช่วย", emoji:"📋🚗"},{name:"อิจิจิ ตั้งม่านสำเร็จ", emoji:"📋🚗🛡️"},{name:"อิจิจิ นักสนับสนุนสูงสุด", emoji:"📋🚗🛡️⭐"}]},
+
+  // ★ Common
+  {id:"jjk_cursed_spirit", name:"วิญญาณสาปแช่งทั่วไป", emoji:"👻💜", rarity:"common", element:"dark",
+    base:{hp:120, atk:20, def:12, spd:13},
+    skill:{name:"Cursed Energy Blast — ระเบิดพลังคำสาป", desc:"โจมตีเดี่ยว 120% ATK + ติดสถานะพิษคำสาป 10%", power:1.2, type:"single_burn", cost:22},
+    forms:[{name:"วิญญาณสาปแช่ง เกรด 4", emoji:"👻💜"},{name:"วิญญาณสาปแช่ง เกรด 2", emoji:"👻💜⭐"},{name:"วิญญาณสาปแช่ง พิเศษ", emoji:"👻💜⭐🌑"}]},
 ];
 
 // ตัวละครจากโคลแลบ (นารูโตะ + มาดาระ) — ออกเฉพาะตู้ของตัวเอง
@@ -948,7 +1078,9 @@ const DEMONSLAYER_IDS = ["ds_tanjiro","ds_giyu","ds_shinobu","ds_rengoku","ds_te
 const DEMON_IDS = ["dm_muzan","dm_kokushibo","dm_doma","dm_akaza","dm_hantengu","dm_gyutaro","dm_daki","dm_gyokko","dm_enmu","dm_rui","dm_kamanue","dm_mukago","dm_hairo"];
 // ตัวละคร Overlord — ออกเฉพาะตู้ของตัวเอง (Ainz ได้จาก Fusion เท่านั้น)
 const OVERLORD_IDS = ["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"];
-const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id) && !OVERLORD_IDS.includes(h.id) && h.id !== 'ol_ainz').map(h => h.id);
+// ตัวละคร JJK — ออกเฉพาะตู้ของตัวเอง
+const JJK_IDS = ["jjk_yuji","jjk_megumi","jjk_nobara","jjk_mahito","jjk_gojo","jjk_nanami","jjk_todo","jjk_geto","jjk_haibara","jjk_ino","jjk_mei_mei","jjk_ijichi","jjk_cursed_spirit"];
+const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id) && !OVERLORD_IDS.includes(h.id) && !JJK_IDS.includes(h.id) && h.id !== 'ol_ainz').map(h => h.id);
 
 // Gacha banners
 const BANNERS = [
@@ -1004,6 +1136,15 @@ const BANNERS = [
    feature:"ol_albedo", cost:200, costType:"gem",
    pool: ["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"],
    rateUp:"ol_albedo", mythicBanner:false, overlordBanner:true},
+  // ===== JJK BANNERS =====
+  {id:"jjk", name:"🌀 ตู้ Jujutsu Kaisen — โรงเรียนเวทมนตร์โตเกียว", cls:"b-jjk", desc:"สุ่มตัวละคร JJK! Rate Up: นานามิ ★★★★ + โทโด ★★★★ + โกโจ ★★★★★ UD2! ⚠️ ซุคุนะ UR ได้เฉพาะจาก Fusion เท่านั้น!",
+   feature:"jjk_gojo", cost:180, costType:"gem",
+   pool: ["jjk_yuji","jjk_megumi","jjk_nobara","jjk_nanami","jjk_todo","jjk_geto","jjk_haibara","jjk_ino","jjk_mei_mei","jjk_ijichi","jjk_cursed_spirit"],
+   rateUp:"jjk_nanami", mythicBanner:false},
+  {id:"jjk_gojo_banner", name:"🌀 ตู้โกโจ — อินฟินิตี้ผู้ยิ่งใหญ่ ★★★★★", cls:"b-jjk", desc:"โอกาสได้รับ 'ซาโตรุ โกโจ' ระดับ Mythic ★★★★★ Six Eyes เต็มรูปแบบ! Rate Up Pity 80 ครั้ง ⚠️ ซุคุนะ UR ได้เฉพาะจาก Fusion!",
+   feature:"jjk_gojo", cost:200, costType:"gem",
+   pool: ["jjk_gojo","jjk_nanami","jjk_todo","jjk_geto","jjk_yuji","jjk_megumi","jjk_nobara","jjk_haibara","jjk_mei_mei","jjk_ino"],
+   rateUp:"jjk_gojo", mythicBanner:true},
 ];
 
 // Stages: chapters with story / farm / boss
@@ -1194,6 +1335,23 @@ const STAGES = [
   {ch:"🩷 โหมดเรท: มาฮิโตะ — วิญญาณสาปแช่งแปลงกาย", stages:[
     {id:"raid-mahito-1", name:"😈🩷 มาฮิโตะ — Self-Embodiment of Perfection", type:"raid", enemyLv:750, reward:{gold:85000, exp:36000, gem:4800}, enemies:["jjk_mahito"], bossRate:0.06, story:"มาฮิโตะปลดปล่อยพลัง Self-Embodiment of Perfection! มันเปลี่ยนวิญญาณของศัตรูไปมาอย่างอิสระ ความโกลาหลปกคลุมสนามรบ! โอกาสดรอป 6%"},
   ]},
+
+  // =============================================
+  // JUJUTSU KAISEN UD2 — Hidden Inventory / Gojo Past Arc
+  // =============================================
+  {ch:"🌀 บทที่ 30: Hidden Inventory — ความลับของโกโจหนุ่ม", stages:[
+    {id:"30-1", name:"🌀 โกโจหนุ่ม vs นักเวทมนตร์ก้าวร้าว", type:"story", enemyLv:720, reward:{gold:55000, exp:25000}, enemies:["jjk_geto","jjk_nanami"], story:"โกโจและเก็ตโต้ นักเรียนชั้นนำสองคนจากรุ่นของพวกเขา ออกภารกิจปกป้อง Riko Amanai ดาวหลักจากผู้ล่า!"},
+    {id:"30-2", name:"💰 ภารกิจ Hidden Inventory (ฟาร์ม)", type:"farm", enemyLv:740, reward:{gold:60000, exp:27000}, enemies:["jjk_todo","jjk_ino","jjk_mei_mei"], story:"นักเวทมนตร์ค้ำฟ้าจากโรงเรียนเกียวโตเผชิญหน้ากัน โทโด, อิโนะ และเมอิ เมอิ ต่อสู้เพื่อพิสูจน์ตัวเอง!"},
+    {id:"30-3", name:"🌑 บอส: เก็ตโต้ — จุดเปลี่ยนแห่งชะตากรรม", type:"boss", enemyLv:780, reward:{gold:80000, exp:36000, gem:4200}, enemies:["jjk_geto","jjk_mahito"], bossRate:0.20, story:"เก็ตโต้เลือกเส้นทางสังหารคนธรรมดา! โกโจเผชิญหน้ากับเพื่อนรักที่กลายเป็นศัตรู ความเจ็บปวดที่ลบไม่ออก..."},
+  ]},
+  {ch:"👹 บทที่ 31: Shibuya Incident — คืนมรณะของชิบุยะ", stages:[
+    {id:"31-1", name:"🚇 ชิบุยะ — ม่านปิดสถานีรถไฟ", type:"story", enemyLv:800, reward:{gold:65000, exp:30000}, enemies:["jjk_mahito","jjk_cursed_spirit"], story:"วิญญาณสาปแช่งปิดม่านครอบชิบุยะทั้งเมือง! โกโจติดกับดักในม่าน ทีมนักเวทมนตร์ต้องช่วยเหลือประชาชนที่ติดอยู่ข้างใน!"},
+    {id:"31-2", name:"🩸 สมรภูมิชิบุยะ (ฟาร์ม)", type:"farm", enemyLv:820, reward:{gold:70000, exp:32000}, enemies:["jjk_mahito","jjk_geto","jjk_cursed_spirit"], story:"สมรภูมิชิบุยะปะทุขึ้น! ยูจิ นานามิ และทีมสู้กับกองทัพวิญญาณสาปแช่งระดับพิเศษ เลือดไหลทั่วถนน!"},
+    {id:"31-3", name:"👹🔴 บอส: ซุคุนะตื่นขึ้น — พลังมหาศาลในร่างยูจิ", type:"boss", enemyLv:880, reward:{gold:100000, exp:48000, gem:6000}, enemies:["jjk_mahito","jjk_geto"], bossRate:0.15, story:"พลังของซุคุนะในร่างยูจิตื่นขึ้นในคืนชิบุยะ! มาฮิโตะและเก็ตโต้รุมโจมตี ทีมนักเวทมนตร์ต้องยืนหยัดในความโกลาหล!"},
+  ]},
+  {ch:"👹 โหมดพิเศษ: Fusion — ซุคุนะ UR ราชาแห่งคำสาป", stages:[
+    {id:"raid-sukuna-1", name:"👹🔴 ซุคุนะ — Malevolent Shrine ร่างสมบูรณ์", type:"raid", enemyLv:950, reward:{gold:150000, exp:70000, gem:9000}, enemies:["jjk_gojo","jjk_geto"], bossRate:0.04, isFusionRaid:true, story:"ศึกแห่งคืนชิบุยะ! โกโจและเก็ตโต้ต่อสู้กับนักเวทมนตร์ระดับสูงสุด ต้องการทีม Mythic เท่านั้น! โอกาสดรอป: 🩸 นิ้วซุคุนะ ✕ 4% (ใช้เปิดล็อคเส้นทาง Fusion ซุคุนะ!)"},
+  ]},
 ];
 
 // Special repeatable farming stages (always unlocked, for resource grinding)
@@ -1221,6 +1379,8 @@ const EQUIP_DB = [
   {id:"diamond_blue",   name:"เพชรน้ำเงิน — เลือดของมุซัง",     emoji:"💙💎", slot:"weapon", bonus:{atk:300}, rarity:"mythic", isDiamond:true, diamondColor:"blue"},
   {id:"diamond_indigo", name:"เพชรคราม — จิตวิญญาณของเบจิโต้",  emoji:"💜💎", slot:"weapon", bonus:{atk:300}, rarity:"mythic", isDiamond:true, diamondColor:"indigo"},
   {id:"diamond_violet", name:"เพชรม่วง — พลังแห่งนาซาริค",      emoji:"🔮💎", slot:"weapon", bonus:{atk:300}, rarity:"mythic", isDiamond:true, diamondColor:"violet"},
+  // นิ้วซุคุนะ — วัตถุดิบคำสาปหายาก ใช้สำหรับ EVO ซุคุนะ UR เท่านั้น (ดรอปจาก raid-sukuna-1)
+  {id:"sukuna_finger", name:"🩸 นิ้วซุคุนะ — ชิ้นส่วนคำสาป 1,000 ปี", emoji:"🩸👹", slot:"material", bonus:{}, rarity:"mythic", isSukunaFinger:true},
 ];
 
 /* ---------- GAME STATE (in-memory, resets on reload) ---------- */
@@ -1240,7 +1400,7 @@ BANNERS.forEach(b=> state.pity[b.id]=0);
 // give starter heroes
 function addStarterHero(heroId, dupes=0){
   const uid = "u_"+heroId+"_"+Math.random().toString(36).slice(2,7);
-  state.roster.push({uid, heroId, level:1, exp:0, dupes, form:0, equip:{weapon:null,armor:null,ring:null}, levelBreak:0});
+  state.roster.push({uid, heroId, level:1, exp:0, dupes, form:0, evo:0, equip:{weapon:null,armor:null,ring:null}, levelBreak:0});
   return uid;
 }
 addStarterHero("h_swordling");
@@ -1282,6 +1442,14 @@ function showConfirm(message, onYes){
 }
 function fmt(n){ return n.toLocaleString(); }
 
+// คืนข้อมูลธาตุ/สกิลของซุคุนะ UR ตามขั้น EVO ปัจจุบัน (null ถ้าไม่ใช่ซุคุนะ)
+function getSukunaEvoForm(unit){
+  const def = heroDef(unit.heroId);
+  if(!def.isSukuna || !def.evoForms) return null;
+  const idx = Math.min(unit.evo||0, def.evoForms.length-1);
+  return def.evoForms[idx];
+}
+
 // compute current stats for roster unit (with level + equip + form bonus)
 function computeStats(unit){
   const def = heroDef(unit.heroId);
@@ -1308,6 +1476,14 @@ function computeStats(unit){
     atk = Math.round(atk * 1.5);
     dfn = Math.round(dfn * 1.5);
     spd = Math.round(spd * 1.5);
+  }
+  // EVO BONUS (UR เท่านั้น) — แต่ละขั้น EVO เพิ่มพลังทั้งหมด +35%
+  if(def.isSukuna && unit.evo > 0){
+    const evoMul = 1 + unit.evo * 0.35;
+    hp  = Math.round(hp  * evoMul);
+    atk = Math.round(atk * evoMul);
+    dfn = Math.round(dfn * evoMul);
+    spd = Math.round(spd * evoMul);
   }
   return {hp, atk, def:dfn, spd, maxhp:hp, mp:0, maxmp:100};
 }
@@ -1735,7 +1911,8 @@ const RAID_ORDER = [
   "raid-yoriichi-1",
   "raid-muzan-1","raid-muzan-2",
   "raid-ainz-1","raid-ainz-2",
-  "raid-mahito-1"
+  "raid-mahito-1",
+  "raid-sukuna-1"
 ];
 
 // คืนเรทบอสถัดไปตามลำดับ RAID_ORDER (null ถ้าเป็นเรทสุดท้ายแล้ว)
@@ -1828,9 +2005,10 @@ function startBattle(stage, staminaCost){
     const u = getUnit(uid);
     const stats = computeStats(u);
     const def = heroDef(u.heroId);
+    const evoForm = getSukunaEvoForm(u);
     return {
       uid:u.uid, heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji, rarity:def.rarity,
-      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, skill2: def.skill2||null,
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: evoForm?evoForm.skill:def.skill, skill2: evoForm?evoForm.skill2:(def.skill2||null),
       isEnemy:false, alive:true, origSide:'ally', level:u.level,
       isAinz: !!def.isAinz,
       isFusion: !!def.isFusion,
@@ -2091,6 +2269,13 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
             const dmg = Math.max(1, Math.round(goat.atk * 1.0 * (0.9+Math.random()*0.2)));
             target.hp = Math.max(0, target.hp - dmg);
             addLog(`🐐 ${goat.name} โจมตี ${target.emoji}${target.name} ดาเมจ ${dmg.toLocaleString()}!`);
+            // ดูดเลือดถ้าดาเมจมากกว่า Ainz ATK × 300%
+            const ainzAtkRef = actor.atk || 220;
+            if(dmg > ainzAtkRef * 3){
+              const healAmt = Math.round(dmg * 0.3);
+              goat.hp = Math.min(goat.maxhp, goat.hp + healAmt);
+              addLog(`🩸 ${goat.name} ดูดเลือด +${healAmt.toLocaleString()} HP! (ดาเมจเกิน 300% Ainz ATK)`);
+            }
             if(target.hp<=0 && target.alive){ target.alive=false; addLog(`💀 ${target.name} ถูกกำจัด!`); }
           }
         });
@@ -2099,8 +2284,8 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
       // อัญเชิญแพะ 3 ตัวเข้าทีมจริง
       const ainzAtk = actor.atk || 220;
       const ainzHp  = actor.maxhp || 1200;
-      const goatAtk = ainzAtk * 100;
-      const goatHp  = ainzHp  * 100;
+      const goatAtk = ainzAtk * 3;
+      const goatHp  = ainzHp  * 3;
       addLog(`💀✨ ${actor.name} เปิด Gate of Death — อัญเชิญ Nazarick Goat Lords!`);
       const goatNames = ['🐐 แพะนาซาริค Alpha','🐐 แพะนาซาริค Beta','🐐 แพะนาซาริค Gamma'];
       for(let g=0;g<3;g++){
@@ -2118,7 +2303,7 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
           def: 0,
           spd: actor.spd - 1 - g, // เร็วรองจากเอนซ์
           mp: 0, maxmp: 100,
-          skill: { name:'พุ่งชน', power:1.2, type:'single', cost:30 },
+          skill: { name:'พุ่งชน + ดูดเลือด', power:1.2, type:'goat_lifesteal', cost:30 },
           isEnemy: false,
           alive: true,
           origSide: 'ally',
@@ -2128,6 +2313,20 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
         };
         allyTeam.push(goat);
         addLog(`🐐 ${goatNames[g]} ปรากฏตัว! HP ${goatHp.toLocaleString()} | ATK ${goatAtk.toLocaleString()}`);
+      }
+      break;
+    }
+    case 'goat_lifesteal':{
+      // แพะดูดเลือด: โจมตีเดี่ยว + ดูดเลือดถ้าดาเมจ > Ainz ATK × 300%
+      const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
+      const dmg = dealDamage(target, dmgMul);
+      // หา Ainz ในทีม
+      const ainzUnit = allyTeam.find(u=>u.isAinz && u.alive);
+      const ainzAtkVal = ainzUnit ? ainzUnit.atk : 220;
+      if(dmg > ainzAtkVal * 3){
+        const healAmt = Math.round(dmg * 0.3);
+        actor.hp = Math.min(actor.maxhp, actor.hp + healAmt);
+        addLog(`🩸 ${actor.name} ดูดเลือด +${healAmt.toLocaleString()} HP! (ดาเมจเกิน 300% Ainz ATK)`);
       }
       break;
     }
@@ -2151,6 +2350,37 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
       allyTeam.filter(u=>u.alive).forEach(t=>heal(t, dmgMul));
       break;
     }
+    // ===== SUKUNA UR EVO SKILLS (ไฟ / แสง) =====
+    case 'single_pen_burn':{
+      // EVO1 ไฟ — Fire Arrow: โจมตีเดี่ยวทะลวงเกราะหนัก + เผาไหม้
+      const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
+      dealDamage(target, dmgMul, 0.8);
+      addLog(`🔥 ${target.name} ติดสถานะเผาไหม้จากเปลวคำสาป!`);
+      break;
+    }
+    case 'aoe_burn_debuff':{
+      // EVO1 ไฟ — Domain Amplification: AoE + ลด DEF ศัตรูทั้งหมด
+      addLog(`🔥🌀 คลื่นเพลิงคำสาปปะทุทั่วโดเมน!!!`);
+      aliveEnemies.forEach(t=> dealDamage(t, dmgMul, 0.3));
+      break;
+    }
+    case 'double_meteor_aoe':{
+      // EVO2 แสง — Dismantle + Cleave: AoE ทะลวงเกราะ 2 รอบ
+      addLog(`✨⚔️ รังสีแห่งราชาผ่าทำลายทุกสิ่ง 2 ครั้ง!!!`);
+      aliveEnemies.forEach(t=> dealDamage(t, dmgMul, 0.9));
+      aliveEnemies.filter(u=>u.alive).forEach(t=> dealDamage(t, dmgMul, 0.9));
+      break;
+    }
+    case 'light_team_heal_buff':{
+      // EVO2 แสง — Resurrection: ฮีลทีมทั้งหมด + เกราะป้องกัน Instant Kill (จำลองด้วย Shield)
+      allyTeam.filter(u=>u.alive).forEach(t=>{
+        heal(t, dmgMul*0.1);
+        t.shield = (t.shield||0) + Math.round(t.maxhp*0.2);
+        t.maxshield = (t.maxshield||0) + Math.round(t.maxhp*0.2);
+      });
+      addLog(`✨💫 ${actor.name} ปลดปล่อยรังสีฟื้นคืนชีพ! ทีมทั้งหมดได้รับการฮีลและเกราะป้องกัน!`);
+      break;
+    }
     default:{
       const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
       dealDamage(target, 1.0);
@@ -2168,9 +2398,10 @@ function simulateBattleFast(stage, staminaCost){
     const u = getUnit(uid);
     const stats = computeStats(u);
     const def = heroDef(u.heroId);
+    const evoForm = getSukunaEvoForm(u);
     return {
       heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji,
-      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: def.skill, skill2: def.skill2||null,
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: evoForm?evoForm.skill:def.skill, skill2: evoForm?evoForm.skill2:(def.skill2||null),
       isEnemy:false, alive:true, origSide:'ally', isAinz:!!def.isAinz, isFusion:!!def.isFusion,
       shield:0, maxshield:0,
     };
@@ -2202,7 +2433,7 @@ function simulateBattleFast(stage, staminaCost){
   const equipDropChance = stage.type==='boss' ? 1.0 : 0.6;
   let drop = null;
   if(Math.random() < equipDropChance){
-    const normalEquip = EQUIP_DB.filter(e=>!e.isAinzDrop && !e.isDiamond);
+    const normalEquip = EQUIP_DB.filter(e=>!e.isAinzDrop && !e.isDiamond && !e.isSukunaFinger);
     drop = normalEquip[Math.floor(Math.random()*normalEquip.length)];
   }
 
@@ -2217,6 +2448,7 @@ function simulateBattleFast(stage, staminaCost){
   let heroDropped = false;
   if((stage.type==='boss'||stage.type==='raid') && stage.bossRate && Math.random()<stage.bossRate){
     if(stage.isAinzRaid) heroDropped = 'ainz_item';
+    else if(stage.id === 'raid-sukuna-1') heroDropped = 'sukuna_finger';
     else if(RAID_DIAMOND_MAP_FAST[stage.id]) heroDropped = RAID_DIAMOND_MAP_FAST[stage.id];
     else heroDropped = true;
   }
@@ -2252,7 +2484,7 @@ function showBattleResult(win, stage, allies){
     const equipDropChance = stage.type === 'boss' ? 1.0 : 0.6;
     if(Math.random() < equipDropChance){
       // ยกเว้น Ainz item จาก random drop ปกติ — ดรอปเฉพาะ raid
-      const normalEquip = EQUIP_DB.filter(e=>!e.isAinzDrop && !e.isDiamond);
+      const normalEquip = EQUIP_DB.filter(e=>!e.isAinzDrop && !e.isDiamond && !e.isSukunaFinger);
       dropEquip = normalEquip[Math.floor(Math.random()*normalEquip.length)];
       state.inventory[dropEquip.id] = (state.inventory[dropEquip.id]||0)+1;
     }
@@ -2281,6 +2513,10 @@ function showBattleResult(win, stage, allies){
         state.inventory['ainz_killer_shard'] = (state.inventory['ainz_killer_shard']||0)+1;
         state.inventory['diamond_violet'] = (state.inventory['diamond_violet']||0)+1;
         bossHero = {name:"คทาแห่งความตาย + เพชรม่วง", emoji:"🔱💀🔮💎", rarity:"mythic", isAinzItem:true};
+      } else if(stage.id === 'raid-sukuna-1'){
+        // ดรอป 🩸 นิ้วซุคุนะ — วัตถุดิบ EVO ซุคุนะ UR
+        state.inventory['sukuna_finger'] = (state.inventory['sukuna_finger']||0)+1;
+        bossHero = {name:"🩸 นิ้วซุคุนะ", emoji:"🩸👹", rarity:'mythic', isSukunaFingerDrop:true};
       } else {
         // ดรอปเพชรสีตาม RAID_DIAMOND_MAP
         const diamondId = RAID_DIAMOND_MAP[stage.id];
@@ -2449,6 +2685,8 @@ function showBattleResult(win, stage, allies){
             if(result.heroDropped === 'ainz_item'){
               state.inventory['ainz_killer_shard'] = (state.inventory['ainz_killer_shard']||0)+1;
               state.inventory['diamond_violet'] = (state.inventory['diamond_violet']||0)+1;
+            } else if(result.heroDropped === 'sukuna_finger'){
+              state.inventory['sukuna_finger'] = (state.inventory['sukuna_finger']||0)+1;
             } else if(result.heroDropped.startsWith && result.heroDropped.startsWith('diamond_')){
               state.inventory[result.heroDropped] = (state.inventory[result.heroDropped]||0)+1;
             } else {
@@ -2552,13 +2790,19 @@ function openHeroDetail(uid){
   const nextBreakCost = LEVEL_BREAK_COST[cap];
   const atCap = u.level >= cap;
   const maxBreak = breakTier >= 6;
+  const evoForm = getSukunaEvoForm(u);
+  const displayElement = evoForm ? evoForm.element : def.element;
+  const displaySkill = evoForm ? evoForm.skill : def.skill;
+  const displaySkill2 = evoForm ? evoForm.skill2 : (def.skill2 || null);
+  const ELEMENT_LABEL = {dark:'🌑 มืด', fire:'🔥 ไฟ', light:'✨ แสง', neutral:'⚪ กลาง', water:'💧 น้ำ', thunder:'⚡ สายฟ้า', nature:'🌿 ธรรมชาติ', earth:'🪨 ดิน', wind:'🌪️ ลม'};
   overlay.innerHTML = `
     <div class="modal">
       <span class="modal-close" id="closeDetail">✕</span>
       <div style="text-align:center;">
         <div style="font-size:64px;">${form.emoji}</div>
         <h3>${form.name} <span class="rarity-badge rarity-${def.rarity}">${RARITY[def.rarity].label}</span></h3>
-        <div class="small-muted">${'★'.repeat(RARITY[def.rarity].stars)} • ธาตุ: ${def.element} • ร่างที่ ${u.form+1}/${def.forms.length}</div>
+        <div class="small-muted">${'★'.repeat(RARITY[def.rarity].stars)} • ธาตุ: ${ELEMENT_LABEL[displayElement]||displayElement} • ร่างที่ ${u.form+1}/${def.forms.length}</div>
+        ${def.isSukuna ? `<div style="margin-top:4px;"><span class="ur-badge">EVO ${u.evo||0} / 2</span></div>` : ''}
       </div>
       <div class="card" style="margin-top:10px;">
         <div class="row-between"><b>Level ${u.level} / ${cap}</b><span class="small-muted">EXP ${u.exp}/${atCap?'MAX':nextExp}</span></div>
@@ -2570,10 +2814,16 @@ function openHeroDetail(uid){
         <div class="row-between"><span>💨 SPD</span><b>${stats.spd}</b></div>
       </div>
       <div class="skill-card">
-        <b>${def.skill.name}</b>
-        <div class="small-muted">${def.skill.desc}</div>
-        <div class="small-muted">MP cost: ${def.skill.cost}</div>
+        <b>${displaySkill.name}</b>
+        <div class="small-muted">${displaySkill.desc}</div>
+        <div class="small-muted">MP cost: ${displaySkill.cost}</div>
       </div>
+      ${displaySkill2 ? `
+      <div class="skill-card">
+        <b>${displaySkill2.name}</b>
+        <div class="small-muted">${displaySkill2.desc}</div>
+        <div class="small-muted">MP cost: ${displaySkill2.cost}</div>
+      </div>` : ''}
       <div class="card">
         <div class="row-between"><b>ของซ้ำ (Dupes)</b><span>${u.dupes} / ${(def.forms.length-1)*3}</span></div>
         <div class="bar-bg"><div class="bar-fill" style="background:var(--epic); width:${Math.min(100, (u.dupes%3)/3*100)}%"></div></div>
@@ -2947,6 +3197,12 @@ function renderFusionPanel(){
   // Ainz Fusion panel
   renderAinzFusionPanel(fusionTarget);
 
+  // Sukuna UR Fusion panel
+  renderSukunaFusionPanel(fusionTarget);
+
+  // Sukuna UR EVO panel (เฉพาะ UR เท่านั้น, 2 ขั้น ตามเนื้อเรื่อง JJK)
+  renderSukunaEvoPanel(fusionTarget);
+
   // Fusion buttons
   const vBtn = panel.querySelector('#fusionVegitoBtn');
   const gBtn = panel.querySelector('#fusionGogetaBtn');
@@ -3201,6 +3457,352 @@ function doAinzFusion(){
   );
 }
 
+/* ============================================================
+   SUKUNA UR FUSION SYSTEM — JJK
+   ต้องการ ยูจิ 7 ตัว + เมงุมิ 7 ตัว
+   ============================================================ */
+function countHeroInRoster(heroId){
+  return state.roster.filter(r=>r.heroId===heroId).length;
+}
+function hasSukunaIngredients(){
+  return countHeroInRoster('jjk_yuji') >= 7 && countHeroInRoster('jjk_megumi') >= 7;
+}
+function hasSukuna(){
+  return !!state.roster.find(r=>r.heroId==='jjk_sukuna');
+}
+
+function renderSukunaFusionPanel(container){
+  const oldPanel = document.getElementById('sukunaFusionPanel');
+  if(oldPanel) oldPanel.remove();
+
+  const def = heroDef('jjk_sukuna');
+  const yujiCount  = countHeroInRoster('jjk_yuji');
+  const megumiCount= countHeroInRoster('jjk_megumi');
+  const canFuse    = yujiCount >= 7 && megumiCount >= 7;
+  const alreadyHas = hasSukuna();
+  const yujiDef    = heroDef('jjk_yuji');
+  const megumiDef  = heroDef('jjk_megumi');
+
+  const panel = document.createElement('div');
+  panel.id = 'sukunaFusionPanel';
+  panel.className = 'sukuna-fusion-panel';
+  panel.innerHTML = `
+    <h3 style="color:#ff6644; font-size:15px; margin-bottom:4px; text-shadow:0 0 10px rgba(255,60,0,0.9);">
+      👹🔴 ระบบ Fusion UR — ริวโอเมน ซุคุนะ
+    </h3>
+    <div style="display:inline-block; background:linear-gradient(90deg,#ff2200,#ff6600,#ffcc00,#ff2200);
+      background-size:200% auto; animation:ur-shine 1.5s linear infinite;
+      color:#1a0000; font-size:10px; font-weight:900; padding:2px 10px; border-radius:6px;
+      letter-spacing:2px; margin-bottom:8px;">◆ UR — ULTIMATE RARE ◆</div>
+    <p class="small-muted" style="margin-bottom:10px; font-size:11px; color:#ff9966;">
+      ต้องการ <b style="color:#ff6644;">🩸👊 ยูจิ อิตาโดริ × 7 ตัว</b> + <b style="color:#ff6644;">🐺🌑 ฟุชิงุโระ เมงุมิ × 7 ตัว</b> ในคลัง
+      <br><span style="color:#ff8888;">⚠️ ยูจิทั้ง 7 + เมงุมิทั้ง 7 จะถูกใช้ไปในการ Fusion (หายจากคลัง)</span>
+    </p>
+
+    <!-- วัตถุดิบ -->
+    <div class="fusion-slot-row" style="flex-wrap:wrap; gap:6px; justify-content:center;">
+      <!-- ยูจิ x7 -->
+      <div style="text-align:center; background:rgba(0,0,0,0.5); border-radius:10px; padding:8px 14px;
+        border:2px solid ${yujiCount>=7?'#ff6644':'#555'};">
+        <div style="font-size:36px;">${yujiDef.emoji}</div>
+        <div style="font-size:11px; font-weight:700; color:${yujiCount>=7?'#ff9977':'#888'};">ยูจิ × 7</div>
+        <div style="font-size:13px; font-weight:900; color:${yujiCount>=7?'#9dff9d':'#ff6666'};">
+          ${yujiCount}/7 ${yujiCount>=7?'✓':''}
+        </div>
+      </div>
+      <div class="fusion-plus" style="color:#ff4400; font-size:28px; align-self:center;">+</div>
+      <!-- เมงุมิ x7 -->
+      <div style="text-align:center; background:rgba(0,0,0,0.5); border-radius:10px; padding:8px 14px;
+        border:2px solid ${megumiCount>=7?'#ff6644':'#555'};">
+        <div style="font-size:36px;">${megumiDef.emoji}</div>
+        <div style="font-size:11px; font-weight:700; color:${megumiCount>=7?'#ff9977':'#888'};">เมงุมิ × 7</div>
+        <div style="font-size:13px; font-weight:900; color:${megumiCount>=7?'#9dff9d':'#ff6666'};">
+          ${megumiCount}/7 ${megumiCount>=7?'✓':''}
+        </div>
+      </div>
+      <div class="fusion-arrow" style="color:#ff4400; font-size:28px; align-self:center;">→</div>
+      <!-- ผลลัพธ์ -->
+      <div style="text-align:center; background:linear-gradient(135deg,rgba(255,60,0,0.25),rgba(30,0,0,0.8));
+        border-radius:10px; padding:8px 12px; border:2px solid #ff4400;
+        box-shadow:0 0 16px rgba(255,60,0,0.6); ${alreadyHas?'':'filter:brightness(0.5)'}">
+        <div style="font-size:36px;">👹🔴🌑</div>
+        <div style="background:linear-gradient(90deg,#ff2200,#ff6600,#ffcc00,#ff2200); background-size:200% auto;
+          animation:ur-shine 1.5s linear infinite; color:#1a0000; font-size:9px; font-weight:900;
+          padding:1px 7px; border-radius:5px; margin-top:3px;">UR</div>
+        <div style="font-size:9px; margin-top:3px; color:#ff9966;">ซุคุนะ</div>
+      </div>
+    </div>
+
+    <!-- Skill preview -->
+    <div style="background:rgba(0,0,0,0.45); border-radius:8px; padding:8px; margin:10px 0; border-left:3px solid #ff4400;">
+      <div style="font-size:11px; font-weight:700; color:#ff9966; margin-bottom:4px;">📖 พลังของซุคุนะ UR</div>
+      <div style="font-size:10px; color:#ffaa88; margin-bottom:3px;">
+        <b>⚔️ สกิล 1 — Malevolent Shrine</b><br>
+        โจมตีศัตรูทั้งหมด 600% ATK เจาะเกราะ 70% มีโอกาส Instant Kill 20%!
+      </div>
+      <div style="font-size:10px; color:#ffaa88;">
+        <b>💉 สกิล 2 — Reverse Cursed Technique</b><br>
+        [Passive] ฟื้นฟู HP 15% ทุกเทิร์น + Active: ฮีลเต็ม HP + ลด ATK ศัตรูทุกตัว 30%
+      </div>
+      <div style="font-size:10px; color:#ff6644; margin-top:4px; font-weight:700;">
+        📊 Stats UR: HP 1,800 | ATK 300 | DEF 120 | SPD 28
+      </div>
+    </div>
+
+    ${alreadyHas
+      ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-bottom:6px;">✅ ซุคุนะ UR ปลดล็อกแล้ว! Fusion ซ้ำเพื่อเพิ่ม Dupe!</div>
+         <button class="btn" id="sukunaFusionBtn" style="width:100%; background:linear-gradient(180deg,#ff6644,#cc2200); color:#fff; box-shadow:0 3px 0 #880000; font-size:14px;"
+           ${!canFuse?'disabled':''}>
+           👹 SUKUNA UR Fusion! ${!canFuse?`(ยูจิ ${yujiCount}/7, เมงุมิ ${megumiCount}/7)`:'(Dupe เพิ่ม)'}
+         </button>`
+      : `<button class="btn" id="sukunaFusionBtn" style="width:100%; background:linear-gradient(180deg,#ff6644,#cc2200); color:#fff; box-shadow:0 3px 0 #880000; font-size:14px;"
+           ${!canFuse?'disabled':''}>
+           👹 SUKUNA UR Fusion! ${!canFuse?`(ยูจิ ${yujiCount}/7, เมงุมิ ${megumiCount}/7)`:'🔴 ปลดล็อกซุคุนะ UR ★!!'}
+         </button>`
+    }
+    <p class="small-muted" style="margin-top:6px; font-size:10px; text-align:center; color:#aa5533;">
+      ⚠️ ยูจิ 7 ตัว + เมงุมิ 7 ตัว จะหายจากคลัง | สะสมได้จากตู้ JJK
+    </p>
+  `;
+  container.appendChild(panel);
+
+  const btn = panel.querySelector('#sukunaFusionBtn');
+  if(btn) btn.onclick = ()=> doSukunaFusion();
+}
+
+function doSukunaFusion(){
+  const id = 'jjk_sukuna';
+  const def = heroDef(id);
+  if(countHeroInRoster('jjk_yuji') < 7){ showToast("ต้องการ ยูจิ 7 ตัวในคลัง!"); return; }
+  if(countHeroInRoster('jjk_megumi') < 7){ showToast("ต้องการ เมงุมิ 7 ตัวในคลัง!"); return; }
+
+  showConfirm(
+    `ใช้ Fusion สร้าง "${def.emoji} ${def.name}"?\n<b style="color:#ff8888;">ยูจิ 7 ตัว + เมงุมิ 7 ตัว จะถูกใช้ไปในการหลอมรวม (หายจากคลัง)</b>\nซุคุนะ UR จะถูกเพิ่มในคลัง!`,
+    ()=>{
+      // ลบ ยูจิ 7 ตัว
+      let removedYuji = 0;
+      for(let i = state.roster.length-1; i >= 0 && removedYuji < 7; i--){
+        if(state.roster[i].heroId === 'jjk_yuji'){
+          const uid = state.roster[i].uid;
+          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+          state.roster.splice(i,1);
+          removedYuji++;
+        }
+      }
+      // ลบ เมงุมิ 7 ตัว
+      let removedMegumi = 0;
+      for(let i = state.roster.length-1; i >= 0 && removedMegumi < 7; i--){
+        if(state.roster[i].heroId === 'jjk_megumi'){
+          const uid = state.roster[i].uid;
+          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+          state.roster.splice(i,1);
+          removedMegumi++;
+        }
+      }
+      const existing = state.roster.find(r=>r.heroId===id);
+      if(existing){
+        existing.dupes++;
+        if(existing.dupes % 3 === 0 && existing.form < def.forms.length-1) existing.form++;
+        showToast(`👹 ซุคุนะ UR ได้รับ Dupe! (${existing.dupes} dupes) — พลังเพิ่มขึ้น!`);
+      } else {
+        addStarterHero(id, 0);
+        showToast(`👹🔴🌑 ริวโอเมน ซุคุนะ UR ปลดล็อกสำเร็จ!! ราชาแห่งคำสาปปรากฏตัว!`);
+      }
+      if(activeTab==='fusion') renderFusionTab(); else renderTeam();
+    }
+  );
+}
+
+/* ============================================================
+   SUKUNA UR — EVO SYSTEM (เฉพาะ UR เท่านั้น)
+   3 ธาตุประจำร่าง: EVO0 มืด 🌑 → EVO1 ไฟ 🔥 → EVO2 แสง ✨
+   แต่ละขั้นมีสกิลของตัวเองไม่ซ้ำกัน (ดูที่ jjk_sukuna.evoForms)
+   ต้องใช้ 🩸 นิ้วซุคุนะ (ดรอปจาก raid-sukuna-1 เท่านั้น 4%) — ของยากมาก!
+   ============================================================ */
+const SUKUNA_EVO = [
+  null, // evo 0 = ร่างเริ่มต้น "ในร่างยูจิ" (ธาตุมืด 🌑) — ไม่มีข้อมูล evo
+  { // EVO 1 — ธาตุไฟ 🔥
+    name:"ซุคุนะตื่น — คืนชิบุยะ 15 นิ้ว",
+    emoji:"👹🔥⚡",
+    element:"fire",
+    elementLabel:"🔥 ไฟ",
+    desc:"ในคืนชิบุยะ ซุคุนะกลืนนิ้วเพิ่มอีก 6 นิ้ว ตื่นขึ้นพร้อมพลังคำสาปลุกเป็นไฟ! สกิลเปลี่ยนเป็น Fire Arrow + Domain Amplification",
+    require:{yuji:5, megumi:5, gold:150000, gem:1000, sukuna_finger:2},
+    statBonus:"+35% ทุกค่าสเตตัส (รวมสะสม)"
+  },
+  { // EVO 2 — ธาตุแสง ✨
+    name:"ซุคุนะร่างสมบูรณ์ — 20 นิ้ว ยุคเฮอัน",
+    emoji:"👹✨👑",
+    element:"light",
+    elementLabel:"✨ แสง",
+    desc:"ซุคุนะคืนร่างสมบูรณ์ดั้งเดิมจากยุคเฮอัน! ราชาแห่งคำสาปแช่งตัวจริงปรากฏตัวเต็มพลัง สกิลเปลี่ยนเป็น Dismantle+Cleave + Resurrection ถึงขีดสุด!",
+    require:{yuji:8, megumi:8, gold:400000, gem:3000, sukuna_finger:5},
+    statBonus:"+70% ทุกค่าสเตตัส (รวมสะสม จาก EVO1)"
+  }
+];
+
+function sukunaUnit(){
+  return state.roster.find(r=>r.heroId==='jjk_sukuna');
+}
+
+function canEvoSukuna(stage){
+  const u = sukunaUnit();
+  if(!u) return false;
+  if((u.evo||0) !== stage-1) return false; // ต้องอยู่ขั้นก่อนหน้าพอดี
+  const req = SUKUNA_EVO[stage].require;
+  return countHeroInRoster('jjk_yuji') >= req.yuji
+    && countHeroInRoster('jjk_megumi') >= req.megumi
+    && state.gold >= req.gold
+    && state.gem >= req.gem
+    && (state.inventory['sukuna_finger']||0) >= req.sukuna_finger;
+}
+
+function renderSukunaEvoPanel(container){
+  const oldPanel = document.getElementById('sukunaEvoPanel');
+  if(oldPanel) oldPanel.remove();
+
+  const u = sukunaUnit();
+  if(!u) return; // ต้อง Fusion ซุคุนะให้ได้ก่อน
+
+  const def = heroDef('jjk_sukuna');
+  const curEvo = u.evo || 0;
+  const yujiCount = countHeroInRoster('jjk_yuji');
+  const megumiCount = countHeroInRoster('jjk_megumi');
+  const fingerCount = state.inventory['sukuna_finger']||0;
+
+  const ELEMENT_COLORS = {dark:'#aa66ff', fire:'#ff6644', light:'#ffee88'};
+
+  const panel = document.createElement('div');
+  panel.id = 'sukunaEvoPanel';
+  panel.className = 'sukuna-fusion-panel';
+  panel.style.marginTop = '14px';
+  panel.style.borderTop = '2px solid #ff2a6d';
+
+  let html = `
+    <h3 style="color:#ff2a6d; font-size:15px; margin-bottom:4px; text-shadow:0 0 10px rgba(255,42,109,0.9);">
+      🌀 ระบบ EVO — เฉพาะ UR เท่านั้น (3 ธาตุ: 🌑 มืด → 🔥 ไฟ → ✨ แสง)
+    </h3>
+    <p class="small-muted" style="margin-bottom:6px; font-size:11px; color:#ff99bb;">
+      ปลุกพลังซุคุนะ UR ให้แข็งแกร่งขึ้นตามเนื้อเรื่อง JJK! แต่ละขั้นเปลี่ยนธาตุและสกิลทั้งหมด มีทั้งหมด 2 ขั้น
+      <br>ขั้นปัจจุบัน: <b style="color:var(--ur);">EVO ${curEvo} / 2</b> — ${curEvo===0?'🌑 ในร่างยูจิ (ธาตุมืด, เริ่มต้น)':`${SUKUNA_EVO[curEvo].elementLabel} ${SUKUNA_EVO[curEvo].name}`}
+    </p>
+    <div style="background:rgba(255,42,109,0.12); border:1px solid rgba(255,42,109,0.4); border-radius:8px; padding:6px 8px; margin-bottom:10px;">
+      <div style="font-size:10px; color:#ff99bb;">
+        🩸 <b>นิ้วซุคุนะ</b> (วัตถุดิบหายากสุด): <b style="color:${fingerCount>0?'#9dff9d':'#ff6666'};">${fingerCount}</b> ชิ้น
+        <br>ดรอปจาก <b style="color:#ff6644;">เรดบอส "ซุคุนะ — Malevolent Shrine ร่างสมบูรณ์"</b> เท่านั้น (โอกาส 4% ต่อครั้ง — ของยากมาก!)
+      </div>
+    </div>
+  `;
+
+  for(let stage=1; stage<=2; stage++){
+    const evoDef = SUKUNA_EVO[stage];
+    const done = curEvo >= stage;
+    const locked = curEvo < stage-1; // ต้องทำขั้นก่อนหน้าให้เสร็จก่อน
+    const ready = canEvoSukuna(stage);
+    const ec = ELEMENT_COLORS[evoDef.element];
+
+    html += `
+      <div style="background:rgba(0,0,0,0.45); border-radius:10px; padding:10px; margin-bottom:10px;
+        border:2px solid ${done?ec:(locked?'#555':'#ff6644')}; ${done?`box-shadow:0 0 14px ${ec}99;`:''}">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="font-size:36px;">${evoDef.emoji}</div>
+          <div style="flex:1;">
+            <div style="font-size:12px; font-weight:800; color:${done?ec:'#ffaa88'};">EVO ${stage} — ${evoDef.name}</div>
+            <div style="font-size:10px; font-weight:700; color:${ec}; margin-top:2px;">ธาตุ: ${evoDef.elementLabel}</div>
+            <div style="font-size:10px; color:#ffaa88; margin-top:2px;">${evoDef.desc}</div>
+            <div style="font-size:10px; color:var(--ur); font-weight:700; margin-top:3px;">${evoDef.statBonus}</div>
+          </div>
+        </div>
+        ${done
+          ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-top:8px;">✅ ปลดล็อก EVO ${stage} แล้ว! (ธาตุ ${evoDef.elementLabel})</div>`
+          : locked
+            ? `<div style="color:#888; font-size:11px; text-align:center; margin-top:8px;">🔒 ต้องทำ EVO ${stage-1} ให้เสร็จก่อน</div>`
+            : `
+              <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:8px 0;">
+                <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${yujiCount>=evoDef.require.yuji?'#9dff9d':'#ff6666'};">
+                  🩸👊 ยูจิ ${yujiCount}/${evoDef.require.yuji}
+                </span>
+                <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${megumiCount>=evoDef.require.megumi?'#9dff9d':'#ff6666'};">
+                  🐺🌑 เมงุมิ ${megumiCount}/${evoDef.require.megumi}
+                </span>
+                <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${fingerCount>=evoDef.require.sukuna_finger?'#9dff9d':'#ff6666'};">
+                  🩸👹 นิ้วซุคุนะ ${fingerCount}/${evoDef.require.sukuna_finger}
+                </span>
+                <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${state.gold>=evoDef.require.gold?'#9dff9d':'#ff6666'};">
+                  🪙 ${fmt(evoDef.require.gold)}
+                </span>
+                <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${state.gem>=evoDef.require.gem?'#9dff9d':'#ff6666'};">
+                  💎 ${fmt(evoDef.require.gem)}
+                </span>
+              </div>
+              <button class="btn" id="sukunaEvoBtn${stage}" style="width:100%; background:linear-gradient(180deg,#ff5577,#aa0033); color:#fff; box-shadow:0 3px 0 #660022; font-size:13px;"
+                ${!ready?'disabled':''}>
+                🌀 ปลุกพลัง EVO ${stage}! ${!ready?'(วัตถุดิบไม่พอ)':''}
+              </button>
+              <p class="small-muted" style="margin-top:4px; font-size:9px; text-align:center; color:#ff99bb;">
+                ⚠️ ยูจิ/เมงุมิ/นิ้วซุคุนะที่ใช้จะหายจากคลัง (ไม่ใช่ตัวที่ Fusion เป็นซุคุนะ)
+              </p>
+            `
+        }
+      </div>
+    `;
+  }
+  panel.innerHTML = html;
+  container.appendChild(panel);
+
+  for(let stage=1; stage<=2; stage++){
+    const btn = panel.querySelector('#sukunaEvoBtn'+stage);
+    if(btn) btn.onclick = ()=> doSukunaEvo(stage);
+  }
+}
+
+function doSukunaEvo(stage){
+  const u = sukunaUnit();
+  if(!u){ showToast("ต้อง Fusion ซุคุนะ UR ก่อน!"); return; }
+  if(!canEvoSukuna(stage)){ showToast("วัตถุดิบหรือทรัพยากรไม่พอสำหรับ EVO นี้!"); return; }
+  const evoDef = SUKUNA_EVO[stage];
+
+  showConfirm(
+    `ปลุกพลัง <b style="color:var(--ur);">EVO ${stage} — ${evoDef.name}</b> (ธาตุ ${evoDef.elementLabel})?\n` +
+    `<b style="color:#ff8888;">ใช้ ยูจิ ${evoDef.require.yuji} ตัว + เมงุมิ ${evoDef.require.megumi} ตัว + 🩸นิ้วซุคุนะ ${evoDef.require.sukuna_finger} + 🪙${fmt(evoDef.require.gold)} + 💎${fmt(evoDef.require.gem)}</b>\n` +
+    `ซุคุนะ UR จะแข็งแกร่งขึ้น ${evoDef.statBonus} และเปลี่ยนสกิลทั้งหมด!`,
+    ()=>{
+      // หักวัตถุดิบ
+      let removedYuji = 0;
+      for(let i = state.roster.length-1; i >= 0 && removedYuji < evoDef.require.yuji; i--){
+        if(state.roster[i].heroId === 'jjk_yuji'){
+          const uid = state.roster[i].uid;
+          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+          state.roster.splice(i,1);
+          removedYuji++;
+        }
+      }
+      let removedMegumi = 0;
+      for(let i = state.roster.length-1; i >= 0 && removedMegumi < evoDef.require.megumi; i--){
+        if(state.roster[i].heroId === 'jjk_megumi'){
+          const uid = state.roster[i].uid;
+          for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+          state.roster.splice(i,1);
+          removedMegumi++;
+        }
+      }
+      state.gold -= evoDef.require.gold;
+      state.gem  -= evoDef.require.gem;
+      state.inventory['sukuna_finger'] = (state.inventory['sukuna_finger']||0) - evoDef.require.sukuna_finger;
+      u.evo = stage;
+      // ปรับร่างที่แสดงให้ตรงกับ EVO ถ้า EVO สูงกว่าร่างปัจจุบัน
+      if(u.form < stage && stage <= heroDef('jjk_sukuna').forms.length-1){
+        u.form = stage;
+      }
+      showToast(`🌀👹 ซุคุนะ UR ปลุกพลัง EVO ${stage} สำเร็จ!! ${evoDef.elementLabel} ${evoDef.name}! สกิลเปลี่ยนใหม่ทั้งหมด!`);
+      if(activeTab==='fusion') renderFusionTab(); else renderTeam();
+      updateTopbar();
+    }
+  );
+}
+
+
+
 /* ---------- PLAYER PROFILES (Local) ---------- */
 const PROFILES_KEY = "hero_collector_profiles_v1";
 let currentProfile = null;
@@ -3270,6 +3872,10 @@ function loadGame(){
     ['diamond_red','diamond_orange','diamond_yellow','diamond_green','diamond_blue','diamond_indigo','diamond_violet'].forEach(id=>{
       if(state.inventory[id] == null) state.inventory[id] = 0;
     });
+    // อัปเดตคลัง นิ้วซุคุนะ (วัตถุดิบ EVO ซุคุนะ UR)
+    if(state.inventory['sukuna_finger'] == null) state.inventory['sukuna_finger'] = 0;
+    // migrate roster units missing evo field
+    state.roster.forEach(u=>{ if(u.evo == null) u.evo = 0; });
     // ===================================================
     return true;
   }catch(e){ return false; }
