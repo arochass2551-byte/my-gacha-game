@@ -31,6 +31,14 @@
   .currency span{display:flex; align-items:center; gap:4px; background:rgba(0,0,0,0.25); padding:3px 8px; border-radius:12px;}
   .gem{color:#7be3ff;} .gold{color:var(--gold);} .stamina{color:#9dff9d;}
   #title{font-weight:800; font-size:15px; letter-spacing:1px; background:linear-gradient(90deg,var(--gold),#ff8de0); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  #autosave-indicator{
+    font-size:9px; font-weight:600; padding:2px 7px; border-radius:10px;
+    background:rgba(0,0,0,0.3); color:#888; border:1px solid rgba(255,255,255,0.1);
+    transition:all 0.4s ease; white-space:nowrap; margin-left:4px;
+  }
+  #autosave-indicator.saving{color:#ffd86b; border-color:#ffd86b; background:rgba(255,216,107,0.12); animation:save-pulse 0.5s ease;}
+  #autosave-indicator.saved{color:#9dff9d; border-color:#9dff9d; background:rgba(157,255,157,0.1);}
+  @keyframes save-pulse{0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
 
   /* MAIN CONTENT */
   #content{flex:1; padding:12px 12px 90px 12px; animation:fadein 0.25s ease;}
@@ -304,10 +312,13 @@
   </div>
   <div id="topbar">
     <div id="title">⚔️ HERO COLLECTOR<div id="playerTag" style="font-size:9px; font-weight:600; color:#9dff9d; letter-spacing:0; -webkit-text-fill-color:#9dff9d;"></div></div>
-    <div class="currency">
-      <span class="gem">💎 <span id="gemCount">0</span></span>
-      <span class="gold">🪙 <span id="goldCount">0</span></span>
-      <span class="stamina">⚡ <span id="staminaCount">0</span>/<span id="staminaMax">0</span></span>
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
+      <div class="currency">
+        <span class="gem">💎 <span id="gemCount">0</span></span>
+        <span class="gold">🪙 <span id="goldCount">0</span></span>
+        <span class="stamina">⚡ <span id="staminaCount">0</span>/<span id="staminaMax">0</span></span>
+      </div>
+      <div id="autosave-indicator">💾 รอ...</div>
     </div>
   </div>
   <div id="content"></div>
@@ -2180,7 +2191,7 @@ function showBattleResult(win, stage, allies){
       }
     }
 
-    const nextStage = findNextStage(stage.id);
+    const nextStage = stage.type==='raid' ? stage : findNextStage(stage.id);
     const staminaCostNext = nextStage && nextStage.type==='raid' ? 30 : 10;
     const canGoNext = nextStage && state.stamina >= staminaCostNext;
 
@@ -3106,10 +3117,22 @@ function getSaveKey(){ return getSaveKeyFor(currentProfile); }
 function saveGame(silent){
   if(!currentProfile) return;
   try{
+    const ind = document.getElementById('autosave-indicator');
+    if(ind){ ind.className='saving'; ind.textContent='💾 กำลังเซฟ...'; }
     localStorage.setItem(getSaveKey(), JSON.stringify(state));
     if(!silent) showToast("💾 บันทึกเกมเรียบร้อย!");
+    if(ind){
+      setTimeout(()=>{
+        ind.className='saved';
+        const now = new Date();
+        ind.textContent='✅ เซฟแล้ว ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+        setTimeout(()=>{ ind.className=''; }, 3000);
+      }, 300);
+    }
   }catch(e){
     showToast("บันทึกไม่สำเร็จ");
+    const ind = document.getElementById('autosave-indicator');
+    if(ind){ ind.className=''; ind.textContent='❌ เซฟไม่ได้'; }
   }
 }
 
@@ -3282,8 +3305,20 @@ setInterval(()=>{
   if(state.stamina < state.staminaMax){ state.stamina++; updateTopbar(); }
 }, 20000);
 
-// autosave every 60s
-setInterval(()=> saveGame(true), 60000);
+// autosave every 10s
+const AUTOSAVE_INTERVAL = 10;
+let autosaveCountdown = AUTOSAVE_INTERVAL;
+setInterval(()=>{
+  autosaveCountdown--;
+  const ind = document.getElementById('autosave-indicator');
+  if(ind && !ind.classList.contains('saving') && !ind.classList.contains('saved')){
+    ind.textContent = '💾 เซฟใน ' + autosaveCountdown + 's';
+  }
+  if(autosaveCountdown <= 0){
+    autosaveCountdown = AUTOSAVE_INTERVAL;
+    saveGame(true);
+  }
+}, 1000);
 window.addEventListener('beforeunload', ()=> saveGame(true));
 </script>
 </body>
