@@ -159,6 +159,76 @@
     color:#1a0000; text-transform:uppercase; display:inline-block; letter-spacing:1px;
   }
   @keyframes ur-shine{to{background-position:200% center;}}
+
+  /* UR RAINBOW BORDER — กรอบสีรุ้งพิเศษ */
+  .hero-tile.rarity-ur{
+    border:3px solid transparent;
+    position:relative;
+    animation:ur-tile-glow 2s ease-in-out infinite alternate;
+  }
+  .hero-tile.rarity-ur::before{
+    content:'';
+    position:absolute;
+    inset:-3px;
+    border-radius:12px;
+    background:linear-gradient(
+      135deg,
+      #ff0000, #ff7700, #ffee00,
+      #00ff44, #00cfff, #7700ff,
+      #ff00cc, #ff0000
+    );
+    background-size:300% 300%;
+    animation:ur-rainbow-border 2s linear infinite;
+    z-index:0;
+  }
+  .hero-tile.rarity-ur::after{
+    content:'';
+    position:absolute;
+    inset:2px;
+    border-radius:9px;
+    background:linear-gradient(160deg,#1c1c34,#34304f);
+    z-index:1;
+  }
+  .hero-tile.rarity-ur > *{
+    position:relative;
+    z-index:2;
+  }
+  @keyframes ur-rainbow-border{
+    0%  { background-position:0% 0%; }
+    50% { background-position:100% 100%; }
+    100%{ background-position:0% 0%; }
+  }
+  @keyframes ur-tile-glow{
+    from{ box-shadow:0 0 10px 2px rgba(255,80,80,0.5), 0 0 20px 4px rgba(80,80,255,0.3); }
+    to{   box-shadow:0 0 22px 5px rgba(160,0,255,0.8), 0 0 42px 8px rgba(0,200,255,0.4), 0 0 60px 10px rgba(255,0,150,0.2); }
+  }
+
+  /* UR rarity-badge: rainbow animated */
+  .rarity-badge.rarity-ur{
+    background:linear-gradient(90deg,#ff0000,#ff7700,#ffee00,#00ff44,#00cfff,#aa00ff,#ff00cc,#ff0000);
+    background-size:300% auto;
+    animation:ur-shine 1.8s linear infinite;
+    color:#1a0000;
+    border:1px solid rgba(255,255,255,0.3);
+  }
+  /* UR hero-stars: rainbow text */
+  .hero-tile.rarity-ur .hero-stars{
+    background:linear-gradient(90deg,#ff0000,#ff9900,#ffee00,#00ff66,#00ccff,#aa00ff,#ff00cc);
+    background-size:200% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    animation:ur-shine 1.5s linear infinite;
+    font-size:11px;
+  }
+  /* pull-card rainbow border for UR gacha result */
+  .pull-card.rarity-ur{
+    border:3px solid transparent;
+    position:relative;
+    background:linear-gradient(160deg,#1c1c34,#34304f) padding-box,
+               linear-gradient(135deg,#ff0000,#ff7700,#ffee00,#00ff44,#00cfff,#aa00ff,#ff00cc,#ff0000) border-box;
+    animation:ur-tile-glow 2s ease-in-out infinite alternate;
+  }
   .banner-card.b-sukuna-ur{
     background:linear-gradient(135deg,#1a0000,#3a0010,#8b0000,#ff2200,#1a0000);
     border:2px solid #ff4400; box-shadow:0 0 32px rgba(255,60,0,1);
@@ -175,7 +245,25 @@
     animation:sukuna-ur-glow 2s ease-in-out infinite alternate;
   }
 
-  /* JJK / JUJUTSU KAISEN STYLES */
+  /* SUKUNA EVO3 — MAHORAGA VOID THEME */
+  .banner-card.b-sukuna-evo3{
+    background:linear-gradient(135deg,#000000,#0a000a,#1a0020,#2a0040,#000a00,#000000);
+    border:2px solid #7700cc; box-shadow:0 0 36px rgba(80,0,200,1);
+    animation:mahoraga-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes mahoraga-glow{
+    from{box-shadow:0 0 24px rgba(80,0,200,0.8), 0 0 40px rgba(0,0,0,0.9);}
+    to{box-shadow:0 0 80px rgba(120,0,255,1), 0 0 120px rgba(40,0,100,0.8), 0 0 160px rgba(200,0,255,0.3);}
+  }
+  .mahoraga-badge{
+    font-size:9px; font-weight:900; padding:2px 8px; border-radius:6px;
+    background:linear-gradient(90deg,#2a0040,#7700cc,#aa00ff,#2a0040);
+    background-size:200% auto; animation:mahoraga-shine 1.5s linear infinite;
+    color:#e0aaff; text-transform:uppercase; display:inline-block; letter-spacing:1px;
+    border:1px solid #7700cc;
+  }
+  @keyframes mahoraga-shine{to{background-position:200% center;}}
+
   .banner-card.b-jjk{
     background:linear-gradient(135deg,#0a0010,#1a0030,#3a0060,#7700cc,#0a0010);
     border:2px solid #cc00ff; box-shadow:0 0 28px rgba(180,0,255,0.9);
@@ -394,6 +482,7 @@ const RARITY = {
   epic:      {label:"Epic",      color:"epic",       weight:12, stars:3},
   legendary: {label:"Legendary", color:"legendary",  weight:3,  stars:4},
   mythic:    {label:"Mythic ★★★★★", color:"mythic", weight:0.5, stars:5},
+  ur:        {label:"UR ◆ ULTIMATE", color:"ur",    weight:0,   stars:6},
 };
 
 // Each hero has: base stats, skill, evolution forms (alt forms unlocked via duplicates/level)
@@ -979,6 +1068,14 @@ const HERO_DB = [
     skill:{name:"Idle Transfiguration — ขโมยศัตรูมาเป็นพวกถาวร", desc:"มาฮิโตะแปลงจิตใจศัตรู 1 ตัว ดึงตัวนั้นมาสู้ให้ฝ่ายมาฮิโตะถาวรตลอดการต่อสู้!", power:1.0, type:"enemy_charm", cost:65},
     forms:[{name:"มาฮิโตะ วิญญาณสาปแช่ง", emoji:"😈🩷"},{name:"มาฮิโตะ Self-Embodiment", emoji:"😈🩷🌀"},{name:"มาฮิโตะ Domain Expansion", emoji:"😈🩷🌀⚫"}]},
 
+  // ---- มโหรากา — Divine General UR (ดรอปจากเรดเท่านั้น) ----
+  {id:"jjk_mahoraga", name:"มโหรากา — Eight-Handled Sword Divine General", emoji:"🐉⚙️🌀", rarity:"ur", element:"dark",
+    base:{hp:2200, atk:380, def:200, spd:22},
+    skill:{name:"Wheel of Adaptation — ล้อปรับตัวสังหาร", desc:"Wheel of Adaptation หมุน! ทำลาย Shield ศัตรูทั้งหมดและโจมตีหมู่ 800% ATK เจาะเกราะ 100% มโหรากาปรับตัวกับทุกสิ่งได้ — ดาเมจเพิ่ม 50% ทุกครั้งที่ถูกโจมตีในเทิร์นนั้น", power:8.0, type:"mahoraga_wheel", cost:100},
+    skill2:{name:"New Shadow Style: Simple Domain — โดเมนแห่งการปรับตัว", desc:"[Passive] DEF +999 ภูมิคุ้มกันทุก Instant Kill + Active: ฟื้นฟู HP ตัวเอง 50% และปล่อยพลัง Adaptation Wave โจมตีศัตรูทั้งหมด 600% ATK เจาะเกราะ 100%", power:6.0, type:"mahoraga_passive_aoe", cost:110},
+    forms:[{name:"มโหรากา — ถูกอัญเชิญ", emoji:"🐉⚙️🌀"},{name:"มโหรากา — Adaptation ระดับ 1", emoji:"🐉⚙️🌀⚡"},{name:"มโหรากา — Wheel of Infinity", emoji:"🐉⚙️🌀⚡👑"}],
+    isMahoragaHero:true},
+
   // =============================================
   // JUJUTSU KAISEN UD2 — Hidden Inventory / Gojo Past Arc
   // =============================================
@@ -991,11 +1088,11 @@ const HERO_DB = [
     isAinz:false},
 
   // ★ UR — ซุคุนะ UR ได้เฉพาะจาก Fusion เท่านั้น (ยูจิ 7 + เมงุมิ 7)
-  {id:"jjk_sukuna", name:"ริวโอเมน ซุคุนะ — ราชาแห่งคำสาป UR", emoji:"👹🔴🌑", rarity:"mythic", element:"dark",
+  {id:"jjk_sukuna", name:"ริวโอเมน ซุคุนะ — ราชาแห่งคำสาป UR", emoji:"👹🔴🌑", rarity:"ur", element:"dark",
     base:{hp:1800, atk:300, def:120, spd:28},
     skill:{name:"Malevolent Shrine — ศาลเจ้าแห่งความชั่วร้าย", desc:"ซุคุนะเปิด Domain Expansion! ตัดทุกสิ่งในรัศมี โจมตีศัตรูทั้งหมด 600% ATK เจาะเกราะ 70% มีโอกาส Instant Kill 20%!", power:6.0, type:"meteor_aoe", cost:85},
     skill2:{name:"Reverse Cursed Technique — คืนชีพด้วยพลังสาปกลับ", desc:"[Passive] ฟื้นฟู HP 15% ทุกเทิร์น + Active: ฮีลตัวเองเต็ม HP และลด ATK ศัตรูทุกตัว 30% 2 เทิร์น", power:1.0, type:"ainz_team_shield", cost:80},
-    forms:[{name:"ซุคุนะ ในร่างยูจิ", emoji:"👹🔴"},{name:"ซุคุนะ 15 นิ้ว — เปลวคำสาปชิบุยะ", emoji:"👹🔥⚡"},{name:"ซุคุนะ ร่างสมบูรณ์ 20 นิ้ว — ราชาผู้เรืองแสง", emoji:"👹✨👑"}],
+    forms:[{name:"ซุคุนะ ในร่างยูจิ", emoji:"👹🔴"},{name:"ซุคุนะ 15 นิ้ว — เปลวคำสาปชิบุยะ", emoji:"👹🔥⚡"},{name:"ซุคุนะ ร่างสมบูรณ์ 20 นิ้ว — ราชาผู้เรืองแสง", emoji:"👹✨👑"},{name:"ซุคุนะ ผู้อัญเชิญมโหรากา — ราชาแห่งมิติสิ้นสุด", emoji:"👹🌀⚫🐉"}],
     // ===== EVO ELEMENT/SKILL PROGRESSION (3 ธาตุ: มืด → ไฟ → แสง) =====
     // index ตรงกับ unit.evo (0,1,2) — แต่ละขั้นมีธาตุและสกิลของตัวเองไม่ซ้ำกัน
     evoForms:[
@@ -1013,6 +1110,12 @@ const HERO_DB = [
         element:"light",
         skill:{name:"Dismantle + Cleave — แยกสลายและจอมเซน", desc:"ปล่อยพลังคำสาปบริสุทธิ์ดุจรังสีแสง! ตัดทุกสิ่งในมิติ 2 ครั้ง โจมตีศัตรูทั้งหมด 500% ATK ต่อครั้ง เจาะเกราะ 90% มีโอกาส Instant Kill 35%! เปิดทาง World Cutting Slash", power:10.0, type:"double_meteor_aoe", cost:100},
         skill2:{name:"Resurrection — รังสีฟื้นคืนชีพราชา", desc:"[Passive] ฟื้นฟู HP 30% ทุกเทิร์น + ภูมิคุ้มกัน Instant Kill 100% + Active: ฮีลทีมทั้งหมด 50% Max HP และเพิ่ม ATK ทีมทั้งหมด 40% 3 เทิร์น", power:5.0, type:"light_team_heal_buff", cost:95}
+      },
+      { // EVO 3 — ราชาอัญเชิญมโหราก (ธาตุ: void / มืดสูงสุด)
+        element:"dark",
+        elementLabel:"🌀⚫ Void",
+        skill:{name:"Eight-Handled Sword Divergent Sila Divine General Mahoraga — อัญเชิญมโหรากา", desc:"ซุคุนะปลุก Divine General Mahoraga ขึ้นจากโดเมน! มโหรากาปรากฏตัวในสนามรบและโจมตีศัตรูทั้งหมด 999% ATK เจาะเกราะ 100% ทำลายทุกเกราะและ Shield ทันที มีโอกาส Instant Kill 50%! ราชาคำสาปผู้ยิ่งใหญ่ที่สุดได้ปรากฏตัว!", power:9.99, type:"sukuna_mahoraga_summon", cost:110},
+        skill2:{name:"Mahoraga Adaptation — มโหรากาปรับตัวไม่มีขีดจำกัด", desc:"[Passive] มโหรากายืนในสนามโจมตีศัตรูทุกเทิร์น 300% ATK + ฟื้นฟู HP ซุคุนะ 25% ทุกเทิร์น + Active: มโหรากา Wheel of Adaptation หมุน — ทีมศัตรูทั้งหมด DEF ลด 60% 3 เทิร์น และโจมตีหมู่ 500% ATK เจาะเกราะ 100%!", power:5.0, type:"mahoraga_passive_aoe", cost:105}
       }
     ],
     isFusion:true, fusionRequires:["jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi"], fusionType:"sukuna",
@@ -1352,6 +1455,10 @@ const STAGES = [
   {ch:"👹 โหมดพิเศษ: Fusion — ซุคุนะ UR ราชาแห่งคำสาป", stages:[
     {id:"raid-sukuna-1", name:"👹🔴 ซุคุนะ — Malevolent Shrine ร่างสมบูรณ์", type:"raid", enemyLv:950, reward:{gold:150000, exp:70000, gem:9000}, enemies:["jjk_gojo","jjk_geto"], bossRate:0.04, isFusionRaid:true, story:"ศึกแห่งคืนชิบุยะ! โกโจและเก็ตโต้ต่อสู้กับนักเวทมนตร์ระดับสูงสุด ต้องการทีม Mythic เท่านั้น! โอกาสดรอป: 🩸 นิ้วซุคุนะ ✕ 4% (ใช้เปิดล็อคเส้นทาง Fusion ซุคุนะ!)"},
   ]},
+  {ch:"🐉 โหมดเรทพิเศษ: ซุคุนะ UR + มโหรากา — ราชาแห่งมิติสิ้นสุด", stages:[
+    {id:"raid-sukuna-mahoraga-1", name:"👹🌀 ซุคุนะ UR EVO3 — อัญเชิญมโหรากาแห่งการทำลาย", type:"raid", enemyLv:1200, reward:{gold:300000, exp:150000, gem:15000}, enemies:["jjk_sukuna","jjk_gojo","jjk_megumi"], bossRate:0.02, isMahoragaRaid:true, story:"ซุคุนะในร่างสมบูรณ์ปลดปล่อย Divine General Mahoraga! Eight-Handled Sword Divergent Sila ปรากฏตัวในสนามรบจริง ล้อ Adaptation หมุนวน — ทุกการโจมตีจะถูกปรับตัวและเอาชนะได้! โอกาสดรอป: ⚙️ ล้อมโหรากา 2% + มโหรากา UR 2% (ต้องใช้ Mythic ทั้งทีมเท่านั้น!)"},
+    {id:"raid-mahoraga-1", name:"🐉⚙️ มโหรากา — Wheel of Adaptation นิรันดร์", type:"raid", enemyLv:1350, reward:{gold:500000, exp:250000, gem:20000}, enemies:["jjk_mahoraga","jjk_sukuna"], bossRate:0.02, isMahoragaRaid:true, story:"มโหรากาที่ถูกปลดปล่อยออกมาสู่โลกแห่งความเป็นจริง! Wheel of Adaptation หมุนสังหารทุกสิ่งที่ขวางหน้า ไม่มีใครเคยเอาชนะมันได้ในรอบนับพันปี — จนกว่าราชาแห่งคำสาปจะจับมันไว้! โอกาสดรอป: 🐉 มโหรากา UR 2% + ⚙️ ล้อมโหรากา 2% (ด่านที่ยากที่สุดในเกม!)"},
+  ]},
 ];
 
 // Special repeatable farming stages (always unlocked, for resource grinding)
@@ -1381,6 +1488,8 @@ const EQUIP_DB = [
   {id:"diamond_violet", name:"เพชรม่วง — พลังแห่งนาซาริค",      emoji:"🔮💎", slot:"weapon", bonus:{atk:300}, rarity:"mythic", isDiamond:true, diamondColor:"violet"},
   // นิ้วซุคุนะ — วัตถุดิบคำสาปหายาก ใช้สำหรับ EVO ซุคุนะ UR เท่านั้น (ดรอปจาก raid-sukuna-1)
   {id:"sukuna_finger", name:"🩸 นิ้วซุคุนะ — ชิ้นส่วนคำสาป 1,000 ปี", emoji:"🩸👹", slot:"material", bonus:{}, rarity:"mythic", isSukunaFinger:true},
+  // ล้อมโหรากา — วัตถุดิบหายากสุด ใช้สำหรับ EVO3 ซุคุนะ UR เท่านั้น (ดรอปจาก raid-mahoraga-1 เท่านั้น 2%)
+  {id:"mahoraga_wheel", name:"⚙️ ล้อ Adaptation มโหรากา — Wheel of Divergent Sila", emoji:"⚙️🌀🐉", slot:"material", bonus:{}, rarity:"mythic", isMahorakaWheel:true},
 ];
 
 /* ---------- GAME STATE (in-memory, resets on reload) ---------- */
@@ -1912,7 +2021,9 @@ const RAID_ORDER = [
   "raid-muzan-1","raid-muzan-2",
   "raid-ainz-1","raid-ainz-2",
   "raid-mahito-1",
-  "raid-sukuna-1"
+  "raid-sukuna-1",
+  "raid-sukuna-mahoraga-1",
+  "raid-mahoraga-1"
 ];
 
 // คืนเรทบอสถัดไปตามลำดับ RAID_ORDER (null ถ้าเป็นเรทสุดท้ายแล้ว)
@@ -2381,6 +2492,74 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
       addLog(`✨💫 ${actor.name} ปลดปล่อยรังสีฟื้นคืนชีพ! ทีมทั้งหมดได้รับการฮีลและเกราะป้องกัน!`);
       break;
     }
+    // ===== SUKUNA EVO3 — MAHORAGA SUMMON =====
+    case 'sukuna_mahoraga_summon':{
+      // ตรวจว่ามโหรากาอยู่ในทีมแล้วหรือยัง
+      const existingMahoraga = allyTeam.find(u=>u.isMahoraga && u.alive);
+      if(existingMahoraga){
+        // มโหรากาอยู่แล้ว — สั่งโจมตีหมู่ทันที
+        addLog(`🌀⚫ มโหรากาตอบรับคำสั่งราชา! Wheel of Adaptation หมุน!!!`);
+        aliveEnemies.forEach(t=>{
+          t.shield = 0; t.maxshield = 0; // ทำลาย Shield ก่อน
+          dealDamage(t, dmgMul, 1.0);
+        });
+      } else {
+        // อัญเชิญมโหรากาเข้าสู่สนาม
+        const sukunaAtk = actor.atk || 300;
+        const sukunaHp  = actor.maxhp || 1800;
+        const mahoragaAtk = Math.round(sukunaAtk * 4.0);
+        const mahoragaHp  = Math.round(sukunaHp  * 3.5);
+        addLog(`🌀⚫ ซุคุนะ UR EVO3 ปลุก Divine General Mahoraga จากโดเมน!!!`);
+        addLog(`🐉 Eight-Handled Sword Divergent Sila Divine General — Mahoraga ปรากฏตัว!!!`);
+        // ทำลาย Shield ศัตรูทั้งหมดก่อน
+        aliveEnemies.forEach(t=>{ t.shield=0; t.maxshield=0; });
+        // โจมตีหมู่ก่อน 1 รอบ
+        aliveEnemies.forEach(t=> dealDamage(t, dmgMul, 1.0));
+        const mahoraga = {
+          uid: 'mahoraga_'+Math.random().toString(36).slice(2,5),
+          name: '🐉 Divine General Mahoraga',
+          emoji: '🐉',
+          rarity: 'ur',
+          hp: mahoragaHp,
+          maxhp: mahoragaHp,
+          atk: mahoragaAtk,
+          def: 9999,
+          spd: actor.spd + 2,
+          mp: 0, maxmp: 100,
+          skill:{ name:'Wheel of Adaptation', power:3.0, type:'mahoraga_wheel', cost:40 },
+          isEnemy: false,
+          alive: true,
+          origSide: 'ally',
+          isMahoraga: true,
+          shield: 0, maxshield: 0,
+        };
+        allyTeam.push(mahoraga);
+        addLog(`🐉 Mahoraga เข้าร่วมสนาม! HP ${mahoragaHp.toLocaleString()} | ATK ${mahoragaAtk.toLocaleString()} | DEF ∞ (Adaptation)`);
+      }
+      break;
+    }
+    case 'mahoraga_passive_aoe':{
+      // EVO3 สกิล 2 — Mahoraga Adaptation: ลด DEF ศัตรูทั้งหมด + AoE
+      addLog(`🌀 Wheel of Adaptation หมุน! DEF ศัตรูทั้งหมดพังทลาย!!!`);
+      aliveEnemies.forEach(t=>{
+        t.shield = 0; t.maxshield = 0;
+        dealDamage(t, dmgMul, 1.0);
+      });
+      // ฟื้นฟู HP ซุคุนะ
+      const healAmt = Math.round(actor.maxhp * 0.25);
+      actor.hp = Math.min(actor.maxhp, actor.hp + healAmt);
+      addLog(`💉 ซุคุนะฟื้นฟู HP +${healAmt.toLocaleString()} จากพลังมโหรากา!`);
+      break;
+    }
+    case 'mahoraga_wheel':{
+      // มโหรากาใช้สกิล Wheel of Adaptation — โจมตี AoE แบบทะลวงเกราะ
+      addLog(`🐉🌀 Wheel of Adaptation — มโหรากาหมุนล้อสังหาร!!!`);
+      aliveEnemies.forEach(t=>{
+        t.shield = 0; t.maxshield = 0;
+        dealDamage(t, dmgMul, 1.0);
+      });
+      break;
+    }
     default:{
       const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
       dealDamage(target, 1.0);
@@ -2449,6 +2628,10 @@ function simulateBattleFast(stage, staminaCost){
   if((stage.type==='boss'||stage.type==='raid') && stage.bossRate && Math.random()<stage.bossRate){
     if(stage.isAinzRaid) heroDropped = 'ainz_item';
     else if(stage.id === 'raid-sukuna-1') heroDropped = 'sukuna_finger';
+    else if(stage.isMahoragaRaid){
+      // ด่านมโหรากา: สุ่มระหว่าง ล้อมโหรากา กับ ตัวมโหรากา UR
+      heroDropped = Math.random() < 0.5 ? 'mahoraga_hero' : 'mahoraga_wheel';
+    }
     else if(RAID_DIAMOND_MAP_FAST[stage.id]) heroDropped = RAID_DIAMOND_MAP_FAST[stage.id];
     else heroDropped = true;
   }
@@ -2517,6 +2700,24 @@ function showBattleResult(win, stage, allies){
         // ดรอป 🩸 นิ้วซุคุนะ — วัตถุดิบ EVO ซุคุนะ UR
         state.inventory['sukuna_finger'] = (state.inventory['sukuna_finger']||0)+1;
         bossHero = {name:"🩸 นิ้วซุคุนะ", emoji:"🩸👹", rarity:'mythic', isSukunaFingerDrop:true};
+      } else if(stage.isMahoragaRaid){
+        // ด่านมโหรากา — สุ่มระหว่างล้อมโหรากา กับ ตัว UR
+        if(Math.random() < 0.5){
+          // ดรอปตัวมโหรากา UR
+          const mhDef = heroDef('jjk_mahoraga');
+          const existing = state.roster.find(r=>r.heroId==='jjk_mahoraga');
+          if(existing){
+            existing.dupes++;
+            if(existing.dupes % 3 === 0 && existing.form < mhDef.forms.length-1) existing.form++;
+          } else {
+            addStarterHero('jjk_mahoraga', 0);
+          }
+          bossHero = {name:"🐉⚙️ มโหรากา UR — ปลดล็อกสำเร็จ!", emoji:"🐉⚙️🌀", rarity:'ur', isMahoragaDrop:true};
+        } else {
+          // ดรอปล้อมโหรากา (วัตถุดิบ EVO3)
+          state.inventory['mahoraga_wheel'] = (state.inventory['mahoraga_wheel']||0)+1;
+          bossHero = {name:"⚙️ ล้อมโหรากา — Wheel of Adaptation", emoji:"⚙️🌀🐉", rarity:'mythic', isMahorakaWheelDrop:true};
+        }
       } else {
         // ดรอปเพชรสีตาม RAID_DIAMOND_MAP
         const diamondId = RAID_DIAMOND_MAP[stage.id];
@@ -2553,7 +2754,7 @@ function showBattleResult(win, stage, allies){
         <div style="font-size:48px;">🏆</div>
         <p>ได้รับ: 🪙 ${goldGain} ${gemGain?('• 💎 '+gemGain):''} • EXP ${expGain} (ทุกคนในทีม)</p>
         ${dropEquip?`<p>🎁 ดรอปไอเทม: ${dropEquip.emoji} ${dropEquip.name} <span style="color:#9dff9d;">(เข้าคลังแล้ว ✓)</span></p>`:''}
-        ${bossHero?`<p style="color:#bb88ff; font-weight:800;">${bossHero.isAinzItem?'🔱💀 ดรอปพิเศษ!! ':bossHero.isDiamondDrop?'💎 เพชรดรอปพิเศษ!! ':bossHero.rarity==='mythic'?'🌑☄️ ดรอปตำนาน!! ':'🌟 บอสดรอปฮีโร่: '}${bossHero.emoji} ${bossHero.name}${bossHero.isAinzItem?' เข้าคลังแล้ว! (ใช้ Fusion เอนซ์ได้เลย 🔱)':bossHero.isDiamondDrop?' เข้าคลังแล้ว! (รวบรวมครบ 7 สี → Fusion เอนซ์!)':bossHero.rarity==='mythic'?' ★★★★★ เข้าคลังแล้ว!':'!'}</p>`:''}
+        ${bossHero?`<p style="color:#bb88ff; font-weight:800;">${bossHero.isAinzItem?'🔱💀 ดรอปพิเศษ!! ':bossHero.isDiamondDrop?'💎 เพชรดรอปพิเศษ!! ':bossHero.isMahoragaDrop?'🐉⚙️ UR มโหรากาดรอป!!! ':bossHero.isMahorakaWheelDrop?'⚙️ ล้อมโหรากาดรอป!! ':bossHero.rarity==='ur'?'🌀⚫ UR ดรอปตำนาน!!! ':bossHero.rarity==='mythic'?'🌑☄️ ดรอปตำนาน!! ':'🌟 บอสดรอปฮีโร่: '}${bossHero.emoji} ${bossHero.name}${bossHero.isAinzItem?' เข้าคลังแล้ว! (ใช้ Fusion เอนซ์ได้เลย 🔱)':bossHero.isDiamondDrop?' เข้าคลังแล้ว! (รวบรวมครบ 7 สี → Fusion เอนซ์!)':bossHero.isMahoragaDrop?' เข้าคลังแล้ว! (ใช้ EVO3 ซุคุนะ UR ได้เลย! 🌀⚫)':bossHero.isMahorakaWheelDrop?' เข้าคลังแล้ว! (วัตถุดิบ EVO3 ซุคุนะ UR 🔓)':bossHero.rarity==='mythic'?' ★★★★★ เข้าคลังแล้ว!':'!'}</p>`:''}
         ${stage.type==='raid' && !bossHero?`<p class="small-muted" style="color:#888;">💨 บอสหลบหนีไป... (โอกาส ${Math.round((stage.bossRate||0)*100)}%) ลองใหม่อีกครั้ง!</p>`:''}
 
         <!-- AUTO-REPLAY SECTION -->
@@ -2794,7 +2995,7 @@ function openHeroDetail(uid){
   const displayElement = evoForm ? evoForm.element : def.element;
   const displaySkill = evoForm ? evoForm.skill : def.skill;
   const displaySkill2 = evoForm ? evoForm.skill2 : (def.skill2 || null);
-  const ELEMENT_LABEL = {dark:'🌑 มืด', fire:'🔥 ไฟ', light:'✨ แสง', neutral:'⚪ กลาง', water:'💧 น้ำ', thunder:'⚡ สายฟ้า', nature:'🌿 ธรรมชาติ', earth:'🪨 ดิน', wind:'🌪️ ลม'};
+  const ELEMENT_LABEL = {dark:'🌑 มืด', fire:'🔥 ไฟ', light:'✨ แสง', neutral:'⚪ กลาง', water:'💧 น้ำ', thunder:'⚡ สายฟ้า', nature:'🌿 ธรรมชาติ', earth:'🪨 ดิน', wind:'🌪️ ลม', void:'🌀⚫ Void'};
   overlay.innerHTML = `
     <div class="modal">
       <span class="modal-close" id="closeDetail">✕</span>
@@ -2802,7 +3003,7 @@ function openHeroDetail(uid){
         <div style="font-size:64px;">${form.emoji}</div>
         <h3>${form.name} <span class="rarity-badge rarity-${def.rarity}">${RARITY[def.rarity].label}</span></h3>
         <div class="small-muted">${'★'.repeat(RARITY[def.rarity].stars)} • ธาตุ: ${ELEMENT_LABEL[displayElement]||displayElement} • ร่างที่ ${u.form+1}/${def.forms.length}</div>
-        ${def.isSukuna ? `<div style="margin-top:4px;"><span class="ur-badge">EVO ${u.evo||0} / 2</span></div>` : ''}
+        ${def.isSukuna ? `<div style="margin-top:4px;"><span class="ur-badge">EVO ${u.evo||0} / 3</span></div>` : ''}
       </div>
       <div class="card" style="margin-top:10px;">
         <div class="row-between"><b>Level ${u.level} / ${cap}</b><span class="small-muted">EXP ${u.exp}/${atCap?'MAX':nextExp}</span></div>
@@ -2876,9 +3077,17 @@ function openHeroDetail(uid){
           `;
         })()}
       </div>
+      <div id="evoSectionAnchor"></div>
     </div>
   `;
   document.body.appendChild(overlay);
+
+  // ถ้าเป็น UR และมี evoForms → แสดง EVO panel ในหน้าต่างนี้เลย
+  if(def.rarity === 'ur' && def.evoForms){
+    const anchor = overlay.querySelector('#evoSectionAnchor');
+    if(anchor) renderSukunaEvoPanel(u, anchor);
+  }
+
   overlay.querySelector('#closeDetail').onclick = ()=>{ overlay.remove(); };
   overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
 
@@ -3200,9 +3409,6 @@ function renderFusionPanel(){
   // Sukuna UR Fusion panel
   renderSukunaFusionPanel(fusionTarget);
 
-  // Sukuna UR EVO panel (เฉพาะ UR เท่านั้น, 2 ขั้น ตามเนื้อเรื่อง JJK)
-  renderSukunaEvoPanel(fusionTarget);
-
   // Fusion buttons
   const vBtn = panel.querySelector('#fusionVegitoBtn');
   const gBtn = panel.querySelector('#fusionGogetaBtn');
@@ -3465,6 +3671,25 @@ function countHeroInRoster(heroId){
   // นับตัวหลัก + dupes ทั้งหมด (dupe แต่ละชิ้นถือเป็น 1 ตัว)
   return state.roster.filter(r=>r.heroId===heroId).reduce((sum, r)=> sum + 1 + (r.dupes||0), 0);
 }
+
+// วางไว้ใกล้ๆ countHeroInRoster เลย
+function consumeHero(heroId, needed){
+  let remaining = needed;
+  for(let i = state.roster.length-1; i >= 0 && remaining > 0; i--){
+    const r = state.roster[i];
+    if(r.heroId !== heroId) continue;
+    const available = 1 + (r.dupes||0);
+    if(available <= remaining){
+      const uid = r.uid;
+      for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
+      state.roster.splice(i,1);
+      remaining -= available;
+    } else {
+      r.dupes -= (remaining - 1);
+      remaining = 0;
+    }
+  }
+}
 function hasSukunaIngredients(){
   return countHeroInRoster('jjk_yuji') >= 7 && countHeroInRoster('jjk_megumi') >= 7;
 }
@@ -3580,29 +3805,6 @@ function doSukunaFusion(){
   showConfirm(
     `ใช้ Fusion สร้าง "${def.emoji} ${def.name}"?\n<b style="color:#ff8888;">ยูจิ 7 ตัว + เมงุมิ 7 ตัว จะถูกใช้ไปในการหลอมรวม (หายจากคลัง)</b>\nซุคุนะ UR จะถูกเพิ่มในคลัง!`,
     ()=>{
-      // ฟังก์ชันช่วย: ลบ N ตัวจากคลัง โดยนับ dupes ด้วย
-      const consumeHero = (heroId, needed) => {
-        let remaining = needed;
-        for(let i = state.roster.length-1; i >= 0 && remaining > 0; i--){
-          const r = state.roster[i];
-          if(r.heroId !== heroId) continue;
-          const available = 1 + (r.dupes||0);
-          if(available <= remaining){
-            const uid = r.uid;
-            for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-            state.roster.splice(i,1);
-            remaining -= available;
-          } else {
-            r.dupes = (r.dupes||0) - (remaining - 1);
-            if(r.dupes < 0){
-              const uid = r.uid;
-              for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-              state.roster.splice(i,1);
-            }
-            remaining = 0;
-          }
-        }
-      };
       // ลบ ยูจิ 7 ตัว (นับ dupes)
       consumeHero('jjk_yuji', 7);
       // ลบ เมงุมิ 7 ตัว (นับ dupes)
@@ -3646,6 +3848,15 @@ const SUKUNA_EVO = [
     desc:"ซุคุนะคืนร่างสมบูรณ์ดั้งเดิมจากยุคเฮอัน! ราชาแห่งคำสาปแช่งตัวจริงปรากฏตัวเต็มพลัง สกิลเปลี่ยนเป็น Dismantle+Cleave + Resurrection ถึงขีดสุด!",
     require:{yuji:8, megumi:8, gold:400000, gem:3000, sukuna_finger:5},
     statBonus:"+70% ทุกค่าสเตตัส (รวมสะสม จาก EVO1)"
+  },
+  { // EVO 3 — อัญเชิญมโหรากา 🌀⚫
+    name:"ซุคุนะ ผู้อัญเชิญมโหรากา — ราชาแห่งมิติสิ้นสุด",
+    emoji:"👹🌀⚫🐉",
+    element:"dark",
+    elementLabel:"🌀⚫ Void",
+    desc:"ซุคุนะปลุกตำนานโบราณจากยุคก่อนประวัติศาสตร์! อัญเชิญ Divine General Mahoraga สู่สนามรบ! สิ่งมีชีวิตที่ไม่มี Shikigami Tamer ใดเคยควบคุมได้ในรอบนับพันปี — มโหรากาปรากฏตัวในฐานะอาวุธของราชา!",
+    require:{yuji:10, megumi:10, gold:800000, gem:5000, sukuna_finger:8, mahoraga:1, mahoraga_wheel:3},
+    statBonus:"+120% ทุกค่าสเตตัส (รวมสะสมจาก EVO2) + อัญเชิญมโหรากาในการต่อสู้!"
   }
 ];
 
@@ -3658,56 +3869,72 @@ function canEvoSukuna(stage){
   if(!u) return false;
   if((u.evo||0) !== stage-1) return false; // ต้องอยู่ขั้นก่อนหน้าพอดี
   const req = SUKUNA_EVO[stage].require;
-  return countHeroInRoster('jjk_yuji') >= req.yuji
+  const baseOk = countHeroInRoster('jjk_yuji') >= req.yuji
     && countHeroInRoster('jjk_megumi') >= req.megumi
     && state.gold >= req.gold
     && state.gem >= req.gem
     && (state.inventory['sukuna_finger']||0) >= req.sukuna_finger;
+  if(!baseOk) return false;
+  // EVO3 ตรวจสอบ มโหรากา + ล้อมโหรากา
+  if(req.mahoraga && countHeroInRoster('jjk_mahoraga') < req.mahoraga) return false;
+  if(req.mahoraga_wheel && (state.inventory['mahoraga_wheel']||0) < req.mahoraga_wheel) return false;
+  return true;
 }
 
-function renderSukunaEvoPanel(container){
-  const oldPanel = document.getElementById('sukunaEvoPanel');
-  if(oldPanel) oldPanel.remove();
+function renderSukunaEvoPanel(unitOverride, container){
+  // unitOverride = unit object (ส่งมาจาก openHeroDetail)
+  // container = DOM element ที่จะ append panel เข้าไป
+  const u = unitOverride || sukunaUnit();
+  if(!u) return;
 
-  const u = sukunaUnit();
-  if(!u) return; // ต้อง Fusion ซุคุนะให้ได้ก่อน
+  const def = heroDef(u.heroId);
+  if(!def.evoForms) return; // ไม่มีระบบ EVO
 
-  const def = heroDef('jjk_sukuna');
+  // ลบ panel เก่าถ้ามี (ใน container เดียวกัน)
+  container.querySelectorAll('.ur-evo-panel').forEach(el=>el.remove());
+
   const curEvo = u.evo || 0;
+  const maxEvo = def.evoForms.length - 1; // EVO สูงสุด = จำนวน evoForms - 1
   const yujiCount = countHeroInRoster('jjk_yuji');
   const megumiCount = countHeroInRoster('jjk_megumi');
   const fingerCount = state.inventory['sukuna_finger']||0;
+  const mahoragaCount = countHeroInRoster('jjk_mahoraga');
+  const mahoragaWheelCount = state.inventory['mahoraga_wheel']||0;
 
-  const ELEMENT_COLORS = {dark:'#aa66ff', fire:'#ff6644', light:'#ffee88'};
+  const ELEMENT_COLORS = {dark:'#aa66ff', fire:'#ff6644', light:'#ffee88', void:'#9944ff'};
 
   const panel = document.createElement('div');
-  panel.id = 'sukunaEvoPanel';
-  panel.className = 'sukuna-fusion-panel';
-  panel.style.marginTop = '14px';
-  panel.style.borderTop = '2px solid #ff2a6d';
+  panel.className = 'sukuna-fusion-panel ur-evo-panel';
+  panel.style.cssText = 'margin-top:14px; border-top:2px solid #ff2a6d;';
 
   let html = `
     <h3 style="color:#ff2a6d; font-size:15px; margin-bottom:4px; text-shadow:0 0 10px rgba(255,42,109,0.9);">
-      🌀 ระบบ EVO — เฉพาะ UR เท่านั้น (3 ธาตุ: 🌑 มืด → 🔥 ไฟ → ✨ แสง)
+      🌀 ระบบ EVO — UR เท่านั้น
     </h3>
     <p class="small-muted" style="margin-bottom:6px; font-size:11px; color:#ff99bb;">
-      ปลุกพลังซุคุนะ UR ให้แข็งแกร่งขึ้นตามเนื้อเรื่อง JJK! แต่ละขั้นเปลี่ยนธาตุและสกิลทั้งหมด มีทั้งหมด 2 ขั้น
-      <br>ขั้นปัจจุบัน: <b style="color:var(--ur);">EVO ${curEvo} / 2</b> — ${curEvo===0?'🌑 ในร่างยูจิ (ธาตุมืด, เริ่มต้น)':`${SUKUNA_EVO[curEvo].elementLabel} ${SUKUNA_EVO[curEvo].name}`}
+      ปลุกพลัง UR ให้แข็งแกร่งขึ้น! แต่ละขั้นเปลี่ยนธาตุและสกิลทั้งหมด
+      <br>ขั้นปัจจุบัน: <b style="color:var(--ur);">EVO ${curEvo} / ${maxEvo}</b>
+      — ${curEvo===0
+          ? (def.evoForms[0]?.elementLabel ? def.evoForms[0].elementLabel+' '+def.evoForms[0].name : '🌑 ร่างเริ่มต้น')
+          : (SUKUNA_EVO[curEvo]?.elementLabel+' '+SUKUNA_EVO[curEvo]?.name)}
     </p>
     <div style="background:rgba(255,42,109,0.12); border:1px solid rgba(255,42,109,0.4); border-radius:8px; padding:6px 8px; margin-bottom:10px;">
       <div style="font-size:10px; color:#ff99bb;">
-        🩸 <b>นิ้วซุคุนะ</b> (วัตถุดิบหายากสุด): <b style="color:${fingerCount>0?'#9dff9d':'#ff6666'};">${fingerCount}</b> ชิ้น
-        <br>ดรอปจาก <b style="color:#ff6644;">เรดบอส "ซุคุนะ — Malevolent Shrine ร่างสมบูรณ์"</b> เท่านั้น (โอกาส 4% ต่อครั้ง — ของยากมาก!)
+        🩸 <b>นิ้วซุคุนะ</b> (EVO1/2): <b style="color:${fingerCount>0?'#9dff9d':'#ff6666'};">${fingerCount}</b> ชิ้น — ดรอปจาก <b style="color:#ff6644;">เรดบอส Malevolent Shrine</b> (4%)
+        <br>🐉 <b>มโหรากา UR</b> (EVO3): <b style="color:${mahoragaCount>0?'#9dff9d':'#ff6666'};">${mahoragaCount}</b> ตัว — ดรอปจาก <b style="color:#9944ff;">เรดบอส มโหรากา</b> (2%)
+        <br>⚙️ <b>ล้อมโหรากา</b> (EVO3): <b style="color:${mahoragaWheelCount>0?'#9dff9d':'#ff6666'};">${mahoragaWheelCount}</b> ชิ้น — ดรอปจาก <b style="color:#9944ff;">เรดบอส ซุคุนะ+มโหรากา</b> (2%)
       </div>
     </div>
   `;
 
-  for(let stage=1; stage<=2; stage++){
+  for(let stage=1; stage<=maxEvo; stage++){
     const evoDef = SUKUNA_EVO[stage];
+    if(!evoDef) continue;
     const done = curEvo >= stage;
-    const locked = curEvo < stage-1; // ต้องทำขั้นก่อนหน้าให้เสร็จก่อน
+    const locked = curEvo < stage-1;
     const ready = canEvoSukuna(stage);
-    const ec = ELEMENT_COLORS[evoDef.element];
+    const ec = ELEMENT_COLORS[evoDef.element] || '#ffaa88';
+    const isEvo3 = stage === 3;
 
     html += `
       <div style="background:rgba(0,0,0,0.45); border-radius:10px; padding:10px; margin-bottom:10px;
@@ -3722,9 +3949,9 @@ function renderSukunaEvoPanel(container){
           </div>
         </div>
         ${done
-          ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-top:8px;">✅ ปลดล็อก EVO ${stage} แล้ว! (ธาตุ ${evoDef.elementLabel})</div>`
+          ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-top:8px;">✅ ปลดล็อก EVO ${stage} แล้ว! (${evoDef.elementLabel})</div>`
           : locked
-            ? `<div style="color:#888; font-size:11px; text-align:center; margin-top:8px;">🔒 ต้องทำ EVO ${stage-1} ให้เสร็จก่อน</div>`
+            ? `<div style="color:#888; font-size:11px; text-align:center; margin-top:8px;">🔒 ต้องทำ EVO ${stage-1} ก่อน</div>`
             : `
               <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin:8px 0;">
                 <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${yujiCount>=evoDef.require.yuji?'#9dff9d':'#ff6666'};">
@@ -3734,8 +3961,15 @@ function renderSukunaEvoPanel(container){
                   🐺🌑 เมงุมิ ${megumiCount}/${evoDef.require.megumi}
                 </span>
                 <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${fingerCount>=evoDef.require.sukuna_finger?'#9dff9d':'#ff6666'};">
-                  🩸👹 นิ้วซุคุนะ ${fingerCount}/${evoDef.require.sukuna_finger}
+                  🩸👹 นิ้ว ${fingerCount}/${evoDef.require.sukuna_finger}
                 </span>
+                ${isEvo3 ? `
+                <span style="font-size:10px; background:rgba(80,0,180,0.4); padding:3px 8px; border-radius:6px; border:1px solid #7744cc; color:${mahoragaCount>=(evoDef.require.mahoraga||0)?'#9dff9d':'#ff6666'};">
+                  🐉 มโหรากา ${mahoragaCount}/${evoDef.require.mahoraga||1}
+                </span>
+                <span style="font-size:10px; background:rgba(80,0,180,0.4); padding:3px 8px; border-radius:6px; border:1px solid #7744cc; color:${mahoragaWheelCount>=(evoDef.require.mahoraga_wheel||0)?'#9dff9d':'#ff6666'};">
+                  ⚙️ ล้อมโหรากา ${mahoragaWheelCount}/${evoDef.require.mahoraga_wheel||3}
+                </span>` : ''}
                 <span style="font-size:10px; background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:6px; color:${state.gold>=evoDef.require.gold?'#9dff9d':'#ff6666'};">
                   🪙 ${fmt(evoDef.require.gold)}
                 </span>
@@ -3743,28 +3977,33 @@ function renderSukunaEvoPanel(container){
                   💎 ${fmt(evoDef.require.gem)}
                 </span>
               </div>
-              <button class="btn" id="sukunaEvoBtn${stage}" style="width:100%; background:linear-gradient(180deg,#ff5577,#aa0033); color:#fff; box-shadow:0 3px 0 #660022; font-size:13px;"
-                ${!ready?'disabled':''}>
-                🌀 ปลุกพลัง EVO ${stage}! ${!ready?'(วัตถุดิบไม่พอ)':''}
+              <button class="btn ur-evo-btn" data-evo-stage="${stage}" style="width:100%; background:${isEvo3?'linear-gradient(180deg,#9944ff,#5500cc)':'linear-gradient(180deg,#ff5577,#aa0033)'}; color:#fff; box-shadow:0 3px 0 ${isEvo3?'#330077':'#660022'}; font-size:13px;" ${!ready?'disabled':''}>
+                ${isEvo3?'🐉🌀':'🌀'} ปลุกพลัง EVO ${stage}! ${!ready?'(วัตถุดิบไม่พอ)':''}
               </button>
               <p class="small-muted" style="margin-top:4px; font-size:9px; text-align:center; color:#ff99bb;">
-                ⚠️ ยูจิ/เมงุมิ/นิ้วซุคุนะที่ใช้จะหายจากคลัง (ไม่ใช่ตัวที่ Fusion เป็นซุคุนะ)
+                ⚠️ ${isEvo3?'ยูจิ/เมงุมิ/นิ้วซุคุนะ/มโหรากา/ล้อมโหรากาที่ใช้จะหายจากคลัง':'ยูจิ/เมงุมิ/นิ้วซุคุนะที่ใช้จะหายจากคลัง'}
               </p>
             `
         }
       </div>
     `;
   }
+
   panel.innerHTML = html;
   container.appendChild(panel);
 
-  for(let stage=1; stage<=2; stage++){
-    const btn = panel.querySelector('#sukunaEvoBtn'+stage);
-    if(btn) btn.onclick = ()=> doSukunaEvo(stage);
-  }
+  panel.querySelectorAll('.ur-evo-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      const stage = parseInt(btn.dataset.evoStage);
+      doSukunaEvo(stage, ()=>{
+        // refresh EVO panel ใน modal
+        renderSukunaEvoPanel(sukunaUnit(), container);
+      });
+    };
+  });
 }
 
-function doSukunaEvo(stage){
+function doSukunaEvo(stage, onDone){
   const u = sukunaUnit();
   if(!u){ showToast("ต้อง Fusion ซุคุนะ UR ก่อน!"); return; }
   if(!canEvoSukuna(stage)){ showToast("วัตถุดิบหรือทรัพยากรไม่พอสำหรับ EVO นี้!"); return; }
@@ -3775,42 +4014,31 @@ function doSukunaEvo(stage){
     `<b style="color:#ff8888;">ใช้ ยูจิ ${evoDef.require.yuji} ตัว + เมงุมิ ${evoDef.require.megumi} ตัว + 🩸นิ้วซุคุนะ ${evoDef.require.sukuna_finger} + 🪙${fmt(evoDef.require.gold)} + 💎${fmt(evoDef.require.gem)}</b>\n` +
     `ซุคุนะ UR จะแข็งแกร่งขึ้น ${evoDef.statBonus} และเปลี่ยนสกิลทั้งหมด!`,
     ()=>{
-      // หักวัตถุดิบ (นับ dupes ด้วย)
-      const consumeHeroEvo = (heroId, needed) => {
-        let remaining = needed;
-        for(let i = state.roster.length-1; i >= 0 && remaining > 0; i--){
-          const r = state.roster[i];
-          if(r.heroId !== heroId) continue;
-          const available = 1 + (r.dupes||0);
-          if(available <= remaining){
-            const uid = r.uid;
-            for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-            state.roster.splice(i,1);
-            remaining -= available;
-          } else {
-            r.dupes = (r.dupes||0) - (remaining - 1);
-            if(r.dupes < 0){
-              const uid = r.uid;
-              for(let s=0;s<state.team.length;s++){ if(state.team[s]===uid) state.team[s]=null; }
-              state.roster.splice(i,1);
-            }
-            remaining = 0;
-          }
-        }
-      };
-      consumeHeroEvo('jjk_yuji', evoDef.require.yuji);
-      consumeHeroEvo('jjk_megumi', evoDef.require.megumi);
+      // หักวัตถุดิบ (ใช้ global consumeHero)
+      consumeHero('jjk_yuji', evoDef.require.yuji);
+      consumeHero('jjk_megumi', evoDef.require.megumi);
       state.gold -= evoDef.require.gold;
       state.gem  -= evoDef.require.gem;
       state.inventory['sukuna_finger'] = (state.inventory['sukuna_finger']||0) - evoDef.require.sukuna_finger;
+      // EVO3: หักมโหรากาและล้อมโหรากาด้วย
+      if(evoDef.require.mahoraga){
+        consumeHero('jjk_mahoraga', evoDef.require.mahoraga);
+      }
+      if(evoDef.require.mahoraga_wheel){
+        state.inventory['mahoraga_wheel'] = (state.inventory['mahoraga_wheel']||0) - evoDef.require.mahoraga_wheel;
+      }
       u.evo = stage;
       // ปรับร่างที่แสดงให้ตรงกับ EVO ถ้า EVO สูงกว่าร่างปัจจุบัน
       if(u.form < stage && stage <= heroDef('jjk_sukuna').forms.length-1){
         u.form = stage;
       }
       showToast(`🌀👹 ซุคุนะ UR ปลุกพลัง EVO ${stage} สำเร็จ!! ${evoDef.elementLabel} ${evoDef.name}! สกิลเปลี่ยนใหม่ทั้งหมด!`);
-      if(activeTab==='fusion') renderFusionTab(); else renderTeam();
       updateTopbar();
+      if(typeof onDone === 'function'){
+        onDone(); // refresh panel ใน modal
+      } else {
+        if(activeTab==='fusion') renderFusionTab(); else renderTeam();
+      }
     }
   );
 }
@@ -3888,6 +4116,8 @@ function loadGame(){
     });
     // อัปเดตคลัง นิ้วซุคุนะ (วัตถุดิบ EVO ซุคุนะ UR)
     if(state.inventory['sukuna_finger'] == null) state.inventory['sukuna_finger'] = 0;
+    // อัปเดตคลัง ล้อมโหรากา (วัตถุดิบ EVO3 ซุคุนะ UR)
+    if(state.inventory['mahoraga_wheel'] == null) state.inventory['mahoraga_wheel'] = 0;
     // migrate roster units missing evo field
     state.roster.forEach(u=>{ if(u.evo == null) u.evo = 0; });
     // ===================================================
