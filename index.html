@@ -1115,7 +1115,8 @@ const HERO_DB = [
         element:"dark",
         elementLabel:"🌀⚫ Void",
         skill:{name:"Eight-Handled Sword Divergent Sila Divine General Mahoraga — อัญเชิญมโหรากา", desc:"ซุคุนะปลุก Divine General Mahoraga ขึ้นจากโดเมน! มโหรากาปรากฏตัวในสนามรบและโจมตีศัตรูทั้งหมด 999% ATK เจาะเกราะ 100% ทำลายทุกเกราะและ Shield ทันที มีโอกาส Instant Kill 50%! ราชาคำสาปผู้ยิ่งใหญ่ที่สุดได้ปรากฏตัว!", power:9.99, type:"sukuna_mahoraga_summon", cost:110},
-        skill2:{name:"Mahoraga Adaptation — มโหรากาปรับตัวไม่มีขีดจำกัด", desc:"[Passive] มโหรากายืนในสนามโจมตีศัตรูทุกเทิร์น 300% ATK + ฟื้นฟู HP ซุคุนะ 25% ทุกเทิร์น + Active: มโหรากา Wheel of Adaptation หมุน — ทีมศัตรูทั้งหมด DEF ลด 60% 3 เทิร์น และโจมตีหมู่ 500% ATK เจาะเกราะ 100%!", power:5.0, type:"mahoraga_passive_aoe", cost:105}
+        skill2:{name:"Mahoraga Adaptation — มโหรากาปรับตัวไม่มีขีดจำกัด", desc:"[Passive] มโหรากายืนในสนามโจมตีศัตรูทุกเทิร์น 300% ATK + ฟื้นฟู HP ซุคุนะ 25% ทุกเทิร์น + Active: มโหรากา Wheel of Adaptation หมุน — ทีมศัตรูทั้งหมด DEF ลด 60% 3 เทิร์น และโจมตีหมู่ 500% ATK เจาะเกราะ 100%!", power:5.0, type:"mahoraga_passive_aoe", cost:105},
+        skill3:{name:"Domain Collapse — ศาลเจ้าผนึกมิติล่มสลาย", desc:"ซุคุนะและมโหรากาผนึกพลังร่วมกัน! Malevolent Shrine ล่มสลายทับศัตรูทั้งสนาม โจมตีศัตรูทั้งหมด 700% ATK เจาะเกราะ 100% ลด DEF ศัตรูทั้งหมด 50% 2 เทิร์น และมีโอกาส Instant Kill 40%! แรงสั่นสะเทือนทำลายทุกสิ่งในมิติ!", power:7.0, type:"sukuna_domain_collapse", cost:100}
       }
     ],
     isFusion:true, fusionRequires:["jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi"], fusionType:"sukuna",
@@ -2119,7 +2120,7 @@ function startBattle(stage, staminaCost){
     const evoForm = getSukunaEvoForm(u);
     return {
       uid:u.uid, heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji, rarity:def.rarity,
-      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: evoForm?evoForm.skill:def.skill, skill2: evoForm?evoForm.skill2:(def.skill2||null),
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: evoForm?evoForm.skill:def.skill, skill2: evoForm?evoForm.skill2:(def.skill2||null), skill3: evoForm?(evoForm.skill3||null):(def.skill3||null),
       isEnemy:false, alive:true, origSide:'ally', level:u.level,
       isAinz: !!def.isAinz,
       isFusion: !!def.isFusion,
@@ -2257,26 +2258,34 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
   const skill = actor.skill;
   let dmgMul = useSkill ? skill.power : 1.0;
   let type = useSkill ? skill.type : (actor.isMadara ? 'madara_normal_aoe' : 'single');
-  // Ainz: สลับสกิล 1 / สกิล 2 ทุกครั้งที่ MP เต็ม
+  // Ainz/Sukuna: สลับสกิล 1 / 2 / 3 ทุกครั้งที่ MP เต็ม (วนรอบตามจำนวนสกิลที่มีจริง)
   const ainzHeroDef = actor.heroId ? heroDef(actor.heroId) : null;
   const hasSkill2 = ainzHeroDef && ainzHeroDef.skill2 && actor.skill2;
+  const hasSkill3 = ainzHeroDef && ainzHeroDef.skill3 && actor.skill3;
   if(useSkill && hasSkill2){
-    // สลับ toggle: odd = skill1, even = skill2
-    if(actor._ainzSkillToggle){
+    const skillCount = hasSkill3 ? 3 : 2;
+    const slot = (actor._skillRotation||0) % skillCount;
+    if(slot === 1){
       // ใช้สกิล 2
       const sk2 = actor.skill2;
       type = sk2.type;
       dmgMul = sk2.power;
-      actor.mp -= skill.cost; // MP หักแล้วจาก skill.cost ก่อนหน้า แต่ต้องแก้ cost ให้ถูก
-      // Refund skill1 cost and apply skill2 cost
-      actor.mp += skill.cost;
+      actor.mp += skill.cost; // refund skill1 cost ที่หักไปก่อนหน้า
       actor.mp -= (sk2.cost||80);
       addLog(`💜 ${actor.name} ใช้สกิล 2 [${sk2.name}]!`);
+    } else if(slot === 2){
+      // ใช้สกิล 3
+      const sk3 = actor.skill3;
+      type = sk3.type;
+      dmgMul = sk3.power;
+      actor.mp += skill.cost;
+      actor.mp -= (sk3.cost||80);
+      addLog(`🌀 ${actor.name} ใช้สกิล 3 [${sk3.name}]!`);
     } else {
       actor.mp -= skill.cost;
       addLog(`✨ ${actor.name} ใช้สกิล [${skill.name}]!`);
     }
-    actor._ainzSkillToggle = !actor._ainzSkillToggle;
+    actor._skillRotation = (slot+1) % skillCount;
   } else if(useSkill){
     actor.mp -= skill.cost;
     addLog(`✨ ${actor.name} ใช้สกิล [${skill.name}]!`);
@@ -2560,6 +2569,19 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
       });
       break;
     }
+    case 'sukuna_domain_collapse':{
+      // EVO3 สกิล 3 — Domain Collapse: AoE เจาะเกราะเต็ม + Instant Kill
+      addLog(`🌑💥 Domain Collapse — ศาลเจ้าผนึกมิติล่มสลายทับศัตรูทั้งสนาม!!!`);
+      aliveEnemies.forEach(t=>{
+        t.shield = 0; t.maxshield = 0;
+        dealDamage(t, dmgMul, 1.0);
+        if(Math.random() < 0.4 && t.hp > 0){
+          t.hp = 0; t.alive = false;
+          addLog(`☠️ ${t.name} ถูกทำลายล้างจากมิติที่ล่มสลาย! (Instant Kill)`);
+        }
+      });
+      break;
+    }
     default:{
       const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
       dealDamage(target, 1.0);
@@ -2580,7 +2602,7 @@ function simulateBattleFast(stage, staminaCost){
     const evoForm = getSukunaEvoForm(u);
     return {
       heroId:u.heroId, name: def.forms[u.form].name, emoji: def.forms[u.form].emoji,
-      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: evoForm?evoForm.skill:def.skill, skill2: evoForm?evoForm.skill2:(def.skill2||null),
+      ...stats, hp:stats.hp, mp:0, maxmp:100, skill: evoForm?evoForm.skill:def.skill, skill2: evoForm?evoForm.skill2:(def.skill2||null), skill3: evoForm?(evoForm.skill3||null):(def.skill3||null),
       isEnemy:false, alive:true, origSide:'ally', isAinz:!!def.isAinz, isFusion:!!def.isFusion,
       shield:0, maxshield:0,
     };
@@ -2995,6 +3017,7 @@ function openHeroDetail(uid){
   const displayElement = evoForm ? evoForm.element : def.element;
   const displaySkill = evoForm ? evoForm.skill : def.skill;
   const displaySkill2 = evoForm ? evoForm.skill2 : (def.skill2 || null);
+  const displaySkill3 = evoForm ? (evoForm.skill3 || null) : (def.skill3 || null);
   const ELEMENT_LABEL = {dark:'🌑 มืด', fire:'🔥 ไฟ', light:'✨ แสง', neutral:'⚪ กลาง', water:'💧 น้ำ', thunder:'⚡ สายฟ้า', nature:'🌿 ธรรมชาติ', earth:'🪨 ดิน', wind:'🌪️ ลม', void:'🌀⚫ Void'};
   overlay.innerHTML = `
     <div class="modal">
@@ -3024,6 +3047,12 @@ function openHeroDetail(uid){
         <b>${displaySkill2.name}</b>
         <div class="small-muted">${displaySkill2.desc}</div>
         <div class="small-muted">MP cost: ${displaySkill2.cost}</div>
+      </div>` : ''}
+      ${displaySkill3 ? `
+      <div class="skill-card">
+        <b>${displaySkill3.name}</b>
+        <div class="small-muted">${displaySkill3.desc}</div>
+        <div class="small-muted">MP cost: ${displaySkill3.cost}</div>
       </div>` : ''}
       <div class="card">
         <div class="row-between"><b>ของซ้ำ (Dupes)</b><span>${u.dupes} / ${(def.forms.length-1)*3}</span></div>
