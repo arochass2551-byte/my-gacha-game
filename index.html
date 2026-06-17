@@ -1122,6 +1122,14 @@ const HERO_DB = [
     isFusion:true, fusionRequires:["jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_yuji","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi","jjk_megumi"], fusionType:"sukuna",
     isSukuna:true},
 
+  // ★ UR — ยูจิ โมดูโล: ฟิวชั่นจากทุกตัวละครใน JJK (13 ตัว) รวมเป็นหนึ่งร่างเดียว
+  {id:"jjk_yuji_modulo", name:"อิตาโดริ ยูจิ — โมดูโล ราชาแห่งความสมดุล UR", emoji:"🩸♾️👊", rarity:"ur", element:"neutral",
+    base:{hp:2000, atk:330, def:140, spd:30},
+    skill:{name:"Modulo Resonance — เสียงสะท้อนแห่งจูจุสึไคเซ็น", desc:"ยูจิรวมพลังของนักเวทมนตร์และวิญญาณสาปแช่งทุกตัวที่หลอมรวมในกายเป็นหนึ่ง! ปลดปล่อยคลื่นพลังมหาศาลทำลายทุกสิ่งในสนาม โจมตีศัตรูทั้งหมด 850% ATK เจาะเกราะ 100% ทำลาย Shield ทั้งหมดทันที มีโอกาส Instant Kill 35%!", power:8.5, type:"modulo_resonance_aoe", cost:105},
+    skill2:{name:"Sukuna's Vessel Balance — ภาชนะสมดุลของราชาคำสาป", desc:"[Passive] ฟื้นฟู HP 20% ทุกเทิร์น + ภูมิคุ้มกัน Instant Kill 50% + Active: ปลดปล่อยสมดุลของทุกจิตวิญญาณที่หลอมรวม เพิ่ม ATK ทีมทั้งหมด 35% และฮีลทีม 30% Max HP เป็นเวลา 3 เทิร์น", power:3.0, type:"light_team_heal_buff", cost:90},
+    forms:[{name:"ยูจิ โมดูโล — จิตวิญญาณหลอมรวม", emoji:"🩸♾️👊"},{name:"ยูจิ โมดูโล — สมดุลตื่นรู้", emoji:"🩸♾️👊⚡"},{name:"ยูจิ โมดูโล — ราชาแห่งความสมดุลสมบูรณ์", emoji:"🩸♾️👊⚡👑"}],
+    isFusion:true, fusionRequires:["jjk_yuji","jjk_megumi","jjk_nobara","jjk_mahito","jjk_gojo","jjk_nanami","jjk_todo","jjk_geto","jjk_haibara","jjk_ino","jjk_mei_mei","jjk_ijichi","jjk_cursed_spirit"], fusionType:"yuji_modulo"},
+
 
   // ★★★★ Legendary
   {id:"jjk_nanami", name:"เคนโตะ นานามิ — นักเวทมนตร์เกรด 1", emoji:"👔⚔️", rarity:"legendary", element:"neutral",
@@ -2582,6 +2590,19 @@ function doAction(actor, allies, enemies, addLog, capturedUnits){
       });
       break;
     }
+    case 'modulo_resonance_aoe':{
+      // ยูจิ โมดูโล UR — Modulo Resonance: รวมพลังทุกจิตวิญญาณ AoE เจาะเกราะเต็ม + ทำลาย Shield + Instant Kill
+      addLog(`🩸♾️💥 Modulo Resonance — เสียงสะท้อนของทุกจิตวิญญาณปะทุพร้อมกัน!!!`);
+      aliveEnemies.forEach(t=>{
+        t.shield = 0; t.maxshield = 0;
+        dealDamage(t, dmgMul, 1.0);
+        if(Math.random() < 0.35 && t.hp > 0){
+          t.hp = 0; t.alive = false;
+          addLog(`☠️ ${t.name} ถูกคลื่นพลังสมดุลทำลายล้าง! (Instant Kill)`);
+        }
+      });
+      break;
+    }
     default:{
       const target = aliveEnemies[Math.floor(Math.random()*aliveEnemies.length)];
       dealDamage(target, 1.0);
@@ -3438,6 +3459,9 @@ function renderFusionPanel(){
   // Sukuna UR Fusion panel
   renderSukunaFusionPanel(fusionTarget);
 
+  // Yuji Modulo UR Fusion panel
+  renderYujiModuloFusionPanel(fusionTarget);
+
   // Fusion buttons
   const vBtn = panel.querySelector('#fusionVegitoBtn');
   const gBtn = panel.querySelector('#fusionGogetaBtn');
@@ -3724,6 +3748,122 @@ function hasSukunaIngredients(){
 }
 function hasSukuna(){
   return !!state.roster.find(r=>r.heroId==='jjk_sukuna');
+}
+
+/* ============================================================
+   YUJI MODULO UR FUSION SYSTEM — JJK
+   ต้องการตัวละคร JJK ที่หาได้ปกติทั้งหมด 13 ตัว อย่างละ 1
+   ============================================================ */
+function hasYujiModuloIngredients(){
+  return hasAllFusionIngredients(heroDef('jjk_yuji_modulo'));
+}
+function hasYujiModulo(){
+  return !!state.roster.find(r=>r.heroId==='jjk_yuji_modulo');
+}
+
+function renderYujiModuloFusionPanel(container){
+  const oldPanel = document.getElementById('yujiModuloFusionPanel');
+  if(oldPanel) oldPanel.remove();
+
+  const def = heroDef('jjk_yuji_modulo');
+  const ingredientDefs = def.fusionRequires.map(id=>heroDef(id));
+  const canFuse = hasYujiModuloIngredients();
+  const alreadyHas = hasYujiModulo();
+
+  const panel = document.createElement('div');
+  panel.id = 'yujiModuloFusionPanel';
+  panel.className = 'sukuna-fusion-panel';
+  panel.innerHTML = `
+    <h3 style="color:#66ddff; font-size:15px; margin-bottom:4px; text-shadow:0 0 10px rgba(0,180,255,0.9);">
+      🩸♾️ ระบบ Fusion UR — ยูจิ โมดูโล
+    </h3>
+    <div style="display:inline-block; background:linear-gradient(90deg,#0044ff,#00ccff,#ffffff,#0044ff);
+      background-size:200% auto; animation:ur-shine 1.5s linear infinite;
+      color:#001a33; font-size:10px; font-weight:900; padding:2px 10px; border-radius:6px;
+      letter-spacing:2px; margin-bottom:8px;">◆ UR — ULTIMATE RARE ◆</div>
+    <p class="small-muted" style="margin-bottom:10px; font-size:11px; color:#88ccff;">
+      ต้องการ <b style="color:#66ddff;">ตัวละคร JJK ทุกตัวที่หาได้ปกติ รวม 13 ตัว อย่างละ 1</b> ในคลัง
+      <br><span style="color:#ff8888;">⚠️ ทั้ง 13 ตัวจะถูกใช้ไปในการ Fusion (หายจากคลังทั้งหมด)</span>
+    </p>
+
+    <!-- วัตถุดิบ -->
+    <div class="fusion-slot-row" style="flex-wrap:wrap; gap:4px;">
+      ${ingredientDefs.map(d=>{
+        const has = countHeroInRoster(d.id) >= 1;
+        return `
+        <div class="fusion-hero-box ${has?'has':''}" style="padding:4px;">
+          <div style="font-size:20px;">${d.emoji}</div>
+          <div style="font-size:8px; color:${has?'#aef0ff':'#888'};">${d.name.split(' ')[0]}</div>
+        </div>`;
+      }).join('')}
+      <div class="fusion-arrow" style="color:#00ccff;">→</div>
+      <div class="fusion-result-box ${alreadyHas?'':'fusion-locked'}" style="border-color:#00ccff; box-shadow:0 0 12px rgba(0,200,255,0.5);">
+        <div style="font-size:32px;">🩸♾️👊</div>
+        <div style="background:linear-gradient(90deg,#0044ff,#00ccff,#ffffff,#0044ff); background-size:200% auto;
+          animation:ur-shine 1.5s linear infinite; color:#001a33; font-size:9px; font-weight:900;
+          padding:1px 7px; border-radius:5px; margin-top:3px;">UR</div>
+        <div style="font-size:9px; margin-top:3px; color:#88ccff;">ยูจิ โมดูโล</div>
+      </div>
+    </div>
+
+    <!-- Skill preview -->
+    <div style="background:rgba(0,0,0,0.45); border-radius:8px; padding:8px; margin:10px 0; border-left:3px solid #00aaff;">
+      <div style="font-size:11px; font-weight:700; color:#88ccff; margin-bottom:4px;">📖 พลังของยูจิ โมดูโล UR</div>
+      <div style="font-size:10px; color:#aef0ff; margin-bottom:3px;">
+        <b>⚔️ สกิล 1 — Modulo Resonance</b><br>
+        โจมตีศัตรูทั้งหมด 850% ATK เจาะเกราะ 100% ทำลาย Shield ทั้งหมด มีโอกาส Instant Kill 35%!
+      </div>
+      <div style="font-size:10px; color:#aef0ff;">
+        <b>💉 สกิล 2 — Sukuna's Vessel Balance</b><br>
+        [Passive] ฟื้นฟู HP 20% ทุกเทิร์น + ภูมิคุ้มกัน Instant Kill 50% + Active: เพิ่ม ATK ทีม 35% และฮีลทีม 30%
+      </div>
+      <div style="font-size:10px; color:#66ddff; margin-top:4px; font-weight:700;">
+        📊 Stats UR: HP 2,000 | ATK 330 | DEF 140 | SPD 30
+      </div>
+    </div>
+
+    ${alreadyHas
+      ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-bottom:6px;">✅ ยูจิ โมดูโล UR ปลดล็อกแล้ว! Fusion ซ้ำเพื่อเพิ่ม Dupe!</div>
+         <button class="btn" id="yujiModuloFusionBtn" style="width:100%; background:linear-gradient(180deg,#33bbff,#0066cc); color:#fff; box-shadow:0 3px 0 #003366; font-size:14px;"
+           ${!canFuse?'disabled':''}>
+           🩸♾️ YUJI MODULO UR Fusion! ${!canFuse?'(วัตถุดิบไม่ครบ)':'(Dupe เพิ่ม)'}
+         </button>`
+      : `<button class="btn" id="yujiModuloFusionBtn" style="width:100%; background:linear-gradient(180deg,#33bbff,#0066cc); color:#fff; box-shadow:0 3px 0 #003366; font-size:14px;"
+           ${!canFuse?'disabled':''}>
+           🩸♾️ YUJI MODULO UR Fusion! ${!canFuse?'(วัตถุดิบไม่ครบ)':'✨ ปลดล็อกยูจิ โมดูโล UR!'}
+         </button>`
+    }
+    <p class="small-muted" style="margin-top:6px; font-size:10px; text-align:center; color:#5599bb;">
+      ⚠️ ตัวละคร JJK ทั้ง 13 ตัวอย่างละ 1 จะหายจากคลัง | สะสมได้จากตู้ JJK
+    </p>
+  `;
+  container.appendChild(panel);
+
+  const btn = panel.querySelector('#yujiModuloFusionBtn');
+  if(btn) btn.onclick = ()=> doYujiModuloFusion();
+}
+
+function doYujiModuloFusion(){
+  const id = 'jjk_yuji_modulo';
+  const def = heroDef(id);
+  if(!hasYujiModuloIngredients()){ showToast("วัตถุดิบไม่ครบ! ต้องมีตัวละคร JJK ทุกตัวอย่างละ 1 ในคลัง"); return; }
+
+  showConfirm(
+    `ใช้ Fusion สร้าง "${def.emoji} ${def.name}"?\n<b style="color:#ff8888;">ตัวละคร JJK ทั้ง 13 ตัวจะถูกใช้ไปในการหลอมรวม (หายจากคลัง)</b>\nยูจิ โมดูโล UR จะถูกเพิ่มในคลัง!`,
+    ()=>{
+      def.fusionRequires.forEach(heroId=> consumeHero(heroId, 1));
+      const existing = state.roster.find(r=>r.heroId===id);
+      if(existing){
+        existing.dupes++;
+        if(existing.dupes % 3 === 0 && existing.form < def.forms.length-1) existing.form++;
+        showToast(`🩸♾️ ยูจิ โมดูโล UR ได้รับ Dupe! (${existing.dupes} dupes) — พลังเพิ่มขึ้น!`);
+      } else {
+        addStarterHero(id, 0);
+        showToast(`🩸♾️👊 ยูจิ โมดูโล — ราชาแห่งความสมดุล UR ปลดล็อกสำเร็จ!! เพิ่มในทีมทันที!`);
+      }
+      if(activeTab==='fusion') renderFusionTab(); else renderTeam();
+    }
+  );
 }
 
 function renderSukunaFusionPanel(container){
