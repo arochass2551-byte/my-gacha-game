@@ -3738,7 +3738,7 @@ function consumeHero(heroId, needed){
       state.roster.splice(i,1);
       remaining -= available;
     } else {
-      r.dupes -= (remaining - 1);
+      r.dupes -= remaining;
       remaining = 0;
     }
   }
