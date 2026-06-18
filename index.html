@@ -283,6 +283,25 @@
     to{box-shadow:0 0 65px rgba(255,60,60,1), 0 0 95px rgba(180,0,0,0.6), 0 0 130px rgba(255,100,100,0.3);}
   }
 
+  /* HUNTER X HUNTER BANNER */
+  .banner-card.b-hxh{
+    background:linear-gradient(135deg,#040a04,#0e2a0e,#1f5c1f,#5cff5c,#040a04);
+    border:2px solid #4dff4d; box-shadow:0 0 24px rgba(77,255,77,0.8);
+    animation:hxh-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes hxh-glow{
+    from{box-shadow:0 0 18px rgba(77,255,77,0.6);}
+    to{box-shadow:0 0 48px rgba(120,255,120,1), 0 0 70px rgba(0,80,0,0.5);}
+  }
+  .banner-card.b-meruem{
+    background:linear-gradient(135deg,#0a0500,#2a0a00,#5c1400,#ff3300,#0a0500);
+    border:2px solid #ff3300; box-shadow:0 0 28px rgba(255,51,0,0.9);
+    animation:meruem-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes meruem-glow{
+    from{box-shadow:0 0 20px rgba(255,51,0,0.7);}
+    to{box-shadow:0 0 55px rgba(255,80,0,1), 0 0 85px rgba(120,0,0,0.5), 0 0 110px rgba(255,255,255,0.2);}
+  }
 
   /* FUSION SYSTEM */
   .fusion-panel{
@@ -1174,6 +1193,60 @@ const HERO_DB = [
     base:{hp:120, atk:20, def:12, spd:13},
     skill:{name:"Cursed Energy Blast — ระเบิดพลังคำสาป", desc:"โจมตีเดี่ยว 120% ATK + ติดสถานะพิษคำสาป 10%", power:1.2, type:"single_burn", cost:22},
     forms:[{name:"วิญญาณสาปแช่ง เกรด 4", emoji:"👻💜"},{name:"วิญญาณสาปแช่ง เกรด 2", emoji:"👻💜⭐"},{name:"วิญญาณสาปแช่ง พิเศษ", emoji:"👻💜⭐🌑"}]},
+
+  // ---- Hunter x Hunter Banner Heroes (9 ตัว + 1 Mythic เฉพาะตู้เมรุเอม) ----
+  // ★★★★ Legendary
+  {id:"hxh_gon", name:"กอน ฟรีคส์ — นักล่าผู้ตื่นแห่งความโกรธ", emoji:"🎣", rarity:"legendary", element:"fire",
+    base:{hp:370, atk:86, def:36, spd:23},
+    skill:{name:"Jajanken: Rock — หมัดหินอัดพลังเต็มร้อย", desc:"กอนรวบรวมพลังเน็นทั้งหมดส่งหมัดเดียว โจมตีเดี่ยว 320% ATK เจาะเกราะ 35%", power:3.2, type:"single_pen", cost:60},
+    forms:[{name:"กอน ฟรีคส์", emoji:"🎣"},{name:"กอน นักล่าตัวจริง", emoji:"🎣🟢"},{name:"กอน ตื่นแห่งความโกรธ", emoji:"🎣🟢⚡"}]},
+
+  {id:"hxh_killua", name:"คิลวะ โซลดิก — ก็อดสปีด", emoji:"⚡🐱", rarity:"legendary", element:"thunder",
+    base:{hp:330, atk:84, def:30, spd:34},
+    skill:{name:"ก็อดสปีด — ฝ่ามือสายฟ้าพิฆาต", desc:"คิลวะเร่งความเร็วด้วยเน็นสายฟ้าจนเกินขีดจำกัด โจมตี 2 ครั้งรวดเร็ว 170% ATK ต่อครั้ง", power:1.7, type:"double", cost:55},
+    forms:[{name:"คิลวะ โซลดิก", emoji:"⚡🐱"},{name:"คิลวะ ก็อดสปีด", emoji:"⚡🐱💨"},{name:"คิลวะ นักฆ่าสายฟ้าสมบูรณ์", emoji:"⚡🐱💨👑"}]},
+
+  {id:"hxh_kurapika", name:"คุราพิกะ — ตาสีเลือดแห่งการพิพากษา", emoji:"⛓️", rarity:"legendary", element:"light",
+    base:{hp:320, atk:82, def:34, spd:24},
+    skill:{name:"โซ่กักขัง — ดวงตาสีเลือด", desc:"คุราพิกะปลุกตาสีแดงและล่ามโซ่ศัตรู โจมตีเดี่ยว 310% ATK เจาะเกราะ 50%", power:3.1, type:"single_pen", cost:62},
+    forms:[{name:"คุราพิกะ นักล่าสายโซ่", emoji:"⛓️"},{name:"คุราพิกะ ตาสีเลือด", emoji:"⛓️👁️🔴"},{name:"คุราพิกะ โซ่พิพากษาสมบูรณ์", emoji:"⛓️👁️🔴⚖️"}]},
+
+  {id:"hxh_hisoka", name:"ฮิโซกะ โมโรว์ — บันจี้กัมมรณะ", emoji:"🃏", rarity:"legendary", element:"dark",
+    base:{hp:340, atk:90, def:28, spd:27},
+    skill:{name:"บันจี้กัม — ยางเหนียวมรณะ", desc:"ฮิโซกะยืดหยุ่นพลังเน็นเป็นยางดักจับศัตรู โจมตีเดี่ยว 330% ATK และดูดเลือด 20%", power:3.3, type:"single_lifesteal", cost:60},
+    forms:[{name:"ฮิโซกะ โมโรว์", emoji:"🃏"},{name:"ฮิโซกะ ไพ่ปีศาจ", emoji:"🃏🔮"},{name:"ฮิโซกะ บันจี้กัมสมบูรณ์", emoji:"🃏🔮🩸"}]},
+
+  {id:"hxh_chrollo", name:"โครโร่ ลูซิลฟร์ — หัวหน้าโจรปีศาจ", emoji:"📖🕷️", rarity:"legendary", element:"dark",
+    base:{hp:310, atk:78, def:32, spd:22},
+    skill:{name:"Skill Hunter — หนังสือขโมยพลังต้องห้าม", desc:"โครโร่ขโมยทักษะศัตรู โจมตีศัตรูทั้งหมด 150% ATK และลด ATK ศัตรูทั้งหมด 20% 2 เทิร์น", power:1.5, type:"aoe_drain", cost:58},
+    forms:[{name:"โครโร่ ลูซิลฟร์", emoji:"📖🕷️"},{name:"โครโร่ หัวหน้าโจรปีศาจ", emoji:"📖🕷️🌑"},{name:"โครโร่ หนังสือต้องห้ามสมบูรณ์", emoji:"📖🕷️🌑✨"}]},
+
+  {id:"hxh_netero", name:"เนเทโร่ — ประธานสมาคมฮันเตอร์", emoji:"🙏", rarity:"legendary", element:"neutral",
+    base:{hp:360, atk:80, def:40, spd:25},
+    skill:{name:"100 ปาง เจ้าแม่กวนอิมพันมือ", desc:"เนเทโร่อธิษฐานพลังศรัทธาทั้งชีวิต โจมตีศัตรูทั้งหมด 170% ATK เจาะเกราะ 25%", power:1.7, type:"aoe", cost:65},
+    forms:[{name:"เนเทโร่ ประธานสมาคมฮันเตอร์", emoji:"🙏"},{name:"เนเทโร่ พันมือทอง", emoji:"🙏🙌✨"},{name:"เนเทโร่ ซีโร่แฮนด์สมบูรณ์", emoji:"🙏🙌✨💥"}]},
+
+  // ★★★ Epic
+  {id:"hxh_leorio", name:"เลโอริโอ้ พาลาดิไนท์ — นายแพทย์นักล่า", emoji:"💼", rarity:"epic", element:"water",
+    base:{hp:300, atk:62, def:34, spd:17},
+    skill:{name:"หมัดจรวด — นายแพทย์ผู้พิโรธ", desc:"เลโอริโอ้อัดพลังเน็นเข้ากระเป๋าหมัด โจมตีเดี่ยว 230% ATK และฮีลตัวเอง 15%", power:2.3, type:"single_lifesteal", cost:48},
+    forms:[{name:"เลโอริโอ้ พาลาดิไนท์", emoji:"💼"},{name:"เลโอริโอ้ นายแพทย์นักล่า", emoji:"💼🩺"},{name:"เลโอริโอ้ หมัดจรวดสมบูรณ์", emoji:"💼🩺👊"}]},
+
+  {id:"hxh_biscuit", name:"บิสกี้ ครูเกอร์ — ครูฝึกพันปี", emoji:"🍪", rarity:"epic", element:"earth",
+    base:{hp:340, atk:58, def:42, spd:16},
+    skill:{name:"ครูฝึกพันปี — ปลดร่างแท้จริง", desc:"บิสกี้ปลดร่างจริงและฮีลทีมทั้งหมด 30% HP", power:0.3, type:"heal_all_buff", cost:55},
+    forms:[{name:"บิสกี้ ครูเกอร์ ร่างเด็ก", emoji:"🍪"},{name:"บิสกี้ ร่างแท้จริง", emoji:"🍪💪"},{name:"บิสกี้ ครูฝึกตำนาน", emoji:"🍪💪⭐"}]},
+
+  {id:"hxh_knuckle", name:"นัคเคิล ไบน์ — จอมหมัดหนี้นรก", emoji:"🥊", rarity:"epic", element:"fire",
+    base:{hp:290, atk:64, def:30, spd:19},
+    skill:{name:"Hakoware — หมัดยืมหนี้นรก", desc:"นัคเคิลส่งหมัดที่สะสมหนี้ โจมตีเดี่ยว 250% ATK เจาะเกราะ 20%", power:2.5, type:"single_pen", cost:50},
+    forms:[{name:"นัคเคิล ไบน์", emoji:"🥊"},{name:"นัคเคิล จอมหมัดหนี้นรก", emoji:"🥊🔥"},{name:"นัคเคิล แชมป์มืดสมบูรณ์", emoji:"🥊🔥👑"}]},
+
+  // ★★★★★ Mythic — ออกเฉพาะตู้เมรุเอมเท่านั้น
+  {id:"hxh_meruem", name:"เมรุเอม — ราชามดประหลาดผู้สมบูรณ์แบบ", emoji:"🐜👑", rarity:"mythic", element:"dark",
+    base:{hp:620, atk:122, def:54, spd:24},
+    skill:{name:"En + Megaton Rock Punch — กษัตริย์ผู้สมบูรณ์แบบ", desc:"เมรุเอมแผ่ En ครอบคลุมสนามรบและทุบด้วยหมัดมหึมา โจมตีศัตรูทั้งหมด 420% ATK เจาะเกราะ 50%!", power:4.2, type:"meteor_aoe", cost:78},
+    forms:[{name:"เมรุเอม ราชามดประหลาด", emoji:"🐜👑"},{name:"เมรุเอม ผู้สมบูรณ์แบบ", emoji:"🐜👑🔥"},{name:"เมรุเอม จอมราชันนิรันดร์", emoji:"🐜👑🔥🌑"}]},
 ];
 
 // ตัวละครจากโคลแลบ (นารูโตะ + มาดาระ) — ออกเฉพาะตู้ของตัวเอง
@@ -1192,7 +1265,9 @@ const DEMON_IDS = ["dm_muzan","dm_kokushibo","dm_doma","dm_akaza","dm_hantengu",
 const OVERLORD_IDS = ["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"];
 // ตัวละคร JJK — ออกเฉพาะตู้ของตัวเอง
 const JJK_IDS = ["jjk_yuji","jjk_megumi","jjk_nobara","jjk_mahito","jjk_gojo","jjk_nanami","jjk_todo","jjk_geto","jjk_haibara","jjk_ino","jjk_mei_mei","jjk_ijichi","jjk_cursed_spirit"];
-const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id) && !OVERLORD_IDS.includes(h.id) && !JJK_IDS.includes(h.id) && h.id !== 'ol_ainz').map(h => h.id);
+// ตัวละคร Hunter x Hunter — ออกเฉพาะตู้ของตัวเอง (เมรุเอม ได้จากตู้เมรุเอมเท่านั้น)
+const HXH_IDS = ["hxh_gon","hxh_killua","hxh_kurapika","hxh_hisoka","hxh_chrollo","hxh_netero","hxh_leorio","hxh_biscuit","hxh_knuckle","hxh_meruem"];
+const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id) && !OVERLORD_IDS.includes(h.id) && !JJK_IDS.includes(h.id) && !HXH_IDS.includes(h.id) && h.id !== 'ol_ainz').map(h => h.id);
 
 // Gacha banners
 const BANNERS = [
@@ -1257,6 +1332,15 @@ const BANNERS = [
    feature:"jjk_gojo", cost:200, costType:"gem",
    pool: ["jjk_gojo","jjk_nanami","jjk_todo","jjk_geto","jjk_yuji","jjk_megumi","jjk_nobara","jjk_haibara","jjk_mei_mei","jjk_ino"],
    rateUp:"jjk_gojo", mythicBanner:true},
+  // ===== HUNTER X HUNTER BANNERS =====
+  {id:"hxh", name:"🎣 ตู้นักล่าผู้กล้า — Hunter x Hunter", cls:"b-hxh", desc:"สุ่มตัวละครอิงพลังเน็นจาก Hunter x Hunter 9 ตัวเท่านั้น! Rate Up: คิลวะ โซลดิก ก็อดสปีด ★★★★",
+   feature:"hxh_killua", cost:180, costType:"gem",
+   pool: ["hxh_gon","hxh_killua","hxh_kurapika","hxh_hisoka","hxh_chrollo","hxh_netero","hxh_leorio","hxh_biscuit","hxh_knuckle"],
+   rateUp:"hxh_killua", mythicBanner:false},
+  {id:"meruem", name:"🐜 ตู้เมรุเอม — ราชามดประหลาดผู้สมบูรณ์แบบ ★★★★★", cls:"b-meruem", desc:"โอกาสได้รับ 'เมรุเอม' ระดับ Mythic ★★★★★ ราชาแห่งมดประหลาดผู้ทรงพลังที่สุด! Rate Up Pity 80 ครั้ง",
+   feature:"hxh_meruem", cost:200, costType:"gem",
+   pool: ["hxh_meruem","hxh_gon","hxh_killua","hxh_kurapika","hxh_hisoka","hxh_chrollo","hxh_netero"],
+   rateUp:"hxh_meruem", mythicBanner:true},
 ];
 
 // Stages: chapters with story / farm / boss
@@ -1467,6 +1551,18 @@ const STAGES = [
   {ch:"🐉 โหมดเรทพิเศษ: ซุคุนะ UR + มโหรากา — ราชาแห่งมิติสิ้นสุด", stages:[
     {id:"raid-sukuna-mahoraga-1", name:"👹🌀 ซุคุนะ UR EVO3 — อัญเชิญมโหรากาแห่งการทำลาย", type:"raid", enemyLv:1200, reward:{gold:300000, exp:150000, gem:15000}, enemies:["jjk_sukuna","jjk_gojo","jjk_megumi"], bossRate:0.02, isMahoragaRaid:true, story:"ซุคุนะในร่างสมบูรณ์ปลดปล่อย Divine General Mahoraga! Eight-Handled Sword Divergent Sila ปรากฏตัวในสนามรบจริง ล้อ Adaptation หมุนวน — ทุกการโจมตีจะถูกปรับตัวและเอาชนะได้! โอกาสดรอป: ⚙️ ล้อมโหรากา 2% + มโหรากา UR 2% (ต้องใช้ Mythic ทั้งทีมเท่านั้น!)"},
     {id:"raid-mahoraga-1", name:"🐉⚙️ มโหรากา — Wheel of Adaptation นิรันดร์", type:"raid", enemyLv:1350, reward:{gold:500000, exp:250000, gem:20000}, enemies:["jjk_mahoraga","jjk_sukuna"], bossRate:0.02, isMahoragaRaid:true, story:"มโหรากาที่ถูกปลดปล่อยออกมาสู่โลกแห่งความเป็นจริง! Wheel of Adaptation หมุนสังหารทุกสิ่งที่ขวางหน้า ไม่มีใครเคยเอาชนะมันได้ในรอบนับพันปี — จนกว่าราชาแห่งคำสาปจะจับมันไว้! โอกาสดรอป: 🐉 มโหรากา UR 2% + ⚙️ ล้อมโหรากา 2% (ด่านที่ยากที่สุดในเกม!)"},
+  ]},
+
+  // =============================================
+  // HUNTER X HUNTER — สนามสอบฮันเตอร์ครั้งที่ 287 (เริ่มต้น)
+  // =============================================
+  {ch:"🎣 บทที่ 32: นักล่าผู้กล้า — สนามสอบฮันเตอร์ครั้งที่ 287", stages:[
+    {id:"32-1", name:"🚢 เรือเฟื่องฟ้า — สู่สนามสอบฮันเตอร์", type:"story", enemyLv:1450, reward:{gold:90000, exp:40000}, enemies:["hxh_leorio","hxh_kurapika"], story:"กอน ฟรีคส์ ออกเดินทางจากเกาะวาเล่เพื่อตามหาพ่อ จิง ฟรีคส์ นักล่าระดับตำนาน บนเรือสู่สนามสอบเขาได้พบคุราพิกะและเลโอริโอ้ ผู้สมัครที่มีเป้าหมายของตัวเองไม่แพ้กัน..."},
+    {id:"32-2", name:"🏝️ เกาะกรีดไอแลนด์ — ฝึกฝนเพื่อความอยู่รอด (ฟาร์ม)", type:"farm", enemyLv:1500, reward:{gold:100000, exp:45000}, enemies:["hxh_knuckle","hxh_biscuit"], story:"นัคเคิลและบิสกี้ ครูฝึกระดับตำนานปรากฏตัวที่เกาะกรีดไอแลนด์ เพื่อฝึกฝนกอนและคิลวะให้แข็งแกร่งขึ้นก่อนเผชิญหน้ากับศัตรูตัวจริง!"},
+    {id:"32-3", name:"🃏 บอส: ฮิโซกะ vs โครโร่ — ใครคือนักล่าที่แข็งแกร่งที่สุด", type:"boss", enemyLv:1600, reward:{gold:130000, exp:60000, gem:7500}, enemies:["hxh_hisoka","hxh_chrollo"], bossRate:0.30, story:"ฮิโซกะ โมโรว์ ไพ่ปีศาจผู้รอคอยวันท้าทายกอน ปรากฏตัวพร้อมโครโร่ ลูซิลฟร์ หัวหน้ากลุ่มโจรปีศาจ! การปะทะครั้งนี้จะพิสูจน์ว่าใครคือนักล่าที่แข็งแกร่งที่สุด!"},
+  ]},
+  {ch:"🐜 โหมดเรท: เมรุเอม — ราชามดประหลาดผู้สมบูรณ์แบบ", stages:[
+    {id:"raid-meruem-1", name:"🐜👑 เมรุเอม — ราชาผู้สมบูรณ์แบบที่สุดในห้วงอวกาศ", type:"raid", enemyLv:1800, reward:{gold:650000, exp:320000, gem:26000}, enemies:["hxh_meruem"], bossRate:0.05, story:"เมรุเอม ราชาแห่งมดประหลาดผู้สมบูรณ์แบบที่สุด ปรากฏตัวพร้อมพลัง En ที่แผ่ครอบคลุมสนามรบทั้งหมด! ไม่มีใครสามารถเข้าใกล้เขาได้โดยไม่ถูกจับได้ทันที โอกาสดรอป 5%"},
   ]},
 ];
 
