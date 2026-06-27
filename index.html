@@ -303,6 +303,35 @@
     to{box-shadow:0 0 55px rgba(255,80,0,1), 0 0 85px rgba(120,0,0,0.5), 0 0 110px rgba(255,255,255,0.2);}
   }
 
+  /* TENSURA BANNER */
+  .banner-card.b-tensura{
+    background:linear-gradient(135deg,#001a1a,#003333,#006666,#00ccaa,#001a1a);
+    border:2px solid #00ffcc; box-shadow:0 0 28px rgba(0,255,204,0.8);
+    animation:tensura-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes tensura-glow{
+    from{box-shadow:0 0 18px rgba(0,200,170,0.6);}
+    to{box-shadow:0 0 52px rgba(0,255,204,1), 0 0 80px rgba(0,180,140,0.5), 0 0 110px rgba(0,255,180,0.2);}
+  }
+  .banner-card.b-tensura-rimuru-ur{
+    background:linear-gradient(135deg,#000a1a,#001433,#002266,#0055cc,#00aaff,#000a1a);
+    border:2px solid #00ccff; box-shadow:0 0 32px rgba(0,200,255,1);
+    animation:rimuru-ur-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes rimuru-ur-glow{
+    from{box-shadow:0 0 22px rgba(0,180,255,0.8), 0 0 40px rgba(0,100,200,0.4);}
+    to{box-shadow:0 0 70px rgba(0,220,255,1), 0 0 110px rgba(0,150,255,0.7), 0 0 150px rgba(100,200,255,0.3);}
+  }
+  .banner-card.b-tensura-milim-ur{
+    background:linear-gradient(135deg,#1a0000,#3a0020,#990033,#ff0066,#ffaacc,#1a0000);
+    border:2px solid #ff3399; box-shadow:0 0 32px rgba(255,51,153,1);
+    animation:milim-ur-glow 2s ease-in-out infinite alternate;
+  }
+  @keyframes milim-ur-glow{
+    from{box-shadow:0 0 22px rgba(255,50,150,0.8);}
+    to{box-shadow:0 0 70px rgba(255,80,180,1), 0 0 110px rgba(200,0,100,0.6), 0 0 150px rgba(255,150,200,0.3);}
+  }
+
   /* FUSION SYSTEM */
   .fusion-panel{
     background:linear-gradient(135deg,#1a0a00,#3a1500,#5a2800); border-radius:14px; padding:14px;
@@ -1247,6 +1276,86 @@ const HERO_DB = [
     base:{hp:620, atk:122, def:54, spd:24},
     skill:{name:"En + Megaton Rock Punch — กษัตริย์ผู้สมบูรณ์แบบ", desc:"เมรุเอมแผ่ En ครอบคลุมสนามรบและทุบด้วยหมัดมหึมา โจมตีศัตรูทั้งหมด 420% ATK เจาะเกราะ 50%!", power:4.2, type:"meteor_aoe", cost:78},
     forms:[{name:"เมรุเอม ราชามดประหลาด", emoji:"🐜👑"},{name:"เมรุเอม ผู้สมบูรณ์แบบ", emoji:"🐜👑🔥"},{name:"เมรุเอม จอมราชันนิรันดร์", emoji:"🐜👑🔥🌑"}]},
+  // =============================================
+  // TENSURA — เกิดใหม่ทั้งที่ก็กลายเป็นสไลม์ไปซะแล้ว
+  // =============================================
+
+  // ★★★★★ Mythic
+  {id:"ts_rimuru_demon", name:"ริมุรุ เทมเปสต์ — เดมอนลอร์ดสไลม์แห่งพายุ", emoji:"🌀💙", rarity:"mythic", element:"wind",
+    base:{hp:620, atk:118, def:52, spd:24},
+    skill:{name:"Unlimited Predator — กลืนกินทุกสิ่งไร้ขีดจำกัด", desc:"ริมุรุปลดปล่อย Great Sage เต็มรูปแบบ! โจมตีศัตรูทั้งหมด 450% ATK เจาะเกราะ 55% กลืนสกิลศัตรู 1 ตัวมาใช้เอง ฮีลทีม 20%!", power:4.5, type:"meteor_aoe", cost:80},
+    forms:[{name:"ริมุรุ สไลม์เดมอนลอร์ด", emoji:"🌀💙"},{name:"ริมุรุ ร่างมนุษย์ Demon Lord", emoji:"🌀💙🏙️"},{name:"ริมุรุ True Demon Lord สมบูรณ์", emoji:"🌀💙👑🌌"}]},
+
+  {id:"ts_veldora", name:"เวลโดรา เทมเปสต์ — มังกรพายุระดับเทพ", emoji:"🐉⚡🌀", rarity:"mythic", element:"thunder",
+    base:{hp:680, atk:125, def:58, spd:20},
+    skill:{name:"Storm of Destruction — พายุแห่งการทำลายล้าง Dragon Nova", desc:"เวลโดรายืนโจมตีในฐานะมังกรพายุระดับเทพ! ปล่อยกระแสพายุสายฟ้า โจมตีศัตรูทั้งหมด 480% ATK เจาะเกราะ 60% ทำให้มึนงงทั้งสนาม 1 เทิร์น!", power:4.8, type:"meteor_aoe", cost:82},
+    forms:[{name:"เวลโดรา ในขวด", emoji:"🐉⚡🌀"},{name:"เวลโดรา ปลดผนึก Rimuru", emoji:"🐉⚡🌀💫"},{name:"เวลโดรา True Dragon เต็มรูปแบบ", emoji:"🐉⚡🌀💫👑"}]},
+
+  // ★★★★ Legendary
+  {id:"ts_shion", name:"ชิออน — เลขาผู้ดูแลริมุรุ", emoji:"🗡️💜", rarity:"legendary", element:"dark",
+    base:{hp:320, atk:76, def:30, spd:18},
+    skill:{name:"Catastrophe — กระบี่สับสับหลายชั้น", desc:"ชิออนปล่อย Unique Skill โจมตีเดี่ยว 360% ATK เจาะเกราะ 40% โจมตีซ้ำ 1 ครั้ง 200% ATK", power:3.6, type:"single_pen", cost:65},
+    forms:[{name:"ชิออน เลขาส่วนตัว", emoji:"🗡️💜"},{name:"ชิออน Commander ทหารเอก", emoji:"🗡️💜⚡"},{name:"ชิออน Shion Battle Form", emoji:"🗡️💜⚡👑"}]},
+
+  {id:"ts_benimaru", name:"เบนิมารุ — จอมนักรบไฟแห่งเทมเปสต์", emoji:"🔥🧡", rarity:"legendary", element:"fire",
+    base:{hp:295, atk:80, def:26, spd:22},
+    skill:{name:"Hellflare — เปลวไฟนรกฟาดทุกสิ่ง", desc:"เบนิมารุปล่อย Unique Skill Hellflame! โจมตีศัตรูทั้งหมด 360% ATK ติดไหม้ 30% 3 เทิร์น เจาะเกราะ 35%", power:3.6, type:"aoe_burn", cost:65},
+    forms:[{name:"เบนิมารุ นักรบไฟ", emoji:"🔥🧡"},{name:"เบนิมารุ Jinrai เต็มรูปแบบ", emoji:"🔥🧡⚡"},{name:"เบนิมารุ Commander of Fire", emoji:"🔥🧡⚡💀"}]},
+
+  {id:"ts_shuna", name:"ชูนะ — เจ้าหญิงหมาป่าศักดิ์สิทธิ์", emoji:"⛩️🌸", rarity:"legendary", element:"light",
+    base:{hp:280, atk:65, def:38, spd:18},
+    skill:{name:"Holy Barrier — เกราะศักดิ์สิทธิ์พิทักษ์", desc:"ชูนะสร้าง Shield ให้ทีมทั้งหมด 25% Max HP ฮีล 20% HP โจมตีเดี่ยว 280% ATK", power:2.8, type:"heal_all_buff", cost:62},
+    forms:[{name:"ชูนะ เจ้าหญิงหมาป่า", emoji:"⛩️🌸"},{name:"ชูนะ Holy Magicule User", emoji:"⛩️🌸✨"},{name:"ชูนะ Narasimha Shrine Maiden", emoji:"⛩️🌸✨👑"}]},
+
+  {id:"ts_souei", name:"โซเอ — หัวหน้าสายข่าวเทมเปสต์", emoji:"🌑🕵️", rarity:"legendary", element:"dark",
+    base:{hp:265, atk:70, def:32, spd:26},
+    skill:{name:"Shadow Step — ก้าวเงาสังหาร", desc:"โซเอซ่อนตัวในเงาโจมตีศัตรู HP น้อยสุด 380% ATK เจาะเกราะ 45% และหายตัว 1 เทิร์น", power:3.8, type:"execute", cost:62},
+    forms:[{name:"โซเอ สายข่าวหมาป่า", emoji:"🌑🕵️"},{name:"โซเอ Commander Shadow", emoji:"🌑🕵️🌀"},{name:"โซเอ Rank-S Spy Master", emoji:"🌑🕵️🌀👑"}]},
+
+  // ★★★ Epic
+  {id:"ts_gobta", name:"โกบตะ — นักรบโกบลินผู้พิเศษ", emoji:"👺💚", rarity:"epic", element:"wind",
+    base:{hp:230, atk:48, def:24, spd:25},
+    skill:{name:"Tumble Escape — หกล้อหนีแบบไม่มีใครคาด", desc:"โกบตะเอาตัวรอดอย่างเหลือเชื่อ! โจมตีเดี่ยว 240% ATK เจาะเกราะ 20% + เพิ่ม SPD ทีม 20%", power:2.4, type:"single_pen", cost:48},
+    forms:[{name:"โกบตะ โกบลินนำพา", emoji:"👺💚"},{name:"โกบตะ Rank-B Adventurer", emoji:"👺💚⭐"},{name:"โกบตะ กัปตันทหารเอก", emoji:"👺💚⭐💪"}]},
+
+  {id:"ts_ranga", name:"รังกะ — หมาป่าพายุผู้พิทักษ์", emoji:"🐺🌩️", rarity:"epic", element:"thunder",
+    base:{hp:310, atk:68, def:36, spd:24},
+    skill:{name:"Thunder Storm Fang — เขี้ยวพายุสายฟ้า", desc:"รังกะพุ่งโจมตีโดยมีสายฟ้ากระทบทุกศัตรู! โจมตีหมู่ 280% ATK มึนงง 25% 1 เทิร์น", power:2.8, type:"aoe", cost:52},
+    forms:[{name:"รังกะ หมาป่าพายุ", emoji:"🐺🌩️"},{name:"รังกะ Tempest Wolf Alpha", emoji:"🐺🌩️👑"},{name:"รังกะ Storm Wolf สมบูรณ์", emoji:"🐺🌩️👑⚡"}]},
+
+  // ★★ Rare
+  {id:"ts_rimuru_slime", name:"ริมุรุ ร่างสไลม์ดั้งเดิม", emoji:"🔵💧", rarity:"rare", element:"water",
+    base:{hp:190, atk:38, def:20, spd:18},
+    skill:{name:"Predator Mimicry — เลียนแบบและกลืนกิน", desc:"ริมุรุกลืนทักษะศัตรู! โจมตีเดี่ยว 200% ATK และฮีลตัวเอง 20%", power:2.0, type:"single_lifesteal", cost:42},
+    forms:[{name:"ริมุรุ สไลม์สีฟ้า", emoji:"🔵💧"},{name:"ริมุรุ สไลม์พิเศษ", emoji:"🔵💧✨"},{name:"ริมุรุ สไลม์ผู้ยิ่งใหญ่", emoji:"🔵💧✨🌀"}]},
+
+  {id:"ts_geld", name:"เกลด์ — ราชาออร์คแห่งเทมเปสต์", emoji:"🐷🛡️", rarity:"rare", element:"earth",
+    base:{hp:260, atk:42, def:32, spd:12},
+    skill:{name:"Orc Lord Shield — โล่ราชาออร์ค", desc:"เกลด์ปกป้องทีม! เพิ่ม DEF ทีมทั้งหมด 25% โจมตีเดี่ยว 180% ATK เจาะเกราะ 15%", power:1.8, type:"single_buff", cost:40},
+    forms:[{name:"เกลด์ ราชาออร์ค", emoji:"🐷🛡️"},{name:"เกลด์ Commander Orc Disaster", emoji:"🐷🛡️💀"},{name:"เกลด์ จอมราชาออร์คสมบูรณ์", emoji:"🐷🛡️💀👑"}]},
+
+  // ★ Common
+  {id:"ts_treyni", name:"เทรย์นี — นางไม้แห่ง Great Forest of Jura", emoji:"🌿🌺", rarity:"common", element:"nature",
+    base:{hp:130, atk:24, def:14, spd:14},
+    skill:{name:"Jura Forest Blessing — พรแห่งป่าจูรา", desc:"ฮีลพันธมิตร 1 ตัว 22% HP + เพิ่ม DEF 10%", power:0.22, type:"heal_single", cost:26},
+    forms:[{name:"เทรย์นี นางไม้", emoji:"🌿🌺"},{name:"เทรย์นี ผู้พิทักษ์ป่า", emoji:"🌿🌺🌳"},{name:"เทรย์นี เทพนางไม้นิรันดร์", emoji:"🌿🌺🌳✨"}]},
+
+  // ★ UR — ริมุรุ UR ได้จาก Fusion (ตัวละครทุกตัวใน Tensura)
+  {id:"ts_rimuru_ur", name:"ริมุรุ เทมเปสต์ — Demon Lord True Form UR", emoji:"🌀💙👑", rarity:"ur", element:"wind",
+    base:{hp:2500, atk:420, def:180, spd:35},
+    skill:{name:"Harvest Festival — งานเก็บเกี่ยวชีวิต ผู้เป็นราชาอสูรสมบูรณ์", desc:"ริมุรุปลดปล่อย Harvest Festival รวมพลังทุกชีวิตที่เคยกลืนกิน! โจมตีศัตรูทั้งหมด 900% ATK เจาะเกราะ 100% ฮีลทีมทั้งหมดเต็ม HP ล้างทุกสถานะแย่ทั้งทีม มีโอกาส Instant Kill 30%!", power:9.0, type:"meteor_aoe", cost:105},
+    skill2:{name:"Great Sage — Raphael ราชาแห่งปัญญา", desc:"[Passive] Great Sage วิเคราะห์ทุกการโจมตีและตอบโต้อัตโนมัติ! ดูดซับดาเมจ 35% ทุกเทิร์น + Active: ริมุรุคัดลอกสกิลศัตรูทั้งหมดในสนาม โจมตีหมู่ 600% ATK เจาะเกราะ 100% ฟื้นฟู HP 25% ทีม", power:6.0, type:"light_team_heal_buff", cost:90},
+    forms:[{name:"ริมุรุ UR — True Demon Lord", emoji:"🌀💙👑"},{name:"ริมุรุ UR — Storm of Tempest", emoji:"🌀💙👑⚡"},{name:"ριมุรุ UR — Rimuru God of Storms", emoji:"🌀💙👑⚡🌌"}],
+    isFusion:true, fusionRequires:["ts_rimuru_demon","ts_veldora","ts_shion","ts_benimaru","ts_shuna","ts_souei","ts_ranga","ts_gobta","ts_geld","ts_rimuru_slime","ts_treyni"], fusionType:"rimuru_ur",
+    isRimuruUR:true},
+
+  // ★ UR — มิลิม UR ได้จาก Raid เฉพาะ
+  {id:"ts_milim_ur", name:"มิลิม นาวะ — เดมอนลอร์ดที่ทรงพลังที่สุด Dragon Nova UR", emoji:"🌸🔥💥", rarity:"ur", element:"fire",
+    base:{hp:2200, atk:460, def:150, spd:40},
+    skill:{name:"Dragon Nova — ระเบิดมังกรเพลิงทำลายล้าง", desc:"มิลิมปลดปล่อยพลัง Drago Nova สูงสุด! ปล่อยระเบิดพลังงานมังกรลูกใหญ่ที่สุดในประวัติศาสตร์ โจมตีศัตรูทั้งหมด 1000% ATK เจาะเกราะ 100% ทำลายทุก Shield และเกราะทันที มีโอกาส Instant Kill 40%!", power:10.0, type:"sukuna_mahoraga_summon", cost:110},
+    skill2:{name:"Yuki-chan Mode — ออรา Dragonoid สมบูรณ์", desc:"[Passive] มิลิมเปลี่ยนเป็นโหมด Dragonoid! เพิ่ม ATK ตัวเอง 50% + ฟื้นฟู HP 25% ทุกเทิร์น + ภูมิคุ้มกัน Instant Kill + Active: มิลิมปลดปล่อยออร่ามังกรทำลายทุกสิ่ง โจมตีหมู่ 700% ATK เจาะเกราะ 100% ลด DEF ศัตรูทั้งหมด 60% 3 เทิร์น", power:7.0, type:"mahoraga_passive_aoe", cost:100},
+    forms:[{name:"มิลิม UR — Demon Lord Milim", emoji:"🌸🔥💥"},{name:"มิลิม UR — Dragon Nova Mode", emoji:"🌸🔥💥🐉"},{name:"มิลิม UR — Ultimate Dragonoid Destroyer", emoji:"🌸🔥💥🐉👑"}],
+    isMilimUR:true},
 ];
 
 // ตัวละครจากโคลแลบ (นารูโตะ + มาดาระ) — ออกเฉพาะตู้ของตัวเอง
@@ -1267,7 +1376,9 @@ const OVERLORD_IDS = ["ol_albedo","ol_shalltear","ol_cocytus","ol_demiurge"];
 const JJK_IDS = ["jjk_yuji","jjk_megumi","jjk_nobara","jjk_mahito","jjk_gojo","jjk_nanami","jjk_todo","jjk_geto","jjk_haibara","jjk_ino","jjk_mei_mei","jjk_ijichi","jjk_cursed_spirit"];
 // ตัวละคร Hunter x Hunter — ออกเฉพาะตู้ของตัวเอง (เมรุเอม ได้จากตู้เมรุเอมเท่านั้น)
 const HXH_IDS = ["hxh_gon","hxh_killua","hxh_kurapika","hxh_hisoka","hxh_chrollo","hxh_netero","hxh_leorio","hxh_biscuit","hxh_knuckle","hxh_meruem"];
-const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id) && !OVERLORD_IDS.includes(h.id) && !JJK_IDS.includes(h.id) && !HXH_IDS.includes(h.id) && h.id !== 'ol_ainz').map(h => h.id);
+// ตัวละคร Tensura — ออกเฉพาะตู้ของตัวเอง (ริมุรุ UR ได้จาก Fusion, มิลิม UR ได้จาก Raid)
+const TENSURA_IDS = ["ts_rimuru_demon","ts_veldora","ts_shion","ts_benimaru","ts_shuna","ts_souei","ts_ranga","ts_gobta","ts_geld","ts_rimuru_slime","ts_treyni"];
+const STANDARD_POOL = HERO_DB.filter(h => !NARUTO_IDS.includes(h.id) && !ONEPIECE_IDS.includes(h.id) && !BLEACH_IDS.includes(h.id) && !DRAGONBALL_IDS.includes(h.id) && !DEMONSLAYER_IDS.includes(h.id) && !DEMON_IDS.includes(h.id) && !OVERLORD_IDS.includes(h.id) && !JJK_IDS.includes(h.id) && !HXH_IDS.includes(h.id) && !TENSURA_IDS.includes(h.id) && h.id !== 'ol_ainz' && h.id !== 'ts_rimuru_ur' && h.id !== 'ts_milim_ur').map(h => h.id);
 
 // Gacha banners
 const BANNERS = [
@@ -1341,6 +1452,15 @@ const BANNERS = [
    feature:"hxh_meruem", cost:200, costType:"gem",
    pool: ["hxh_meruem","hxh_gon","hxh_killua","hxh_kurapika","hxh_hisoka","hxh_chrollo","hxh_netero"],
    rateUp:"hxh_meruem", mythicBanner:true},
+  // ===== TENSURA BANNERS =====
+  {id:"tensura", name:"🌀 ตู้เทมเปสต์ — เกิดใหม่ทั้งที่ก็กลายเป็นสไลม์", cls:"b-tensura", desc:"สุ่มตัวละครอิงพลังจาก Tensura 11 ตัว! Rate Up: ริมุรุ เทมเปสต์ Demon Lord ★★★★★ & เวลโดรา ★★★★★ ⚠️ ริมุรุ UR ได้จาก Fusion เท่านั้น!",
+   feature:"ts_rimuru_demon", cost:200, costType:"gem",
+   pool: ["ts_rimuru_demon","ts_veldora","ts_shion","ts_benimaru","ts_shuna","ts_souei","ts_ranga","ts_gobta","ts_geld","ts_rimuru_slime","ts_treyni"],
+   rateUp:"ts_rimuru_demon", mythicBanner:true, tensuraBanner:true},
+  {id:"tensura_milim", name:"🌸 ตู้มิลิม — เดมอนลอร์ดผู้ทรงพลัง Dragon Nova ★★★★★", cls:"b-tensura-milim-ur", desc:"โอกาสได้รับ 'มิลิม นาวะ' ระดับ Mythic ★★★★★ Dragon Nova! Rate Up Pity 80 ครั้ง ⚠️ มิลิม UR ได้จาก Raid พิเศษเท่านั้น!",
+   feature:"ts_veldora", cost:220, costType:"gem",
+   pool: ["ts_veldora","ts_rimuru_demon","ts_shion","ts_benimaru","ts_shuna","ts_souei","ts_ranga","ts_geld","ts_rimuru_slime"],
+   rateUp:"ts_veldora", mythicBanner:true, tensuraBanner:true},
 ];
 
 // Stages: chapters with story / farm / boss
@@ -1564,6 +1684,27 @@ const STAGES = [
   {ch:"🐜 โหมดเรท: เมรุเอม — ราชามดประหลาดผู้สมบูรณ์แบบ", stages:[
     {id:"raid-meruem-1", name:"🐜👑 เมรุเอม — ราชาผู้สมบูรณ์แบบที่สุดในห้วงอวกาศ", type:"raid", enemyLv:1800, reward:{gold:650000, exp:320000, gem:26000}, enemies:["hxh_meruem"], bossRate:0.05, story:"เมรุเอม ราชาแห่งมดประหลาดผู้สมบูรณ์แบบที่สุด ปรากฏตัวพร้อมพลัง En ที่แผ่ครอบคลุมสนามรบทั้งหมด! ไม่มีใครสามารถเข้าใกล้เขาได้โดยไม่ถูกจับได้ทันที โอกาสดรอป 5%"},
   ]},
+
+  // =============================================
+  // TENSURA — เกิดใหม่ทั้งที่ก็กลายเป็นสไลม์ไปซะแล้ว
+  // =============================================
+  {ch:"🌀 บทที่ 33: ป่าจูรา — กำเนิดสไลม์ผู้ยิ่งใหญ่", stages:[
+    {id:"33-1", name:"🔵 ถ้ำแห่งป่าจูรา — สไลม์ตื่นแล้ว", type:"story", enemyLv:1900, reward:{gold:120000, exp:55000}, enemies:["ts_rimuru_slime","ts_gobta"], story:"ซาตาอุ มิคามิ พนักงานออฟฟิศธรรมดาถูกแทงตายและเกิดใหม่เป็นสไลม์ในโลกแฟนตาซี! เขาพบกับเวลโดรา มังกรพายุที่ถูกผนึกในถ้ำ ทั้งสองกลายเป็นเพื่อนและริมุรุรับชื่อ 'เทมเปสต์' จากมังกรนิรันดร์!"},
+    {id:"33-2", name:"👺 หมู่บ้านโกบลิน — สร้างบ้านสร้างชาติ (ฟาร์ม)", type:"farm", enemyLv:1950, reward:{gold:130000, exp:58000}, enemies:["ts_gobta","ts_ranga","ts_geld"], story:"ริมุรุช่วยเหลือหมู่บ้านโกบลินจากการโจมตีของหมาป่าพายุ และตั้งชื่อให้ทั้งสองฝ่าย นี่คือจุดเริ่มต้นของอาณาจักรเทมเปสต์ที่จะยิ่งใหญ่ที่สุดในโลก!"},
+    {id:"33-3", name:"🐉💙 บอส: เวลโดรา — มังกรพายุปลดผนึก!", type:"boss", enemyLv:2000, reward:{gold:180000, exp:82000, gem:9500}, enemies:["ts_veldora","ts_rimuru_demon"], bossRate:0.28, story:"ริมุรุกลืน Imaginary Room ของเวลโดรา วิเคราะห์ผนึก Hero เปิดทางให้เวลโดราปลดปล่อยตัวเองออกมา! สายสัมพันธ์ระหว่างริมุรุและเวลโดราเจิดจรัสขึ้นสู่ท้องฟ้า!"},
+  ]},
+  {ch:"🌀 บทที่ 34: กำเนิดอาณาจักร — เดมอนลอร์ดคนแรก", stages:[
+    {id:"34-1", name:"⛩️ พิธีสาบาน — เทมเปสต์ผงาด", type:"story", enemyLv:2050, reward:{gold:140000, exp:62000}, enemies:["ts_shion","ts_benimaru","ts_shuna"], story:"ริมุรุอ่านรายชื่อผู้เสียชีวิต 10,000 คนและปฏิบัติพิธีศพพร้อมปลดปล่อย Harvest Festival! ริมุรุข้ามขีดจำกัดมนุษย์กลายเป็น True Demon Lord คนล่าสุด!"},
+    {id:"34-2", name:"🌸🔥 ฝ่าพวกมาโซค — ทีมเทมเปสต์สู้เต็มกำลัง (ฟาร์ม)", type:"farm", enemyLv:2100, reward:{gold:155000, exp:70000}, enemies:["ts_shion","ts_benimaru","ts_souei"], story:"ศัตรูจากหลายชาติบุกโจมตีเทมเปสต์ ชิออน เบนิมารุ และโซเอนำทัพป้องกันอาณาจักร แสดงให้เห็นพลังของสายเลือดนักรบแท้จริง!"},
+    {id:"34-3", name:"🌀👑 บอส: ริมุรุ — True Demon Lord ผงาด", type:"boss", enemyLv:2200, reward:{gold:220000, exp:100000, gem:12000}, enemies:["ts_rimuru_demon","ts_veldora","ts_shion"], bossRate:0.20, story:"ริมุรุ True Demon Lord ปลดปล่อยพลัง Predator เต็มรูปแบบ! ทุกสิ่งที่เขาเคยกลืนกินหลั่งไหลออกมาเป็นพลังมหาศาล Raphael ระดับเซราฟีมตื่นขึ้น! นี่คือการเกิดของราชาอสูรแห่งเทมเปสต์!"},
+  ]},
+  {ch:"🌀 โหมดพิเศษ: Fusion — ริมุรุ UR True Demon Lord สมบูรณ์", stages:[
+    {id:"raid-rimuru-1", name:"🌀💙 ริมุรุ — Harvest Festival พลังสูงสุด", type:"raid", enemyLv:2300, reward:{gold:280000, exp:130000, gem:16000}, enemies:["ts_rimuru_demon","ts_veldora"], bossRate:0.04, isFusionRaid:true, story:"ริมุรุ True Demon Lord เต็มกำลัง! ปล่อยพลัง Harvest Festival ทำลายล้างทุกสิ่ง ต้องการทีม Mythic เท่านั้น! โอกาสดรอป: 💙 คริสตัลสไลม์ 4% (ใช้เปิดล็อค Fusion ริมุรุ UR!)"},
+  ]},
+  {ch:"🌸🔥 โหมดเรทพิเศษ: มิลิม — Dragon Nova เดมอนลอร์ดสูงสุด UR", stages:[
+    {id:"raid-milim-1", name:"🌸🔥 มิลิม นาวะ — Dragon Nova ระเบิดมิติ", type:"raid", enemyLv:2500, reward:{gold:400000, exp:200000, gem:22000}, enemies:["ts_veldora"], bossRate:0.03, story:"มิลิม นาวะ เดมอนลอร์ดที่ทรงพลังที่สุดในโลก ปล่อยพลัง Dragon Nova! ระเบิดพลังงานมังกรขนาดมหึมาถล่มทุกสิ่ง เธอคือ Dragonoid แท้จริงลูกสาวของมังกรระดับเทพ! โอกาสดรอป: 🌸 คริสตัลมิลิม UR 3%"},
+    {id:"raid-milim-2", name:"🌸🔥💥 มิลิม UR — Dragonoid Mode สมบูรณ์", type:"raid", enemyLv:2800, reward:{gold:700000, exp:350000, gem:35000}, enemies:["ts_veldora","ts_rimuru_demon"], bossRate:0.02, story:"มิลิม UR ปลดปล่อยโหมด Dragonoid สมบูรณ์แบบ! Dragon Nova ระเบิดพร้อมกันทุกทิศทาง ไม่มีสิ่งมีชีวิตใดในจักรวาลที่จะทนพลังนี้ได้! ด่านที่ยากที่สุดใน Tensura! โอกาสดรอป: 🌸 มิลิม UR 2% + คริสตัลมิลิม 2% (ต้องการทีม Mythic เต็มทีม!)"},
+  ]},
 ];
 
 // Special repeatable farming stages (always unlocked, for resource grinding)
@@ -1595,6 +1736,10 @@ const EQUIP_DB = [
   {id:"sukuna_finger", name:"🩸 นิ้วซุคุนะ — ชิ้นส่วนคำสาป 1,000 ปี", emoji:"🩸👹", slot:"material", bonus:{}, rarity:"mythic", isSukunaFinger:true},
   // ล้อมโหรากา — วัตถุดิบหายากสุด ใช้สำหรับ EVO3 ซุคุนะ UR เท่านั้น (ดรอปจาก raid-mahoraga-1 เท่านั้น 2%)
   {id:"mahoraga_wheel", name:"⚙️ ล้อ Adaptation มโหรากา — Wheel of Divergent Sila", emoji:"⚙️🌀🐉", slot:"material", bonus:{}, rarity:"mythic", isMahorakaWheel:true},
+  // คริสตัลสไลม์ — วัตถุดิบสำหรับ Fusion ริมุรุ UR (ดรอปจาก raid-rimuru-1 เท่านั้น 4%)
+  {id:"slime_crystal", name:"💙 คริสตัลสไลม์ — พลังแห่ง Harvest Festival", emoji:"💙🌀", slot:"material", bonus:{}, rarity:"mythic", isSlimeCrystal:true},
+  // คริสตัลมิลิม — วัตถุดิบสำหรับดรอป มิลิม UR (ดรอปจาก raid-milim-1 3%)
+  {id:"milim_crystal", name:"🌸 คริสตัลมิลิม — Dragon Nova Fragment", emoji:"🌸🔥", slot:"material", bonus:{}, rarity:"mythic", isMilimCrystal:true},
 ];
 
 /* ---------- GAME STATE (in-memory, resets on reload) ---------- */
@@ -3558,6 +3703,9 @@ function renderFusionPanel(){
   // Yuji Modulo UR Fusion panel
   renderYujiModuloFusionPanel(fusionTarget);
 
+  // Rimuru UR Fusion panel
+  renderRimuruURFusionPanel(fusionTarget);
+
   // Fusion buttons
   const vBtn = panel.querySelector('#fusionVegitoBtn');
   const gBtn = panel.querySelector('#fusionGogetaBtn');
@@ -3622,6 +3770,107 @@ function doYoriichiFusion(){
     }
     if(activeTab==='fusion') renderFusionTab(); else renderTeam();
   });
+}
+
+/* ============================================================
+   TENSURA FUSION — ริมุรุ UR
+   ============================================================ */
+function hasRimuruURIngredients(){
+  const def = heroDef('ts_rimuru_ur');
+  return def.fusionRequires.every(id => !!state.roster.find(r=>r.heroId===id));
+}
+function hasSlimeCrystal(){
+  return (state.inventory['slime_crystal']||0) > 0;
+}
+function hasRimuruUR(){
+  return !!state.roster.find(r=>r.heroId==='ts_rimuru_ur');
+}
+
+function renderRimuruURFusionPanel(container){
+  const oldPanel = document.getElementById('rimuruURFusionPanel');
+  if(oldPanel) oldPanel.remove();
+
+  const def = heroDef('ts_rimuru_ur');
+  const ingredientDefs = def.fusionRequires.map(id=>heroDef(id));
+  const hasIngredients = hasRimuruURIngredients();
+  const hasCrystal = hasSlimeCrystal();
+  const canFuse = hasIngredients && hasCrystal;
+  const alreadyHas = hasRimuruUR();
+  const crystalCount = state.inventory['slime_crystal']||0;
+
+  const panel = document.createElement('div');
+  panel.id = 'rimuruURFusionPanel';
+  panel.style.cssText = `
+    background:linear-gradient(135deg,#000a1a,#001433,#002266,#0055cc,#000a1a);
+    border-radius:14px; padding:14px; border:2px solid #00ccff;
+    box-shadow:0 0 30px rgba(0,200,255,0.7); margin:16px 0;
+    animation:rimuru-ur-glow 2s ease-in-out infinite alternate;
+  `;
+  panel.innerHTML = `
+    <h3 style="color:#88eeff; font-size:15px; margin-bottom:4px; text-shadow:0 0 10px rgba(0,180,255,0.8);">
+      🌀💙 ระบบ Fusion — ริมุรุ เทมเปสต์ UR True Demon Lord
+    </h3>
+    <p class="small-muted" style="margin-bottom:10px; font-size:11px; color:#66ccdd;">
+      ต้องการตัวละคร Tensura ทั้ง 11 ตัว ในคลังพร้อมกัน + <b style="color:#88eeff;">💙 คริสตัลสไลม์ (ดรอปจาก Raid ริมุรุ 4%)</b> 1 ชิ้น!
+      <span style="color:#ff8888;">⚠️ ตัวละครทั้งหมดจะถูกใช้ไปในการหลอมรวม</span>
+    </p>
+    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:6px; margin:10px 0;">
+      ${ingredientDefs.map(d=>{
+        const owns = !!state.roster.find(r=>r.heroId===d.id);
+        return `<div class="ainz-goat-card" style="${owns?'border-color:#00ccff;':'opacity:0.4;'}">
+          <div style="font-size:20px;">${d.emoji}</div>
+          <div style="font-size:8px; color:${owns?'#88eeff':'#888'};">${d.name.split('—')[0].trim().split(' ')[0]}</div>
+          ${owns?'<div style="font-size:8px; color:#9dff9d;">✓</div>':''}
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="text-align:center; margin:8px 0;">
+      <span style="font-size:12px; color:${hasCrystal?'#88eeff':'#888'};">
+        💙 คริสตัลสไลม์: ${crystalCount} / 1 ${hasCrystal?'✓':'✗'}
+      </span>
+    </div>
+    <div style="font-size:11px; color:${hasIngredients&&hasCrystal?'#9dff9d':'#ff8888'}; text-align:center; margin-bottom:8px;">
+      ${canFuse ? '✅ พร้อม Fusion ริมุรุ UR!' : `❌ ยังขาด: ${!hasIngredients?'ตัวละคร Tensura ':''}${!hasCrystal?'💙 คริสตัลสไลม์':''}`}
+    </div>
+    ${alreadyHas
+      ? `<div style="color:#9dff9d; font-size:11px; text-align:center; margin-bottom:6px;">✅ ริมุรุ UR ปลดล็อกแล้ว! ฟิวชั่นซ้ำได้เพื่อเพิ่ม Dupe</div>
+        <button class="btn" id="fusionRimuruURBtn" style="width:100%; background:linear-gradient(180deg,#88eeff,#0055cc); color:#001a33;"
+          ${!canFuse ? 'disabled' : ''}>
+          🌀 Harvest Festival Fusion! (Dupe เพิ่ม)
+        </button>`
+      : `<button class="btn" id="fusionRimuruURBtn" style="width:100%; background:linear-gradient(180deg,#88eeff,#0055cc); color:#001a33; margin-top:6px;"
+          ${!canFuse ? 'disabled' : ''}>
+          🌀 Harvest Festival Fusion! (ปลดล็อก ริมุรุ UR)
+        </button>`
+    }
+  `;
+  container.appendChild(panel);
+
+  const btn = panel.querySelector('#fusionRimuruURBtn');
+  if(btn) btn.onclick = ()=>{
+    const d = heroDef('ts_rimuru_ur');
+    showConfirm(`ใช้ Fusion สร้าง "${d.emoji} ${d.name}"?\n<b style="color:#ff6666;">ตัวละคร Tensura ทั้ง 11 ตัว + คริสตัลสไลม์ จะถูกใช้ไป (หายจากคลัง)</b>`, ()=>{
+      d.fusionRequires.forEach(heroId=>{
+        const idx = state.roster.findIndex(r=>r.heroId===heroId);
+        if(idx !== -1){
+          const uid = state.roster[idx].uid;
+          for(let i=0;i<state.team.length;i++){ if(state.team[i]===uid) state.team[i]=null; }
+          state.roster.splice(idx,1);
+        }
+      });
+      state.inventory['slime_crystal'] = Math.max(0,(state.inventory['slime_crystal']||0)-1);
+      const existing = state.roster.find(r=>r.heroId==='ts_rimuru_ur');
+      if(existing){
+        existing.dupes++;
+        if(existing.dupes % 3 === 0 && existing.form < d.forms.length-1) existing.form++;
+        showToast(`🌀 ริมุรุ UR ได้รับ Dupe! (${existing.dupes} dupes)`);
+      } else {
+        addStarterHero('ts_rimuru_ur', 0);
+        showToast(`🌟✨ ${d.emoji} ริมุรุ UR True Demon Lord ปลดล็อกสำเร็จ!`);
+      }
+      if(activeTab==='fusion') renderFusionTab(); else renderTeam();
+    });
+  };
 }
 
 /* ============================================================
